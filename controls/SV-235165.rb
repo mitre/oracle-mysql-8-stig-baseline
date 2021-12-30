@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235165' do
   title "Database software, including MySQL Database Server 8.0 configuration
 files, must be stored in dedicated directories, or DASD pools (remove),
@@ -57,7 +55,7 @@ length(t1.variable_path) > 0;
 in files dedicated directories separate from the host os or other applications,
 this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Install all applications on directories separate from the DBMS software
 library directory. Relocate any directories or reinstall other application
 software that currently shares the DBMS software library directory.
@@ -77,5 +75,41 @@ configuration file.
   tag fix_id: 'F-38347r623616_fix'
   tag cci: ['CCI-001499']
   tag nist: ['CM-5 (6)']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_directory_variables = %(
+  show variables 
+  where
+     variable_name like '%dir%';
+  )
+
+  query_configuration_variables = %(
+  SELECT
+     t1.*,
+     VARIABLE_VALUE 
+  FROM
+     performance_schema.variables_info t1 
+     JOIN
+        performance_schema.global_variables t2 
+        ON t2.VARIABLE_NAME = t1.VARIABLE_NAME 
+  where
+     length(t1.variable_path) > 0;
+   )
+
+
+  describe "Review the MySQL Database Server 8.0  software library directory and note
+other root directories located on the same disk directory or any subdirectories.
+
+    If any non-MySQL Database Server 8.0 software directories exist on the
+datadir, basedir, or other non tmpdir directories, examine or investigate their
+use.\n#{sql_session.query(query_directory_variables).output}" do
+    skip
+  end
+
+  describe "Manually review result of VARIABLE_PATH shows that configuration values are not stored
+in files dedicated directories separate from the host os or other applications,
+this is a finding.\n#{sql_session.query(query_configuration_variables).output}" do
+    skip
+  end
+end

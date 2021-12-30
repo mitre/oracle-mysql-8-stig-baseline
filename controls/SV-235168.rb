@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235168' do
   title "The MySQL Database Server 8.0 must prohibit user installation of logic
 modules (stored procedures, functions, triggers, views, etc.) without explicit
@@ -60,7 +58,7 @@ specified object or type, this is a finding.
 
     If any user or role membership is not authorized, this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     MySQL requires users (other than root) to be explicitly granted the CREATE
 ROUTINE privilege in order to install logical modules.
 
@@ -78,5 +76,43 @@ of CREATE ROUTINE.
   tag fix_id: 'F-38350r623625_fix'
   tag cci: ['CCI-001812']
   tag nist: ['CM-11 (2)']
-end
 
+  mysql_administrative_users = input('mysql_administrative_users')
+
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_users = %(
+  SELECT
+     user.Host,
+     user.User 
+  FROM
+     mysql.user 
+  where
+     Create_routine_priv = 'Y' 
+     OR Alter_routine_priv = 'Y';
+  )
+
+  query_schema_permissions = %(
+  SELECT
+     db.Host,
+     db.User,
+     db.Db 
+  FROM
+     mysql.db 
+  where
+     db.Create_routine_priv = 'Y' 
+     OR db.Alter_routine_priv = 'Y';
+  )
+
+  describe "List of authorized to create, alter,
+or replace stored procedures and functions." do
+    subject { sql_session.query(query_users).results.column('user') }
+    it { should be_in mysql_administrative_users }
+  end
+
+  describe "List of users or role permissions returned are authorized to modify the
+specified object or type." do
+    subject { sql_session.query(query_schema_permissions).results.column('user') }
+    it { should be_in mysql_administrative_users }
+  end
+end

@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235110' do
   title "The MySQL Database Server 8.0 must generate audit records when
 unsuccessful attempts to access categories of information (e.g., classification
@@ -113,7 +111,7 @@ finding.
 \"audit_select_attempt\", \"message\": \" H level sec data was accessed\",
 \"map\": { \"FOR \": \"fred\" } } },
   "
-  desc  'fix', "
+  desc 'fix', "
     If currently required, configure the MySQL Database Server with views that
 use selects that call audit_api_message_emit_udf() function to produce audit
 records when selection of categories of information occurs.
@@ -136,5 +134,111 @@ records when selection of categories of information occurs.
   tag fix_id: 'F-38292r623451_fix'
   tag cci: ['CCI-000172']
   tag nist: ['AU-12 c']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  audit_log_plugin = %(
+  SELECT
+     PLUGIN_NAME,
+     plugin_status
+  FROM
+     INFORMATION_SCHEMA.PLUGINS
+  WHERE
+     PLUGIN_NAME LIKE 'audit_log' ;
+  )
+
+  audit_log_plugin_status = sql_session.query(audit_log_plugin)
+
+  query_audit_log_filter = %(
+  SELECT
+     audit_log_filter.NAME,
+     audit_log_filter.FILTER
+  FROM
+     mysql.audit_log_filter;
+  )
+
+  audit_log_filter_entries = sql_session.query(query_audit_log_filter)
+
+  query_audit_log_user = %(
+  SELECT
+     audit_log_user.USER,
+     audit_log_user.HOST,
+     audit_log_user.FILTERNAME
+  FROM
+     mysql.audit_log_user;
+  )
+
+  audit_log_user_entries = sql_session.query(query_audit_log_user)
+
+  # Following code design will allow for adaptive tests in this partially automatable control
+  # If ANY of the automatable tests FAIL, the control will report automated statues
+  # If ALL automatable tests PASS, MANUAL review statuses are reported to ensure full compliance
+
+  if !audit_log_plugin_status.results.column('plugin_status').join.eql?('ACTIVE') or
+     audit_log_filter_entries.results.empty? or
+     audit_log_user_entries.results.empty?
+
+    describe 'Audit Log Plugin status' do
+      subject { audit_log_plugin_status.results.column('plugin_status') }
+      it { should cmp 'ACTIVE' }
+    end
+
+    describe 'List of entries in Table: audit_log_filter' do
+      subject { audit_log_filter_entries.results }
+      it { should_not be_empty }
+    end
+
+    describe 'List of entries in Table: audit_log_user' do
+      subject { audit_log_user_entries.results }
+      it { should_not be_empty }
+    end
+  end
+
+  describe "Manually validate `audit_log` plugin is active:\n #{audit_log_plugin_status.output}" do
+    skip
+  end
+  describe "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}" do
+    skip
+  end
+  describe "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}" do
+    skip
+  end
+  describe "Manually validate that required audit logs are generated when the following query is executed:
+  CREATE TABLE `test_trigger`.`info_cat_test` ( `id` INT NOT NULL, `name` VARCHAR(20) NULL, `desc` VARCHAR(20) NULL, `sec_level` CHAR(1) NULL, PRIMARY KEY (`id`));
+  INSERT INTO
+     `test_trigger`.`info_cat_test` (`id`, `name`, `desc`, `sec_level`) 
+  VALUES
+     (
+        '1', 'fred', 'engineer', 'H'
+     )
+  ;
+  INSERT INTO
+     `test_trigger`.`info_cat_test` (`id`, `name`, `desc`, `sec_level`) 
+  VALUES
+     (
+        '2', 'jill', 'program manager', 'M'
+     )
+  ;
+  INSERT INTO
+     `test_trigger`.`info_cat_test` (`id`, `name`, `desc`, `sec_level`) 
+  VALUES
+     (
+        '3', 'joe', 'maintenance', 'L'
+     )
+  ;
+
+  Create a view using the where clause similar to that shown in the select. If inappropriate access is attempted, in this case H level, the select statement will write to the Audit log using the emit function.
+
+  SELECT
+     `info_cat_test`.`id`,
+     `info_cat_test`.`name`,
+     `info_cat_test`.`desc`,
+     `info_cat_test`.`sec_level` 
+  FROM
+     `test_trigger`.`info_cat_test` 
+  where
+     IF(`info_cat_test`.`sec_level` = 'H', CAST(audit_api_message_emit_udf('sec_level_H_ATTEMPTED_selected', 'audit_select_attempt', ' H level sec data was accessed', 'FOR ', name ) as CHAR), 'Not Audited') <> 'OK';
+  " do
+    skip
+  end
+end

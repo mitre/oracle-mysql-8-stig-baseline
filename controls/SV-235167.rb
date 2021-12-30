@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235167' do
   title "The MySQL Database Server 8.0 must disable network functions, ports,
 protocols, and services deemed by the organization to be nonsecure, in accord
@@ -59,7 +57,7 @@ VARIABLE_NAME;
     If any ports or protocols are used that are not specifically approved in
 the server documentation, this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Disable each prohibited network function, port, protocol, or service
 prohibited by the PPSM guidance.
 
@@ -95,5 +93,50 @@ setting mysqlx=0 in the MySQL configuration file, or by passing in either
   tag fix_id: 'F-38349r623622_fix'
   tag cci: ['CCI-001762']
   tag nist: ['CM-7 (1) (b)']
-end
 
+  mysql_ports = input('mysql_ports')
+  mysql_sockets = input('mysql_sockets')
+
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_ports = %(
+  SELECT
+     VARIABLE_NAME,
+     VARIABLE_VALUE 
+  FROM
+     performance_schema.global_variables 
+  WHERE
+     VARIABLE_NAME in 
+     (
+        'port',
+        'mysqlx_port',
+        'admin_port'
+     );
+  )
+
+  query_sockets = %(
+  SELECT
+     VARIABLE_NAME,
+     VARIABLE_VALUE 
+  FROM
+     performance_schema.global_variables 
+  where
+     VARIABLE_NAME like '%pipe%' 
+     or VARIABLE_NAME = 'socket' 
+     or VARIABLE_NAME = 'mysqlx_socket';
+  )
+
+  sql_session.query(query_ports).results.rows.each do |row|
+    describe "MySQL Port: #{row['variable_name']}" do
+      subject { row['variable_value'] }
+      it { should cmp mysql_ports[row['variable_name']] }
+    end
+  end
+
+  sql_session.query(query_sockets).results.rows.each do |row|
+    describe "MySQL socket: #{row['variable_name']}" do
+      subject { row['variable_value'] }
+      it { should cmp mysql_sockets[row['variable_name']] }
+    end
+  end
+end

@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235190' do
   title "The MySQL Database Server 8.0 must implement NIST FIPS 140-2 validated
 cryptographic modules to protect unclassified information requiring
@@ -34,7 +32,7 @@ finding.
 no FIPS-specific code other than to specify to OpenSSL the FIPS mode value. The
 exact behavior of FIPS mode for ON or STRICT depends on the OpenSSL version.
   "
-  desc  'fix', "
+  desc 'fix', "
     Implement NIST FIPS 140-2 validated cryptographic modules to provision
 digital signatures.
 
@@ -60,5 +58,17 @@ exact behavior of FIPS mode for ON or STRICT depends on the OpenSSL version.
   tag fix_id: 'F-38372r623691_fix'
   tag cci: ['CCI-002450']
   tag nist: ['SC-13']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_ssl_params = %(
+  SELECT @@ssl_fips_mode;
+  )
+
+  ssl_params = sql_session.query(query_ssl_params).results
+
+  describe '@@ssl_fips_mode' do
+    subject { ssl_params.column('@@ssl_fips_mode').join }
+    it { should match /1|ON/ }
+  end
+end

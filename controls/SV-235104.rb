@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235104' do
   title "The MySQL Database Server 8.0 must allow only the Information System
 Security Manager (ISSM) (or individuals or roles appointed by the ISSM) to
@@ -34,7 +32,7 @@ run this query:
 documented, or the documented audit maintainers do not have permissions, this
 is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Configure the MySQL Database Server 8.0 settings to allow designated
 personnel to select which auditable events are audited.
 
@@ -56,5 +54,26 @@ personnel to select which auditable events are audited.
   tag fix_id: 'F-38286r623433_fix'
   tag cci: ['CCI-000171']
   tag nist: ['AU-12 b']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  audit_admins = input('audit_admins')
+
+  query_audit_admins = %(
+    SELECT
+     * 
+  FROM
+     INFORMATION_SCHEMA.USER_PRIVILEGES 
+  where
+     PRIVILEGE_TYPE in 
+     (
+        'AUDIT_ADMIN',
+        'SUPER'
+     );
+  )
+
+  describe "List of configured audit admins" do
+    subject { sql_session.query(query_audit_admins).results.column('grantee') }
+    it { should match_array audit_admins }
+  end
+end

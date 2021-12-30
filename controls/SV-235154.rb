@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235154' do
   title "The MySQL Database Server 8.0 must maintain the authenticity of
 communications sessions by guarding against man-in-the-middle attacks that
@@ -36,7 +34,7 @@ algorithms.
 
     If ssl_fips_mode is not \"ON\", this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Connect as a mysql administrator
     mysql> set persist require_secure_transport=ON;
 
@@ -56,5 +54,22 @@ algorithms.
   tag fix_id: 'F-38336r623583_fix'
   tag cci: ['CCI-001188']
   tag nist: ['SC-23 (3)']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_ssl_params = %(
+  SELECT @@require_secure_transport,
+         @@ssl_fips_mode;
+  )
+
+  ssl_params = sql_session.query(query_ssl_params).results
+
+  describe '@@ssl_fips_mode' do
+    subject { ssl_params.column('@@ssl_fips_mode').join }
+    it { should match /ON|STRICT/ }
+  end
+  describe '@@require_secure_transport' do
+    subject { ssl_params.column('@@require_secure_transport').join }
+    it { should match /1|ON/ }
+  end
+end

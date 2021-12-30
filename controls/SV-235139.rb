@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235139' do
   title "If passwords are used for authentication, the MySQL Database Server
 8.0 must transmit only encrypted representations of passwords."
@@ -43,7 +41,7 @@ other details:
     If the certificate is not a DoD certificate, or if no certificate is
 listed, this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Configure encryption for transmission of passwords across the network. If
 the database does not provide encryption for logon events natively, employ
 encryption at the OS or network level.
@@ -85,5 +83,38 @@ names as necessary:
   tag fix_id: 'F-38321r623538_fix'
   tag cci: ['CCI-000197']
   tag nist: ['IA-5 (1) (c)']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  dod_appoved_cert_issuer = input('dod_appoved_cert_issuer')
+
+  query_ssl_params = %(
+  SELECT @@ssl_ca,
+         @@ssl_capath,
+         @@ssl_cert,
+         @@ssl_cipher,
+         @@ssl_crl,
+         @@ssl_crlpath,
+         @@ssl_fips_mode,
+         @@ssl_key,
+         @@require_secure_transport,
+         @@datadir;
+  )
+
+  ssl_params = sql_session.query(query_ssl_params).results
+
+  describe '@@require_secure_transport' do
+    subject { ssl_params.column('@@require_secure_transport').join }
+    it { should match /1|ON/ }
+  end
+
+  full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
+  describe "SSL Certificate file: #{full_cert_path}" do
+    subject { file(full_cert_path) }
+    it { should exist }
+  end
+
+  describe x509_certificate(full_cert_path) do
+    its('issuer.CN') { should match dod_appoved_cert_issuer}
+  end
+end

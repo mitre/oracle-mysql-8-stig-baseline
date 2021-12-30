@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235149' do
   title "The MySQL Database Server 8.0 must uniquely identify and authenticate
 non-organizational users (or processes acting on behalf of non-organizational
@@ -41,7 +39,7 @@ individual authentication, this is not a finding.
     If non-organizational users are not uniquely identified and authenticated,
 this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Configure MySQL Database Server 8.0 settings to uniquely identify and
 authenticate all non-organizational users who log on to the system.
 
@@ -59,5 +57,28 @@ documentation to ensure accounts are documented and unique.
   tag fix_id: 'F-38331r623568_fix'
   tag cci: ['CCI-000804']
   tag nist: ['IA-8']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_accounts = %(
+    SELECT
+       host,
+       user 
+    FROM
+       mysql.user 
+    WHERE
+       user not in 
+       (
+          'mysql.infoschema',
+          'mysql.session',
+          'mysql.sys'
+       );
+  )
+
+  accounts = sql_session.query(query_accounts).output
+
+  describe "Manually review MySQL accounts and determine if any are shared accounts and 
+  that they are compliant with the specified requirements.\n#{accounts}" do
+    skip
+  end
+end

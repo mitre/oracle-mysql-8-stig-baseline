@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235123' do
   title "The MySQL Database Server 8.0 must generate audit records when
 categories of information (e.g., classification levels/security levels) are
@@ -24,7 +22,7 @@ audit records are produced when categories of information are deleted.
 
     If they are not produced, this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Deploy a MySQL Database Server 8.0 capable of producing the required audit
 records when categories of information are deleted.
 
@@ -40,5 +38,14 @@ categories of information are deleted.
   tag fix_id: 'F-38305r623490_fix'
   tag cci: ['CCI-000172']
   tag nist: ['AU-12 c']
-end
 
+  describe 'Manually review DBMS documentation to verify that audit records can be produced when
+categories of information are deleted.' do
+    skip
+  end
+
+  describe 'Manually review the DBMS/database security and audit configurations to verify that
+audit records are produced when categories of information are deleted.' do
+    skip
+  end
+end

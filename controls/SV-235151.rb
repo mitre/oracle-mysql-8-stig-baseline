@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235151' do
   title "The MySQL Database Server 8.0 must isolate security functions from
 non-security functions."
@@ -70,7 +68,7 @@ functionality is stored.
     If security-related database objects or code are not kept separate, this is
 a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Check the server documentation, locate security-related database objects
 and code in a separate database, schema, table, or other separate security
 domain from database objects and code implementing application logic.
@@ -99,5 +97,31 @@ security-related objects to provide effective isolation.
   tag fix_id: 'F-38333r623574_fix'
   tag cci: ['CCI-001084']
   tag nist: ['SC-3']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_schemas = %(
+  SELECT
+     SCHEMATA.SCHEMA_NAME 
+  FROM
+     information_schema.SCHEMATA 
+  where
+     SCHEMA_NAME not in 
+     (
+        'mysql',
+        'information_schema',
+        'performance_schema',
+        'sys'
+     );
+  )
+
+  schemas = sql_session.query(query_schemas).output
+
+  describe "Manually review the database structure to determine where security-related
+functionality is stored.
+
+    If security-related database objects or code are not kept separate, this is
+a finding.\n#{schemas}" do
+    skip
+  end
+end

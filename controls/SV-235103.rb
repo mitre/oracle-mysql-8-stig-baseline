@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235103' do
   title "The MySQL Database Server 8.0 must be configured to provide audit
 record generation capability for DoD-defined auditable events within all
@@ -53,7 +51,7 @@ events are being audited by the system.
     If nothing is returned OR the value for audit_log_encryption is not
 \"AES\", this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Deploy a MySQL Database Server 8.0 that supports the DoD minimum set of
 auditable events.
 
@@ -90,5 +88,36 @@ true } }');
   tag fix_id: 'F-38285r623430_fix'
   tag cci: ['CCI-000169']
   tag nist: ['AU-12 a']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  audit_log_plugin = %(
+  SELECT
+     PLUGIN_NAME,
+     plugin_status 
+  FROM
+     INFORMATION_SCHEMA.PLUGINS 
+  WHERE
+     PLUGIN_NAME LIKE 'audit_log' ;
+  )
+
+  audit_log_encryption = %(
+  SELECT
+     VARIABLE_NAME,
+     VARIABLE_VALUE 
+  FROM
+     performance_schema.global_variables 
+  WHERE
+     VARIABLE_NAME LIKE 'audit_log_encryption' ;
+  )
+
+  describe "Audit Log Plugin status" do
+    subject { sql_session.query(audit_log_plugin).results.column('plugin_status') }
+    it { should cmp 'ACTIVE' }
+  end
+
+  describe "audit_log_encryption config" do
+    subject { sql_session.query(audit_log_encryption).results.column('variable_value') }
+    it { should cmp 'AES' }
+  end
+end

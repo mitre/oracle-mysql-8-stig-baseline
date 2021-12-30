@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235148' do
   title "The MySQL Database Server 8.0 must use NIST FIPS 140-2 validated
 cryptographic modules for cryptographic operations."
@@ -37,7 +35,7 @@ this script in the database:
     The result will be either \"ON\" or \"STRICT\". If not, then NIST FIPS
 140-2 validated modules are not being used, and this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Utilize NIST FIPS 140-2 validated cryptographic modules for all
 cryptographic operations.
     See Use MySQL Server OpenSSL FIPS mode. See
@@ -64,5 +62,17 @@ https://dev.mysql.com/doc/refman/8.0/en/fips-mode.html
   tag fix_id: 'F-38330r623565_fix'
   tag cci: ['CCI-000803']
   tag nist: ['IA-7']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_ssl_params = %(
+  SELECT @@ssl_fips_mode;
+  )
+
+  ssl_params = sql_session.query(query_ssl_params).results
+
+  describe '@@ssl_fips_mode' do
+    subject { ssl_params.column('@@ssl_fips_mode').join }
+    it { should match /ON|STRICT/ }
+  end
+end

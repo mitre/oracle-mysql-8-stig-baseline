@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235169' do
   title "The MySQL Database Server 8.0 must enforce access restrictions
 associated with changes to the configuration of the MySQL Database Server 8.0
@@ -58,7 +56,7 @@ persist system variable settings that save to a file named mysqld-auto.cnf
     If the permissions of the mysqld-auto.cnf are more permissive, this is a
 finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Configure the MySQL Database Server 8.0 to enforce access restrictions
 associated with changes to the configuration of the MySQL Database Server 8.0
 or database(s).
@@ -87,5 +85,15 @@ and \"rw r\" to \"640\".
   tag fix_id: 'F-38351r623628_fix'
   tag cci: ['CCI-001813']
   tag nist: ['CM-5 (1)']
-end
 
+  mycnf = input('mycnf')
+  mysqld_auto_cnf = input('mysqld_auto_cnf')
+
+  describe file(mycnf) do
+    it { should_not be_more_permissive_than('0644') }
+  end
+
+  describe file(mysqld_auto_cnf) do
+    it { should_not be_more_permissive_than('0644') }
+  end
+end

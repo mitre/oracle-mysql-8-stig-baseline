@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235140' do
   title "The MySQL Database Server 8.0 must obscure feedback of authentication
 information during the authentication process to protect the information from
@@ -49,7 +47,7 @@ in password.
     Ensure users are trained to use alternatives to command line password
 parameters, if they are not, this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Modify and configure each non-compliant application, tool, or feature
 associated with the MySQL Database Server 8.0/database so that it does not
 display authentication secrets.
@@ -77,5 +75,8 @@ keyrings. Following is an example:
   tag fix_id: 'F-38322r623541_fix'
   tag cci: ['CCI-000206']
   tag nist: ['IA-6']
-end
 
+  describe 'Manually review users are trained to use alternatives to command line password parameters.' do
+    skip
+  end
+end

@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235163' do
   title "The MySQL Database Server 8.0 must limit privileges to change software
 modules, to include stored procedures, functions and triggers, and links to
@@ -34,7 +32,7 @@ table, and UNINSTALL requires DELETE.
     Run the following statement to check for table specific privileges:
     SELECT * FROM information_schema.TABLE_PRIVILEGES where
 (table_schema='mysql' and table_name=`plugin`) or (table_schema='mysql' and
-table_name='component';)
+table_name='component');
 
     If privilege_type is INSERT or DELETE for an unauthorized user, this is a
 finding.
@@ -46,7 +44,7 @@ privilege_type='INSERT' or privilege_type='DELETE';
     If privilege_type is INSERT or DELETE for an unauthorized user, this is a
 finding.
   "
-  desc  'fix', "Remove permissions from users who should not have insert or
+  desc 'fix', "Remove permissions from users who should not have insert or
 update access to the mysql.plugin or mysql.component table."
   impact 0.5
   tag severity: 'medium'
@@ -57,5 +55,49 @@ update access to the mysql.plugin or mysql.component table."
   tag fix_id: 'F-38345r623610_fix'
   tag cci: ['CCI-001499']
   tag nist: ['CM-5 (6)']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_table_privileges = %(
+  SELECT
+     * 
+  FROM
+     information_schema.TABLE_PRIVILEGES 
+  where
+     (
+        table_schema = 'mysql' 
+        and table_name = 'plugin'
+     )
+     or 
+     (
+        table_schema = 'mysql' 
+        and table_name = 'component'
+     );
+  )
+
+  query_privileges = %(
+  SELECT
+     * 
+  FROM
+     information_schema.user_privileges 
+  WHERE
+     privilege_type = 'INSERT' 
+     or privilege_type = 'DELETE';
+  )
+
+  describe 'Manually Review Server documentation to determine the authorized owner and users or
+groups with modify rights for this SQL instance`s binary files. Additionally
+check the owner and users or groups with modify rights for shared software
+library paths on disk.' do
+    skip 
+  end
+
+
+  describe "Manually review table specific privileges.\n#{sql_session.query(query_table_privileges).output}" do
+    skip
+  end
+
+  describe "Manually review INSERT and DELETE privileges.\n#{sql_session.query(query_privileges).output}" do
+    skip
+  end
+end

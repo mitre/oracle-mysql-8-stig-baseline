@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235160' do
   title "The MySQL Database Server 8.0 must protect its audit features from
 unauthorized access."
@@ -34,7 +32,7 @@ could also manipulate logs to hide evidence of malicious activity.
     If unauthorized accounts have these the AUDIT_ADMIN privilege, this is a
 finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Remove audit-related permissions from individuals and roles not authorized
 to have them.
 
@@ -49,5 +47,22 @@ to have them.
   tag fix_id: 'F-38342r623601_fix'
   tag cci: ['CCI-001493']
   tag nist: ['AU-9']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  audit_admins = input('audit_admins')
+
+  query_audit_admins = %(
+  SELECT
+     * 
+  FROM
+     information_schema.user_privileges 
+  WHERE
+     privilege_type = 'AUDIT_ADMIN';
+  )
+
+  describe 'AUDIT_ADMINs defined' do
+    subject { sql_session.query(query_audit_admins).results.column('grantee') }
+    it { should be_in audit_admins }
+  end
+end

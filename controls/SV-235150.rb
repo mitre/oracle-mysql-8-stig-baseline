@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235150' do
   title "The MySQL Database Server 8.0 must separate user functionality
 (including user interface services) from database management functionality."
@@ -60,7 +58,7 @@ and mysql.session, this is a finding.
     If administrator and general user functionality are not separated, this is
 a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Configure MySQL Database Server 8.0 to separate database administration and
 general user functionality.
 
@@ -78,5 +76,93 @@ https://dev.mysql.com/doc/refman/8.0/en/access-control.html.
   tag fix_id: 'F-38332r623571_fix'
   tag cci: ['CCI-001082']
   tag nist: ['SC-2']
-end
 
+  mysql_administrative_users = input('mysql_administrative_users')
+
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_accounts = %(
+  SELECT
+     user,
+     host,
+     'Global Priv',
+     Select_priv,
+     Insert_priv,
+     Update_priv,
+     Delete_priv,
+     Create_priv,
+     Drop_priv,
+     Reload_priv,
+     Shutdown_priv,
+     Process_priv,
+     File_priv,
+     Grant_priv,
+     References_priv,
+     Index_priv,
+     Alter_priv,
+     Show_db_priv,
+     Super_priv,
+     Create_tmp_table_priv,
+     Lock_tables_priv,
+     Execute_priv,
+     Repl_slave_priv,
+     Repl_client_priv,
+     Create_view_priv,
+     Show_view_priv,
+     Create_routine_priv,
+     Alter_routine_priv,
+     Create_user_priv,
+     Event_priv,
+     Trigger_priv,
+     Create_tablespace_priv,
+     Create_role_priv,
+     Drop_role_priv 
+  FROM
+     mysql.user 
+  WHERE
+     'Y' IN 
+     (
+        Select_priv,
+        Insert_priv,
+        Update_priv,
+        Delete_priv,
+        Create_priv,
+        Drop_priv,
+        Reload_priv,
+        Shutdown_priv,
+        Process_priv,
+        File_priv,
+        Grant_priv,
+        References_priv,
+        Index_priv,
+        Alter_priv,
+        Show_db_priv,
+        Super_priv,
+        Create_tmp_table_priv,
+        Lock_tables_priv,
+        Execute_priv,
+        Repl_slave_priv,
+        Repl_client_priv,
+        Create_view_priv,
+        Show_view_priv,
+        Create_routine_priv,
+        Alter_routine_priv,
+        Create_user_priv,
+        Event_priv,
+        Trigger_priv,
+        Create_tablespace_priv,
+        Create_role_priv,
+        Drop_role_priv
+     )
+     AND user not in 
+     (
+        'mysql.infoschema',
+        'mysql.session'
+     );
+     )
+
+  describe 'List of users with Admin privileges' do
+    subject { sql_session.query(query_accounts).results.column('user') }
+    it { should be_in mysql_administrative_users }
+  end
+end

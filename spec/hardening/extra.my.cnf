@@ -1,0 +1,10 @@
+[mysqld]
+ssl_fips_mode=ON
+tls_version='TLSv1.2,TLSv1.3'
+
+early-plugin-load=keyring_file.so
+
+plugin-load-add=audit_log.so
+audit-log=FORCE_PLUS_PERMANENT
+audit-log-format=JSON
+audit-log-encryption=AES

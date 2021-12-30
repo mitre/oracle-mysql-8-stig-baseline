@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235137' do
   title "If Database Management System (DBMS) authentication using passwords is
 employed, the DBMS must enforce the DoD standards for password complexity and
@@ -82,7 +80,7 @@ policies to ensure required password complexity is met.
     If these results do not meet password complexity requirements listed above,
 this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     If the use of passwords is not needed, configure the MySQL Database Server
 8.0 to prevent their use if it is capable of this; if it is not so capable,
 institute policies and procedures to prohibit their use.
@@ -143,5 +141,41 @@ FILE';
   tag fix_id: 'F-38319r623532_fix'
   tag cci: ['CCI-000192']
   tag nist: ['IA-5 (1) (a)']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_component = %(
+  SELECT component_urn
+  FROM   mysql.component
+  GROUP  BY component_urn; 
+  )
+
+  describe "List of installed components" do
+    subject { sql_session.query(query_component).results.column('component_urn') }
+    it { should include 'file://component_validate_password' }
+  end
+
+  query_password_params = %(
+  SELECT variable_name,
+         variable_value
+  FROM   performance_schema.global_variables
+  WHERE  variable_name LIKE 'valid%password%'
+          OR variable_name LIKE 'password_%'
+          OR variable_name LIKE 'default_password_lifetime'; 
+  )
+
+  password_params = sql_session.query(query_password_params).results.rows.map{|x| {x['variable_name']=> x['variable_value']}}.reduce({}, :merge)
+
+  describe "Password requirement:" do
+    subject { password_params }
+    its(['validate_password.check_user_name']) { should cmp 'ON' }
+    its(['validate_password.length']) { should cmp >= 15 }
+    its(['validate_password.mixed_case_count']) { should cmp >= 1 }
+    its(['validate_password.special_char_count']) { should cmp >= 1 }
+    its(['validate_password.number_count']) { should cmp >= 1 }
+    its(['validate_password.policy']) { should cmp 'STRONG' }
+    its(['password_history']) { should cmp >= 5 }
+    its(['password_reuse_interval']) { should cmp >= 365 }
+    its(['default_password_lifetime']) { should cmp >= 180 }
+  end
+end

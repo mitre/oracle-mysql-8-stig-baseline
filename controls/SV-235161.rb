@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235161' do
   title "The MySQL Database Server 8.0 must protect its audit configuration
 from unauthorized modification."
@@ -40,7 +38,7 @@ generators.
 
     If \"audit_log_encryption\" is not set to \"AES\", this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Remove audit-related permissions from individuals and roles not authorized
 to have them.
 
@@ -108,5 +106,51 @@ keyring_oci_management_endpoint=shortAlphaNumericString-management.kms.us-ashbur
   tag fix_id: 'F-38343r623604_fix'
   tag cci: ['CCI-001494']
   tag nist: ['AU-9']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  audit_admins = input('audit_admins')
+
+  query_audit_admins = %(
+  SELECT
+     * 
+  FROM
+     information_schema.user_privileges 
+  WHERE
+     privilege_type = 'AUDIT_ADMIN';
+  )
+
+  query_keyring_plugins = %(
+  SELECT
+     * 
+  FROM
+     information_schema.PLUGINS 
+  where
+     plugin_name like 'keyring%';
+  )
+
+  audit_log_encryption = %(
+  SELECT
+     VARIABLE_NAME,
+     VARIABLE_VALUE 
+  FROM
+     performance_schema.global_variables 
+  WHERE
+     VARIABLE_NAME LIKE 'audit_log_encryption' ;
+  )
+
+  describe 'AUDIT_ADMINs defined' do
+    subject { sql_session.query(query_audit_admins).results.column('grantee') }
+    it { should be_in audit_admins }
+  end
+
+  describe "List of installed keyring plugins" do
+    subject { sql_session.query(query_keyring_plugins).results.column('variable_value') }
+    it { should_not be_empty }
+  end
+
+  describe "audit_log_encryption config" do
+    subject { sql_session.query(audit_log_encryption).results.column('variable_value') }
+    it { should cmp 'AES' }
+  end
+end

@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235098' do
   title "The MySQL Database Server 8.0 must include additional, more detailed,
 organizationally defined information in the audit records for audit events
@@ -43,7 +41,7 @@ the documented requirements.
     If any such requirement is not satisfied by the audit specification(s) (or
 by supplemental, locally-deployed mechanisms), this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Design and deploy an audit configuration that captures all auditable events
 and data items.
 
@@ -68,5 +66,8 @@ organizationally required information.
   tag fix_id: 'F-38280r623415_fix'
   tag cci: ['CCI-000135']
   tag nist: ['AU-3 (1)']
-end
 
+  describe 'Manually validate that documented audit requirements are satisfied.' do
+    skip
+  end
+end

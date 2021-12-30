@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235143' do
   title "Default demonstration and sample databases, database objects, and
 applications must be removed."
@@ -49,7 +47,7 @@ database names:
 
     If any of these databases exist, this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     MySQL 8.0 contains no demo databases by default. If demo schemas (aka
 databases) were added, remove them by executing:
 
@@ -64,5 +62,26 @@ databases) were added, remove them by executing:
   tag fix_id: 'F-38325r623550_fix'
   tag cci: ['CCI-000381']
   tag nist: ['CM-7 a']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_schemas = %(
+  SELECT
+     * 
+  FROM
+     information_schema.SCHEMATA 
+  where
+     SCHEMA_NAME not in 
+     (
+        'mysql',
+        'information_schema',
+        'sys',
+        'performance_schema'
+     );
+  )
+
+  describe 'Defined schemas' do
+    subject { sql_session.query(query_schemas).results.column('schema_name') }
+    it { should_not be_in ['sakila','world','world_x','menager'] }
+  end
+end

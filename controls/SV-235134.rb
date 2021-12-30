@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235134' do
   title "The MySQL Database Server 8.0, when utilizing PKI-based
 authentication, must validate certificates by performing RFC 5280-compliant
@@ -64,7 +62,7 @@ is listed, this is a finding.
     If user accounts are not being mapped to authenticated identities, this is
 a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Configure the DBMS to validate certificates by constructing a certification
 path with status information to an accepted trust anchor.
 
@@ -118,5 +116,85 @@ names as necessary:
   tag fix_id: 'F-38316r623523_fix'
   tag cci: ['CCI-000185']
   tag nist: ['IA-5 (2) (a)']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_ssl_params = %(
+  SELECT @@ssl_ca,
+         @@ssl_capath,
+         @@ssl_cert,
+         @@ssl_cipher,
+         @@ssl_crl,
+         @@ssl_crlpath,
+         @@ssl_fips_mode,
+         @@ssl_key,
+         @@require_secure_transport,
+         @@datadir;
+  )
+
+  ssl_params = sql_session.query(query_ssl_params).results
+
+  describe '@@ssl_crl' do
+    subject { ssl_params.column('@@ssl_crl').join }
+    it { should_not cmp 'NULL' }
+  end
+
+  if ssl_params.column('@@ssl_crlpath').join.eql?('NULL')
+    crl_path = ssl_params.column('@@datadir').join
+  else
+    crl_path = ssl_params.column('@@ssl_crlpath').join
+  end
+
+  full_crl_path = "#{crl_path}#{ssl_params.column('@@ssl_crl').join}"
+  describe "SSL CRL file: #{full_crl_path}" do
+    subject { file(full_crl_path) }
+    it { should exist }
+  end
+
+  describe '@@require_secure_transport' do
+    subject { ssl_params.column('@@require_secure_transport').join }
+    it { should match /1|ON/ }
+  end
+
+  describe '@@ssl_cert' do
+    subject { ssl_params.column('@@ssl_cert').join }
+    it { should_not cmp 'NULL' }
+  end
+
+  full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
+  describe "SSL Certificate file: #{full_cert_path}" do
+    subject { file(full_cert_path) }
+    it { should exist }
+  end
+
+  dod_appoved_cert_issuer = input('dod_appoved_cert_issuer')
+
+  describe x509_certificate(full_cert_path) do
+    its('issuer.CN') { should match dod_appoved_cert_issuer }
+  end
+
+  pki_exception_users = input('pki_exception_users')
+
+  query_user_params = "
+      SELECT user.Host,
+        user.User,
+        user.ssl_type,
+        CAST(user.x509_issuer as CHAR) as Issuer,
+        CAST(user.x509_subject as CHAR) as Subject
+    FROM mysql.user
+    WHERE  user NOT LIKE 'mysql.%'
+           AND user NOT LIKE 'root'
+          AND user NOT IN ( '#{pki_exception_users.join("', '")}' );"
+
+  user_params = sql_session.query(query_user_params)
+
+  describe "List of users Issuer fields\n#{user_params.output}" do
+    subject { user_params.results.column('issuer') }
+    it { should_not include nil }
+  end
+
+  describe "List of users Subject fields\n#{user_params.output}" do
+    subject { user_params.results.column('subject') }
+    it { should_not include nil }
+  end
+end

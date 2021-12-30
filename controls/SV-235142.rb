@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235142' do
   title "The MySQL Database Server 8.0 must be configured in accordance with
 the security configuration settings based on DoD security configuration and
@@ -25,7 +23,7 @@ guidance, including STIGs, NSA configuration guides, CTOs, DTMs, and IAVMs.
     If the MySQL is not configured in accordance with security configuration
 settings, this is a finding.
   "
-  desc  'fix', "Configure MySQL in accordance with security configuration
+  desc 'fix', "Configure MySQL in accordance with security configuration
 settings by reviewing the Operation System and MySQL documentation and applying
 the necessary configuration parameters to meet the configurations required by
 the STIG, NSA configuration guidelines, CTOs, DTMs, and IAVMs."
@@ -38,5 +36,10 @@ the STIG, NSA configuration guidelines, CTOs, DTMs, and IAVMs."
   tag fix_id: 'F-38324r623547_fix'
   tag cci: ['CCI-000366']
   tag nist: ['CM-6 b']
-end
 
+  describe 'Manually review the MySQL documentation and configuration to determine it is
+configured in accordance with DoD security configuration and implementation
+guidance, including STIGs, NSA configuration guides, CTOs, DTMs, and IAVMs' do
+    skip
+  end
+end

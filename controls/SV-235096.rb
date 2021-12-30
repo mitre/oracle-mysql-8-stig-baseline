@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235096' do
   title "MySQL Database Server 8.0  must limit the number of concurrent
 sessions to an organization-defined number per user for all accounts and/or
@@ -88,5 +86,44 @@ given period of time.
   tag fix_id: 'F-38278r623409_fix'
   tag cci: ['CCI-000054']
   tag nist: ['AC-10']
-end
 
+  max_user_connections = input('max_user_connections')
+
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  global_concurrent_sessions = %(
+  SELECT
+     VARIABLE_NAME,
+     VARIABLE_VALUE 
+  FROM
+     performance_schema.global_variables 
+  WHERE
+     VARIABLE_NAME LIKE 'max_user_connections' ;
+  )
+
+  user_concurrent_sessions = %(
+  SELECT
+     user,
+     host,
+     max_user_connections 
+  FROM
+     mysql.user 
+  WHERE
+     user not like 'mysql.%' 
+     and user not like 'root';
+  )
+
+  describe "Global value of max_user_connections" do
+    subject { sql_session.query(global_concurrent_sessions).results.column('variable_value') }
+    it { should_not cmp 0 }
+    it { should cmp <= max_user_connections }
+  end
+
+  sql_session.query(user_concurrent_sessions).results.rows.each do |row|
+    describe "User value of max_user_connections for user:#{row['user']} host:#{row['host']}" do
+      subject { row['max_user_connections'] }
+      it { should_not cmp 0 }
+      it { should cmp <= max_user_connections }
+    end
+  end
+end

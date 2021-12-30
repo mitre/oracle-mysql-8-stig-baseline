@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235155' do
   title "The MySQL Database Server 8.0 must protect the confidentiality and
 integrity of all information at rest."
@@ -68,7 +66,7 @@ data at rest in the database.
 
     If \"innodb_redo_log_encrypt\" is not set to \"ON\", this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Apply appropriate MySQL Database 8.0 controls to protect the
 confidentiality and integrity of data at rest in the database.
 
@@ -110,5 +108,59 @@ using ALTER TABLE.
   tag fix_id: 'F-38337r623586_fix'
   tag cci: ['CCI-001199']
   tag nist: ['SC-28']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_encryption_params = %(
+  SELECT
+     VARIABLE_NAME,
+     VARIABLE_VALUE 
+  FROM
+     performance_schema.global_variables 
+  WHERE
+     VARIABLE_NAME like '%encrypt%';
+  )
+
+  encryption_params = sql_session.query(query_encryption_params).results.rows.map{|x| {x['variable_name']=> x['variable_value']}}.reduce({}, :merge)
+
+  describe "Encryption Param:" do
+    subject { encryption_params }
+    its(['audit_log_encryption']) { should cmp 'AES' }
+    its(['binlog_encryption']) { should cmp 'ON' }
+    its(['innodb_redo_log_encrypt']) { should cmp 'ON' }
+    its(['innodb_undo_log_encrypt']) { should cmp 'ON' }
+    its(['table_encryption_privilege_check']) { should cmp 'ON' }
+  end
+
+  query_general_log = %(
+  SELECT
+     VARIABLE_NAME,
+     VARIABLE_VALUE 
+  FROM
+     performance_schema.global_variables 
+  WHERE
+     VARIABLE_NAME like 'general_log';
+  )
+
+  describe "general_log config" do
+    subject { sql_session.query(query_general_log).results.column('variable_value').join }
+    it { should cmp 'OFF' }
+  end
+
+  query_tablespaces = %(
+  SELECT
+     INNODB_TABLESPACES.NAME,
+     INNODB_TABLESPACES.ENCRYPTION 
+  FROM
+     information_schema.INNODB_TABLESPACES;
+  )
+
+  tablespaces = sql_session.query(query_tablespaces).results.rows
+
+  tablespaces.each do |tablespace|
+    describe "Tablespace #{tablespace['name']} encryption" do
+      subject { tablespace }
+      its(['encryption']) { should cmp 'Y' }
+    end
+  end
+end
