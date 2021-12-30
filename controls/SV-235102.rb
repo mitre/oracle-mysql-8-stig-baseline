@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235102' do
   title "The MySQL Database Server 8.0 must protect against a user falsely
 repudiating having performed organization-defined actions."
@@ -54,7 +52,7 @@ to be accessed by the DBA or other administrators for system maintenance. In
 these cases, each use of the account must be logged in some manner to assign
 accountability for any actions taken during the use of the account.
   "
-  desc  'fix', "
+  desc 'fix', "
     Remove user-accessible shared accounts and use individual user IDs.
 
     Build/configure applications to ensure successful individual authentication
@@ -76,5 +74,21 @@ to the fewest persons possible.
   tag fix_id: 'F-38284r623427_fix'
   tag cci: ['CCI-000166']
   tag nist: ['AU-10']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_accounts = %(
+    SELECT
+       User,
+       Host 
+    FROM
+       mysql.user;
+  )
+
+  accounts = sql_session.query(query_accounts).output
+
+  describe "Manually review MySQL accounts and determine if any are shared accounts and 
+  that they are compliant with the specified requirements.\n#{accounts}" do
+    skip
+  end
+end

@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235095' do
   title "MySQL Database Server 8.0 must integrate with an organization-level
 authentication/access mechanism providing account management and automation for
@@ -95,7 +93,7 @@ be defined within the user \"authentication string\".
 
     Determine the accounts (SQL logins) managed by Windows. Run the statement:
     Review the accounts
-    SELECT `user`.`Host`,
+    SELECT user.Host,
         `user`.`user`,
         `user`.`plugin`,
         `user`.`authentication_string`
@@ -117,7 +115,7 @@ like 'mysql.%';
     If any accounts listed by the query are not listed in the documentation and
 authorized, this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Integrate MySQL database server 8.0 security with an organization-level
 authentication/access mechanism using MySQL external authentication for
 Microsoft AD or LDAP, or Linux PAMs thus providing account management for all
@@ -169,5 +167,43 @@ https://dev.mysql.com/doc/refman/8.0/en/grant.html.
   tag fix_id: 'F-38277r623406_fix'
   tag cci: ['CCI-000015']
   tag nist: ['AC-2 (1)']
+
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  auth_plugins = %(
+  SELECT
+     plugin_name,
+     plugin_status 
+  FROM
+     information_schema.plugins 
+  WHERE
+     plugin_name LIKE '%ldap%' 
+     OR plugin_name LIKE '%pam%' 
+     OR plugin_name LIKE '%authentication_windows %';
+  )
+
+  auth_variables = %(
+  SELECT
+     VARIABLE_NAME,
+     VARIABLE_VALUE 
+  FROM
+     performance_schema.global_variables 
+  WHERE
+     VARIABLE_NAME LIKE 'auth%' ;
+  )
+
+  auth_plugins_installed = !sql_session.query(auth_plugins).results.empty?
+
+  if auth_plugins_installed
+    describe "Manually review authentication variables are configured as per guidance\n#{sql_session.query(auth_variables).output}" do
+      skip 
+    end
+  else
+    describe "List of installed authentication plugins" do
+      subject { sql_session.query(auth_plugins).results.rows }
+      it { should_not be_empty }
+    end
+  end
 end
+  
 

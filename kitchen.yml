@@ -1,0 +1,50 @@
+provisioner:
+  name: dummy
+
+platforms:
+  - name: mysql_8
+    driver:
+      name: dokken
+      pull_platform_image: true
+      entrypoint:
+        - /entrypoint.sh
+      pid_one_command: mysqld
+      env:
+        - MYSQL_ROOT_PASSWORD=mysqlrootpass
+    transport:
+      name: dokken
+
+verifier:
+  name: inspec
+  sudo: true
+  reporter:
+    - cli
+    - json:reports/raw/%{suite}/%{platform}.json
+  inspec_tests:
+    - name: Oracle MySQL 8.0 STIG
+      path: .
+  load_plugins: true
+
+suites:
+  - name: vanilla
+    driver:
+      image: <%= ENV['REGISTRY'] %>/ci/inspec/targets/mysql8:8.0.26
+      # image: <%= ENV['HARDENED_CONTAINER_IMAGE'] %>
+      entrypoint:
+        - /entrypoint.sh
+      pid_one_command: mysqld
+  - name: hardened
+    driver:
+      image: <%= ENV['REGISTRY'] %>/ci/inspec/targets/mysql-enterprise-server-hardened:8.0.13
+      # image: 
+      entrypoint:
+        - /entrypoint.sh
+      pid_one_command: mysqld --defaults-extra-file=/opt/hardening/extra.my.cnf
+    lifecycle:
+      post_create:
+      - local: sleep 30
+      - remote: bash /opt/hardening/hardening.sh
+
+lifecycle:
+  post_converge:
+  - local: sleep 30

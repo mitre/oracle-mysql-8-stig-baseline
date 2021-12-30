@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235184' do
   title "The MySQL Database Server 8.0 must associate organization-defined
 types of security labels having organization-defined security label values with
@@ -48,7 +46,7 @@ can only view records that are labeled with the tag of classified).
     If a MySQL solution through the use of views and stored procedures or a
 third party solution does not exist, this is a finding.
   "
-  desc  'fix', "Deploy MySQL Views and Stored Procedures or a third-party
+  desc 'fix', "Deploy MySQL Views and Stored Procedures or a third-party
 software, or add custom data structures, data elements and application code, to
 provide reliable security labeling of information in storage."
   impact 0.5
@@ -60,5 +58,8 @@ provide reliable security labeling of information in storage."
   tag fix_id: 'F-38366r623673_fix'
   tag cci: ['CCI-002264']
   tag nist: ['AC-16 a']
-end
 
+  describe 'Manually review organization-defined security labeling of information in storage are satisfied.' do
+    skip
+  end
+end

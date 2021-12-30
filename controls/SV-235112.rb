@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235112' do
   title "The MySQL Database Server 8.0 must generate audit records when
 unsuccessful attempts to add privileges/permissions occur."
@@ -72,7 +70,7 @@ field general_sql_command.str for the following SQL statement types:
     rename_user
     show_create_user
   "
-  desc  'fix', "
+  desc 'fix', "
     Configure the MySQL Database Server to audit when privileges/permissions
 are added.
 
@@ -111,5 +109,73 @@ the STIG compliance audit:
   tag fix_id: 'F-38294r623457_fix'
   tag cci: ['CCI-000172']
   tag nist: ['AU-12 c']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  audit_log_plugin = %(
+  SELECT
+     PLUGIN_NAME,
+     plugin_status
+  FROM
+     INFORMATION_SCHEMA.PLUGINS
+  WHERE
+     PLUGIN_NAME LIKE 'audit_log' ;
+  )
+
+  audit_log_plugin_status = sql_session.query(audit_log_plugin)
+
+  query_audit_log_filter = %(
+  SELECT
+     audit_log_filter.NAME,
+     audit_log_filter.FILTER
+  FROM
+     mysql.audit_log_filter;
+  )
+
+  audit_log_filter_entries = sql_session.query(query_audit_log_filter)
+
+  query_audit_log_user = %(
+  SELECT
+     audit_log_user.USER,
+     audit_log_user.HOST,
+     audit_log_user.FILTERNAME
+  FROM
+     mysql.audit_log_user;
+  )
+
+  audit_log_user_entries = sql_session.query(query_audit_log_user)
+
+  # Following code design will allow for adaptive tests in this partially automatable control
+  # If ANY of the automatable tests FAIL, the control will report automated statues
+  # If ALL automatable tests PASS, MANUAL review statuses are reported to ensure full compliance
+
+  if !audit_log_plugin_status.results.column('plugin_status').join.eql?('ACTIVE') or
+     audit_log_filter_entries.results.empty? or
+     audit_log_user_entries.results.empty?
+
+    describe 'Audit Log Plugin status' do
+      subject { audit_log_plugin_status.results.column('plugin_status') }
+      it { should cmp 'ACTIVE' }
+    end
+
+    describe 'List of entries in Table: audit_log_filter' do
+      subject { audit_log_filter_entries.results }
+      it { should_not be_empty }
+    end
+
+    describe 'List of entries in Table: audit_log_user' do
+      subject { audit_log_user_entries.results }
+      it { should_not be_empty }
+    end
+  end
+
+  describe "Manually validate `audit_log` plugin is active:\n #{audit_log_plugin_status.output}" do
+    skip
+  end
+  describe "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}" do
+    skip
+  end
+  describe "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}" do
+    skip
+  end
+end

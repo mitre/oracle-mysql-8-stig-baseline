@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235187' do
   title "The MySQL Database Server 8.0 must use NSA-approved cryptography to
 protect classified information in accordance with the data owner's
@@ -74,7 +72,7 @@ running this command:
 
     If any PEM file is not in compliance, this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Configure cryptographic functions to use NSA-approved
 cryptography-compliant algorithms.
 
@@ -123,5 +121,95 @@ database.
   tag fix_id: 'F-38369r623682_fix'
   tag cci: ['CCI-002450']
   tag nist: ['SC-13']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_ssl_params = %(
+  SELECT @@ssl_fips_mode,
+         @@datadir,
+         @@ssl_cert,
+         @@tls_version;
+  )
+
+  ssl_params = sql_session.query(query_ssl_params).results
+
+  describe '@@ssl_fips_mode' do
+    subject { ssl_params.column('@@ssl_fips_mode').join }
+    it { should match /1|ON/ }
+  end
+
+  describe '@@tls_version' do
+    subject { ssl_params.column('@@tls_version').join.split(',') }
+    it { should_not be_empty }
+    it { should_not include 'TLSv1' }
+    it { should_not include 'TLSv1.1' }
+  end
+
+  query_ssl_cipher_list = %(
+  SELECT
+     * 
+  FROM
+     performance_schema.global_status 
+  WHERE
+     variable_name = 'Ssl_cipher_list';
+  )
+
+  approved_ssl_cipher_list = %w(
+    ECDHE-ECDSA-AES128-GCM-SHA256
+    ECDHE-ECDSA-AES256-GCM-SHA384
+    ECDHE-RSA-AES128-GCM-SHA256
+    ECDHE-RSA-AES256-GCM-SHA384
+    DHE-RSA-AES128-GCM-SHA256
+    DHE-DSS-AES128-GCM-SHA256
+    DHE-DSS-AES256-GCM-SHA384
+    DHE-RSA-AES256-GCM-SHA384
+    ECDHE-ECDSA-CHACHA20-POLY1305
+    ECDHE-RSA-CHACHA20-POLY1305
+  )
+
+  ssl_cipher_list = sql_session.query(query_ssl_cipher_list).results
+  
+  describe 'Ssl_cipher_list' do
+    subject { ssl_cipher_list.column('variable_value').join.split(',') }
+    it { should_not be_empty }
+    it { should be_in approved_ssl_cipher_list }
+  end
+
+  query_tls_ciphersuites = %(
+  SELECT
+     VARIABLE_NAME,
+     VARIABLE_VALUE 
+  FROM
+     performance_schema.global_variables 
+  WHERE
+     VARIABLE_NAME = 'tls_ciphersuites';
+  )
+
+  approved_tls_ciphersuites = %w(
+    TLS_AES_128_GCM_SHA256
+    TLS_AES_256_GCM_SHA384
+    TLS_CHACHA20_POLY1305_SHA256
+    TLS_AES_128_CCM_SHA256
+    TLS_AES_128_CCM_8_SHA256
+  )
+
+  tls_ciphersuite_list = sql_session.query(query_tls_ciphersuites).results
+  
+  describe 'tls_ciphersuites' do
+    subject { tls_ciphersuite_list.column('variable_value').join.split(',') }
+    it { should_not be_empty }
+    it { should be_in approved_tls_ciphersuites }
+  end
+
+  dod_appoved_cert_issuer = input('dod_appoved_cert_issuer')
+
+  full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
+  describe "SSL Certificate file: #{full_cert_path}" do
+    subject { file(full_cert_path) }
+    it { should exist }
+  end
+
+  describe x509_certificate(full_cert_path) do
+    its('issuer.CN') { should match dod_appoved_cert_issuer}
+  end
+end

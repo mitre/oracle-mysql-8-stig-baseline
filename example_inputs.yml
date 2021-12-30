@@ -1,0 +1,88 @@
+#Description: username MySQL DB Server
+#Value Type: string
+user: root
+
+#Description: password MySQL DB Server
+#Value Type: string
+password: mysqlrootpass
+
+#Description: hostname of MySQL DB Server
+#Value Type:
+host: localhost
+
+#Description: port MySQL DB Server
+#Value Type: numeric
+port: 3306
+
+#Description: Wildcard based path to list all audit log files
+#Value Type: string
+audit_log_path: /var/lib/mysql/audit*log*
+
+#Description: List of documented audit admin accounts.
+#Value Type: array
+audit_admins: ["'root'@'localhost'", "'root'@'%'"]
+
+#Description: Name of the documented server cert issuer.
+#Value Type: string
+dod_appoved_cert_issuer: DoD Root CA
+
+#Description: List of documented accounts exempted from PKI authentication.
+#Value Type: array
+pki_exception_users: ["healthchecker"]
+
+#Description: List of documented accounts allowed to login with password.
+#Value Type: array
+authorized_password_users: ["my_user", "healthchecker"]
+
+#Description: List of documented mysql accounts with administrative previlleges.
+#Value Type: array
+mysql_administrative_users: ["root"]
+
+#Description: List of documented mysql administrative role grantees
+#Value Type: array
+mysql_administrative_grantees: ["'root'@'localhost'"]
+
+#Description: max user connections allowed
+#Value Type: numeric
+max_user_connections: 50
+
+#Description: List of approved Plugins
+#Value Type: array
+approved_plugins: ["audit_log"]
+
+#Description: List of approved components
+#Value Type: array
+approved_components: ["file://component_validate_password"]
+
+#Description: Authorized MySQL port definitions
+#Value Type: Hash
+mysql_ports:
+  port: 3306
+  admin_port: 33062
+  mysqlx_port: 33060
+
+#Description: Authorized MySQL socket definitions
+#Value Type: Hash
+mysql_sockets:
+  socket: '/var/lib/mysql/mysql.sock'
+  mysqlx_socket: '/var/run/mysqld/mysqlx.sock'
+
+#Description: Location of the my.cnf file
+#Value Type: string
+mycnf: /etc/my.cnf
+
+#Description: Location of the mysqld-auto.cnf file
+#Value Type: string
+mysqld_auto_cnf: /var/lib/mysql/auto.cnf
+
+#Description: Location of the mysqld-auto.cnf file
+#Value Type: array
+authorized_procedures: []
+
+#Description: Location of the mysqld-auto.cnf file
+#Value Type: array
+authorized_functions: []
+
+#Description: Approved minimum version of MySQL
+#Value Type: string
+minimum_mysql_version: 8.0.25

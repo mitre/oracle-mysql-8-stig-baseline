@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235153' do
   title "Access to database files must be limited to relevant processes and to
 authorized, administrative users."
@@ -102,7 +100,7 @@ srwxrwxrwx
     Miscellaneous files directory
     /usr/local/mysql/share                root                   drwxr-xr-x
   "
-  desc  'fix', "Configure the permissions granted by the operating system/file
+  desc 'fix', "Configure the permissions granted by the operating system/file
 system on the database files, database log files, and database backup files so
 that only relevant system accounts and authorized system administrators and
 database administrators with a need to know are permitted to read/view these
@@ -117,5 +115,26 @@ certificate, key, or other directories."
   tag fix_id: 'F-38335r623580_fix'
   tag cci: ['CCI-001090']
   tag nist: ['SC-4']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_locations = %(
+  SELECT
+     VARIABLE_NAME,
+     VARIABLE_VALUE 
+  FROM
+     performance_schema.global_variables 
+  WHERE
+     VARIABLE_NAME LIKE '%dir' 
+     or VARIABLE_NAME LIKE '%file' 
+  order by
+     VARIABLE_NAME;
+  )
+
+  locations = sql_session.query(query_locations).output
+
+  describe "Manually review access to database files must be limited to relevant processes and to
+authorized, administrative users.\n#{locations}" do
+    skip
+  end
+end

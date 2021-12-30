@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235152' do
   title "Database contents must be protected from unauthorized and unintended
 information transfer by enforcement of a data-transfer policy."
@@ -27,7 +25,7 @@ unprotected locations.
 organization-defined data transfer policy and/or fails to remove any copies of
 production data from unprotected locations, this is a finding.
   "
-  desc  'fix', "Modify any code used for moving data from production to
+  desc 'fix', "Modify any code used for moving data from production to
 development/test systems to comply with the organization-defined data transfer
 policy, and to ensure copies of production data are not left in unsecured
 locations."
@@ -40,5 +38,9 @@ locations."
   tag fix_id: 'F-38334r623577_fix'
   tag cci: ['CCI-001090']
   tag nist: ['SC-4']
-end
 
+  describe 'Manually review that procedures for the refreshing of development/test data from
+production meet organization-defined data transfer policy .' do
+    skip
+  end
+end

@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235166' do
   title "The role(s)/group(s) used to modify database structure (including but
 not necessarily limited to tables, indexes, storage, etc.) and logic modules
@@ -41,7 +39,7 @@ the following:
     If any database objects are found to have access by users not authorized to
 the database objects, this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Assign ownership of authorized objects to authorized object owner accounts.
 
     Review user accounts with the GRANT OPTION.
@@ -57,5 +55,44 @@ the database objects, this is a finding.
   tag fix_id: 'F-38348r623619_fix'
   tag cci: ['CCI-001499']
   tag nist: ['CM-5 (6)']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  table_names = sql_session.query('SELECT * FROM INFORMATION_SCHEMA.TABLES;').results.column('table_name')
+
+  if table_names.include?('SCHEMA_PRIVILEGES')
+    describe "Manually review SCHEMA_PRIVILEGES.\n#{sql_session.query('SELECT * FROM information_schema.SCHEMA_PRIVILEGES;').output}" do
+      skip
+    end
+  end
+
+  if table_names.include?('TABLE_PRIVILEGES')
+    describe "Manually review TABLE_PRIVILEGES.\n#{sql_session.query('SELECT * FROM information_schema.TABLE_PRIVILEGES;').output}" do
+      skip
+    end
+  end
+
+  if table_names.include?('COLUMN_PRIVILEGES')
+    describe "Manually review COLUMN_PRIVILEGES.\n#{sql_session.query('SELECT * FROM information_schema.COLUMN_PRIVILEGES;').output}" do
+      skip
+    end
+  end
+
+  if table_names.include?('USER_PRIVILEGES')
+    describe "Manually review USER_PRIVILEGES.\n#{sql_session.query('SELECT * FROM information_schema.USER_PRIVILEGES;').output}" do
+      skip
+    end
+  end
+
+  if table_names.include?('ROLE_COLUMN_GRANTS')
+    describe "Manually review ROLE_COLUMN_GRANTS.\n#{sql_session.query('SELECT * FROM information_schema.ROLE_COLUMN_GRANTS;').output}" do
+      skip
+    end
+  end
+
+  if table_names.include?('ROLE_TABLE_GRANTS')
+    describe "Manually review ROLE_TABLE_GRANTS.\n#{sql_session.query('SELECT * FROM information_schema.ROLE_TABLE_GRANTS;').output}" do
+      skip
+    end
+  end
+end

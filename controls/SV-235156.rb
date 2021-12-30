@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235156' do
   title "The MySQL Database Server 8.0 must check the validity of all data
 inputs except those specifically identified by the organization."
@@ -64,5 +62,11 @@ required in the database.
   tag fix_id: 'F-38338r623589_fix'
   tag cci: ['CCI-001310']
   tag nist: ['SI-10']
-end
 
+  describe 'Manualy review MySQL Database Server 8.0 code (stored procedures, functions,
+triggers), application code, settings, column and field definitions, triggers,
+and constraints to determine whether the database is protected against invalid
+input.' do
+    skip
+  end
+end

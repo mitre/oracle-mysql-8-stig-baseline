@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235147' do
   title "The MySQL Database Server 8.0 must uniquely identify and authenticate
 organizational users (or processes acting on behalf of organizational users)."
@@ -64,7 +62,7 @@ is a finding.
     If accounts are determined to be shared, determine if they are directly
 accessible to end users. If so, this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Configure MySQL Database Server 8.0 settings to uniquely identify and
 authenticate all organizational users who log on/connect to the system.
 
@@ -104,5 +102,52 @@ relevant circumstances.
   tag fix_id: 'F-38329r623562_fix'
   tag cci: ['CCI-000764']
   tag nist: ['IA-2']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_auth_plugins = %(
+  SELECT
+     plugin_name,
+     plugin_status 
+  FROM
+     information_schema.plugins 
+  WHERE
+     plugin_name LIKE '%ldap%' 
+     OR plugin_name LIKE '%pam%' 
+     OR plugin_name LIKE '%authentication_windows %';
+  )
+
+  query_auth_variables = %(
+  SELECT
+     VARIABLE_NAME,
+     VARIABLE_VALUE 
+  FROM
+     performance_schema.global_variables 
+  WHERE
+     VARIABLE_NAME LIKE 'auth%' ;
+  )
+
+  query_users = %(
+  SELECT
+     user.Host,
+     user.user,
+     user.plugin,
+     user.authentication_string 
+  from
+     mysql.user 
+  where
+     plugin like 'auth%';
+  )
+
+  describe "Manually review authentication plugins are configured as per guidance\n#{sql_session.query(query_auth_plugins).output}" do
+    skip 
+  end
+
+  describe "Manually review authentication variables are configured as per guidance\n#{sql_session.query(query_auth_variables).output}" do
+    skip 
+  end
+
+  describe "Manually review organizational users are uniquely identified and authenticated\n#{sql_session.query(query_users).output}" do
+    skip 
+  end
+end

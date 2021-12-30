@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235194' do
   title "Security-relevant software updates to the MySQL Database Server 8.0
 must be installed within the time period directed by an authoritative source
@@ -68,5 +66,19 @@ patches are consistently applied to MySQL within the time allowed."
   tag fix_id: 'F-38376r623703_fix'
   tag cci: ['CCI-002605']
   tag nist: ['SI-2 c']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  minimum_mysql_version = input('minimum_mysql_version')
+  
+  query_version = %(
+  SELECT @@version;
+  )
+
+  version = sql_session.query(query_version).results
+
+  describe '@@version' do
+    subject { version.column('@@version').join }
+    it { should cmp >= minimum_mysql_version }
+  end
+end

@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235192' do
   title "The MySQL Database Server 8.0 must implement cryptographic mechanisms
 to prevent unauthorized modification of organization-defined information at
@@ -73,7 +71,7 @@ finding.
     If tables or tablespaces are not encrypted and the value is not \"Y\", this
 is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Configure the MySQL Database Server 8.0, operating system/file system, and
 additional software as relevant, to provide the required level of cryptographic
 protection.
@@ -115,5 +113,59 @@ or other supported protocols.
   tag fix_id: 'F-38374r623697_fix'
   tag cci: ['CCI-002475']
   tag nist: ['SC-28 (1)']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_encryption_params = %(
+  SELECT
+     VARIABLE_NAME,
+     VARIABLE_VALUE 
+  FROM
+     performance_schema.global_variables 
+  WHERE
+     VARIABLE_NAME like '%encrypt%';
+  )
+
+  encryption_params = sql_session.query(query_encryption_params).results.rows.map{|x| {x['variable_name']=> x['variable_value']}}.reduce({}, :merge)
+
+  describe "Encryption Param:" do
+    subject { encryption_params }
+    its(['audit_log_encryption']) { should cmp 'AES' }
+    its(['binlog_encryption']) { should cmp 'ON' }
+    its(['innodb_redo_log_encrypt']) { should cmp 'ON' }
+    its(['innodb_undo_log_encrypt']) { should cmp 'ON' }
+    its(['table_encryption_privilege_check']) { should cmp 'ON' }
+  end
+
+  query_general_log = %(
+  SELECT
+     VARIABLE_NAME,
+     VARIABLE_VALUE 
+  FROM
+     performance_schema.global_variables 
+  WHERE
+     VARIABLE_NAME like 'general_log';
+  )
+
+  describe "general_log config" do
+    subject { sql_session.query(query_general_log).results.column('variable_value').join }
+    it { should cmp 'OFF' }
+  end
+
+  query_tablespaces = %(
+  SELECT
+     INNODB_TABLESPACES.NAME,
+     INNODB_TABLESPACES.ENCRYPTION 
+  FROM
+     information_schema.INNODB_TABLESPACES;
+  )
+
+  tablespaces = sql_session.query(query_tablespaces).results.rows
+
+  tablespaces.each do |tablespace|
+    describe "Tablespace #{tablespace['name']} encryption" do
+      subject { tablespace }
+      its(['encryption']) { should cmp 'Y' }
+    end
+  end
+end

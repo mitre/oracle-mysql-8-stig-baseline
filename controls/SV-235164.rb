@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235164' do
   title "The MySQL Database Server 8.0 software installation account must be
 restricted to authorized users."
@@ -30,7 +28,7 @@ software installation account.
 personnel required, or if unauthorized access to the account has been granted,
 this is a finding.
   "
-  desc  'fix', "Develop, document, and implement procedures to restrict and
+  desc 'fix', "Develop, document, and implement procedures to restrict and
 track use of the MySQL Database Server 8.0 software installation account."
   impact 0.5
   tag severity: 'medium'
@@ -41,5 +39,9 @@ track use of the MySQL Database Server 8.0 software installation account."
   tag fix_id: 'F-38346r623613_fix'
   tag cci: ['CCI-001499']
   tag nist: ['CM-5 (6)']
-end
 
+  describe 'Manually review procedures for controlling and granting access to use of the DBMS
+software installation account.' do
+    skip
+  end
+end

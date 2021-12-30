@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235159' do
   title "The MySQL Database Server 8.0 must initiate session auditing upon
 startup."
@@ -41,7 +39,7 @@ Database Management System (DBMS) is running."
     All currently defined audits for the MySQL server instance will be listed.
 If no audits are returned, this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Configure the MySQL Audit to automatically start during system startup.
     Add to the my.cnf:
 
@@ -59,5 +57,61 @@ If no audits are returned, this is a finding.
   tag fix_id: 'F-38341r623598_fix'
   tag cci: ['CCI-001464']
   tag nist: ['AU-14 (1)']
-end
 
+  mycnf = input('mycnf')
+
+  describe ini(mycnf) do
+    its ('mysqld.plugin-load-add') { should cmp 'audit_log.so' }
+    its ('mysqld.audit-log') { should cmp 'FORCE_PLUS_PERMANENT' }
+  end
+
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  audit_log_plugin = %(
+  SELECT
+     PLUGIN_NAME,
+     plugin_status
+  FROM
+     INFORMATION_SCHEMA.PLUGINS
+  WHERE
+     PLUGIN_NAME LIKE 'audit_log' ;
+  )
+
+  audit_log_plugin_status = sql_session.query(audit_log_plugin)
+
+  query_audit_log_filter = %(
+  SELECT
+     audit_log_filter.NAME,
+     audit_log_filter.FILTER
+  FROM
+     mysql.audit_log_filter;
+  )
+
+  audit_log_filter_entries = sql_session.query(query_audit_log_filter)
+
+  query_audit_log_user = %(
+  SELECT
+     audit_log_user.USER,
+     audit_log_user.HOST,
+     audit_log_user.FILTERNAME
+  FROM
+     mysql.audit_log_user;
+  )
+
+  audit_log_user_entries = sql_session.query(query_audit_log_user)
+
+  describe 'Audit Log Plugin status' do
+    subject { audit_log_plugin_status.results.column('plugin_status').join }
+    it { should cmp 'ACTIVE' }
+  end
+
+  describe 'List of entries in Table: audit_log_filter' do
+    subject { audit_log_filter_entries.results }
+    it { should_not be_empty }
+  end
+
+  describe 'List of entries in Table: audit_log_user' do
+    subject { audit_log_user_entries.results }
+    it { should_not be_empty }
+  end
+end

@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235177' do
   title "The MySQL Database Server 8.0 must prohibit the use of cached
 authenticators after an organization-defined time period."
@@ -40,7 +38,7 @@ Kerberos service Tickets expiration policy.
 
     If the lifetime exceeds the desired expiration time, this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Modify system settings to implement the organization-defined limit on the
 lifetime of cached authenticators.
 
@@ -85,5 +83,9 @@ authentication_ldap_sasl_bind_root_dn=\"cn=admin,cn=users,dc=MYSQL,dc=LOCAL\"
   tag fix_id: 'F-38359r623652_fix'
   tag cci: ['CCI-002007']
   tag nist: ['IA-5 (13)']
-end
 
+  describe 'Manually review the LDAP server for the maximum lifetime of the
+Kerberos service Tickets expiration policy meets organization-defined time period.' do
+    skip
+  end
+end

@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235158' do
   title "The MySQL Database Server 8.0 and associated applications, when making
 use of dynamic code execution, must scan input data for invalid values that may
@@ -91,7 +89,7 @@ not on the allow list for the userhost user to execute.
     If dynamic code execution is employed without protective measures against
 code injection, this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Where dynamic code execution is used, modify the code to implement
 protections against code injection.
 
@@ -118,5 +116,35 @@ placed in PROTECTING (active blocking) or DETECTING(logging) mode.
   tag fix_id: 'F-38340r623595_fix'
   tag cci: ['CCI-001310']
   tag nist: ['SI-10']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_firewall_mode = %(SHOW GLOBAL VARIABLES LIKE 'mysql_firewall_mode';)
+
+  query_firewall_users = %(
+  SELECT
+     * 
+  FROM
+     INFORMATION_SCHEMA.MYSQL_FIREWALL_USERS;
+  )
+
+  describe 'mysql_firewall_mode' do
+    subject { sql_session.query(query_firewall_mode).results.column('value').join }
+    it { should cmp 'ON' }
+  end
+
+  if sql_session.query(query_firewall_mode).results.column('value').join.eql?('ON')
+    describe 'List of MYSQL_FIREWALL_USERS' do
+      subject { sql_session.query(query_firewall_users).results }
+      it { should_not be_empty }
+    end
+
+    sql_session.query(query_firewall_users).results.rows.each do |fw_user|
+      describe "USERHOST #{fw_user['userhost']}" do
+        subject { fw_user }
+        its(['mode']) { should match /LEARNING|DETECTING|PROTECTING/ }
+      end
+    end
+
+  end
+end

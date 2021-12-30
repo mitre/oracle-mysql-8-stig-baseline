@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235178' do
   title "The MySQL Database Server 8.0 must require users to reauthenticate
 when organization-defined circumstances or situations require reauthentication."
@@ -55,7 +53,7 @@ reauthenticate.
 
     If the provided SQL does not force reauthentication, this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Modify and/or configure MySQL and related applications and tools so that
 users are always required to reauthenticate when changing role or escalating
 privileges.
@@ -73,5 +71,9 @@ privileges.
   tag fix_id: 'F-38360r623655_fix'
   tag cci: ['CCI-002038']
   tag nist: ['IA-11']
-end
 
+  describe 'Manually review MySql requires users to reauthenticate
+when organization-defined circumstances or situations require reauthentication.' do
+    skip
+  end
+end

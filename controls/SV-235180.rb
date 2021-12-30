@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235180' do
   title "Execution of software modules (to include stored procedures,
 functions, and triggers) with elevated privileges must be restricted to
@@ -34,7 +32,7 @@ implemented as described in the documentation, this is a finding.
 intended, or in contexts other than intended, or by subjects/principals other
 than intended, this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Remove any procedures that are not authorized.
 
     Drop the procedure or function using
@@ -50,5 +48,24 @@ than intended, this is a finding.
   tag fix_id: 'F-38362r623661_fix'
   tag cci: ['CCI-002233']
   tag nist: ['AC-6 (8)']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_procedures = %(SHOW PROCEDURE STATUS where security_type <> 'INVOKER';)
+
+  query_functions = %(SHOW FUNCTION STATUS where security_type <> 'INVOKER';)
+
+  authorized_procedures = input('authorized_procedures')
+
+  authorized_functions = input('authorized_functions')
+
+  describe "List of PROCEDUREs defined" do
+    subject { sql_session.query(query_procedures).results.column('name') }
+    it { should be_in authorized_procedures }
+  end
+
+  describe "List of FUNCTIONs defined" do
+    subject { sql_session.query(query_functions).results.column('name') }
+    it { should be_in authorized_functions }
+  end
+end

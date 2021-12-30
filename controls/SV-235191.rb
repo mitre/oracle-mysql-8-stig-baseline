@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235191' do
   title "The MySQL Database Server 8.0 must only accept end entity certificates
 issued by DoD PKI or DoD-approved PKI Certification Authorities (CAs) for the
@@ -31,7 +29,7 @@ is issued by a valid DoD certificate authority.
     If there is any issuer present in the certificate that is not a
 DoD-approved certificate authority, this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Remove any certificate that was not issued by a valid DoD certificate
 authority.
 
@@ -47,5 +45,25 @@ that is issued by a valid DoD certificate authorities.
   tag fix_id: 'F-38373r623694_fix'
   tag cci: ['CCI-002470']
   tag nist: ['SC-23 (5)']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  dod_appoved_cert_issuer = input('dod_appoved_cert_issuer')
+
+  query_ssl_params = %(
+  SELECT @@datadir,
+         @@ssl_cert;
+  )
+
+  ssl_params = sql_session.query(query_ssl_params).results
+
+  full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
+  describe "SSL Certificate file: #{full_cert_path}" do
+    subject { file(full_cert_path) }
+    it { should exist }
+  end
+
+  describe x509_certificate(full_cert_path) do
+    its('issuer.CN') { should match dod_appoved_cert_issuer }
+  end
+end

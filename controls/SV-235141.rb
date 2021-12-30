@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235141' do
   title "The MySQL Database Server 8.0 must enforce approved authorizations for
 logical access to information and system resources in accordance with
@@ -100,7 +98,7 @@ by user, host, PRIV_SOURCE, _db, _obj, _col;
 authorized users and to restrict the access of those users to objects and data
 they are authorized to see, this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Configure the MySQL Database Server 8.0 settings and access controls to
 permit user access only to objects and data that the user is authorized to view
 or interact with, and to prevent access to all other objects and data.
@@ -118,5 +116,9 @@ requirements.
   tag fix_id: 'F-38323r623544_fix'
   tag cci: ['CCI-000213']
   tag nist: ['AC-3']
-end
 
+  describe 'Manually validate appropriate access controls are in place to restrict the access of those users to objects and data
+they are authorized to see' do
+    skip
+  end
+end

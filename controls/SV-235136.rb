@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235136' do
   title "The MySQL Database Server 8.0 must map the PKI-authenticated identity
 to an associated user account."
@@ -24,7 +22,7 @@ validated PKI certificate.
     If user accounts are not being mapped to authenticated identities, this is
 a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Configure the MySQL Database Server 8.0 to map the authenticated identity
 directly to the MySQL Database Server 8.0 user account.
 
@@ -52,5 +50,31 @@ directly to the MySQL Database Server 8.0 user account.
   tag fix_id: 'F-38318r623529_fix'
   tag cci: ['CCI-000187']
   tag nist: ['IA-5 (2) (c)']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  pki_exception_users = input('pki_exception_users')
+
+  query_user_params = "
+      SELECT user.Host,
+        user.User,
+        user.ssl_type,
+        CAST(user.x509_issuer as CHAR) as Issuer,
+        CAST(user.x509_subject as CHAR) as Subject
+    FROM mysql.user
+    WHERE  user NOT LIKE 'mysql.%'
+           AND user NOT LIKE 'root'
+          AND user NOT IN ( '#{pki_exception_users.join("', '")}' );"
+
+  user_params = sql_session.query(query_user_params)
+
+  describe "List of users Issuer fields\n#{user_params.output}" do
+    subject { user_params.results.column('issuer') }
+    it { should_not include nil }
+  end
+
+  describe "List of users Subject fields\n#{user_params.output}" do
+    subject { user_params.results.column('subject') }
+    it { should_not include nil }
+  end
+end

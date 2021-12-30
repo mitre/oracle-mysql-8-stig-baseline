@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235138' do
   title "If passwords are used for authentication, the MySQL Database Server
 8.0 must store only hashed, salted representations of passwords."
@@ -100,7 +98,7 @@ obtained; if not, this is a finding.
 of not using the plain-text password option; how to keep the password hidden;
 and adherence to this practice. If they are not, this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Develop, document, and maintain a list of DBMS database objects, database
 configuration files, associated scripts, and applications defined within or
 external to the DBMS that access the database, and DBMS/user environment
@@ -146,5 +144,55 @@ plain-text password option and in how to keep the password hidden.
   tag fix_id: 'F-38320r623535_fix'
   tag cci: ['CCI-000196']
   tag nist: ['IA-5 (1) (c)']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_authentication_methods = %(
+  SELECT
+     PLUGIN_NAME,
+     PLUGIN_STATUS
+  FROM
+     INFORMATION_SCHEMA.PLUGINS
+  WHERE
+     PLUGIN_NAME LIKE '%ldap%'
+     OR PLUGIN_NAME LIKE '%ldap%'
+     OR PLUGIN_NAME LIKE '%pam%'
+     OR PLUGIN_NAME like '%password';
+  )
+
+  authentication_methods = sql_session.query(query_authentication_methods).results
+
+  describe 'Authentication methods' do
+    subject { sql_session.query(query_authentication_methods).results.column('plugin_name') }
+    it { should include 'mysql_native_password' }
+    it { should include 'sha256_password' }
+    it { should include 'caching_sha2_password' }
+  end
+
+  describe 'Plugin Status' do
+    subject { sql_session.query(query_authentication_methods).results.column('plugin_status').uniq }
+    it { should cmp 'ACTIVE' }
+  end
+
+  query_password_users = %(
+  SELECT
+     user,
+     host,
+     user.plugin
+  FROM
+     mysql.user
+  where
+     (
+        user.plugin like '%password'
+     )
+     AND NOT (user like 'mysql.%'
+     or user = 'root');
+  )
+
+  authorized_password_users = input('authorized_password_users')
+
+  describe 'List of password users' do
+    subject { sql_session.query(query_password_users).results.column('user') }
+    it { should be_in authorized_password_users }
+  end
+end

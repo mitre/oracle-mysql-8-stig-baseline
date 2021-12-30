@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235195' do
   title "When invalid inputs are received, the MySQL Database Server 8.0 must
 behave in a predictable and documented manner that reflects organizational and
@@ -34,7 +32,7 @@ invalid inputs are received.
     If input validation is required beyond those enforced by the datatype and
 no constraints exist for data input, this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Configure the MySQL Server to behave in a predictable and documented manner
 that reflects organizational and system objectives when invalid inputs are
 received.
@@ -61,5 +59,19 @@ CHECK (i BETWEEN 7 AND 12 ) );
   tag fix_id: 'F-38377r623706_fix'
   tag cci: ['CCI-002754']
   tag nist: ['SI-10 (3)']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_constraints = %(
+  SELECT
+     * 
+  FROM
+     INFORMATION_SCHEMA.TABLE_CONSTRAINTS;
+  )
+
+  constraints = sql_session.query(query_constraints).output
+
+  describe "Manually review organizationally defined constraints that have been put in place.\n#{constraints}" do
+    skip
+  end
+end

@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235182' do
   title "The MySQL Database Server 8.0 must associate organization-defined
 types of security labels having organization-defined security label values with
@@ -46,7 +44,7 @@ third-party solution nor a MySQL Views and Stored Procedures are used to
 implement row level security solution is implemented that reliably maintains
 labels on information in storage, this is a finding.
   "
-  desc  'fix', "Deploy MySQL Views and Stored Procedures or a third-party
+  desc 'fix', "Deploy MySQL Views and Stored Procedures or a third-party
 software, or add custom data structures, data elements, and application code,
 to provide reliable security labeling of information in storage."
   impact 0.5
@@ -58,5 +56,8 @@ to provide reliable security labeling of information in storage."
   tag fix_id: 'F-38364r623667_fix'
   tag cci: ['CCI-002262']
   tag nist: ['AC-16 a']
-end
 
+  describe 'Manually review organization-defined security labeling of information in storage are satisfied.' do
+    skip
+  end
+end

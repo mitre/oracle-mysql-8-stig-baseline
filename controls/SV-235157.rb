@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235157' do
   title "The MySQL Database Server 8.0 and associated applications must reserve
 the use of dynamic code execution for situations that require it."
@@ -32,7 +30,7 @@ generating SQL.
 could practically be satisfied by static execution with strongly typed
 parameters, this is a finding.
   "
-  desc  'fix', "Where dynamic code execution is employed in circumstances where
+  desc 'fix', "Where dynamic code execution is employed in circumstances where
 the objective could practically be satisfied by static execution with strongly
 typed parameters, modify the code to do so."
   impact 0.5
@@ -44,5 +42,9 @@ typed parameters, modify the code to do so."
   tag fix_id: 'F-38339r623592_fix'
   tag cci: ['CCI-001310']
   tag nist: ['SI-10']
-end
 
+  describe 'Manually review MySQL source code (trigger procedures, functions) and application
+source code, to identify cases of dynamic code execution.' do
+    skip 'Requires manual review at this time.'
+  end
+end

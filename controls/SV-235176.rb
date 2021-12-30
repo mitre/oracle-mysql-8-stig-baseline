@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235176' do
   title "The MySQL Database Server 8.0 must provide an immediate real-time
 alert to appropriate support staff of all audit log failures."
@@ -29,7 +27,7 @@ personnel when auditing fails for any reason.
 
     If real-time alerts are not sent upon auditing failure, this is a finding.
   "
-  desc  'fix', "Configure the system to provide immediate real-time alerts to
+  desc 'fix', "Configure the system to provide immediate real-time alerts to
 appropriate support staff when an audit log failure occurs."
   impact 0.5
   tag severity: 'medium'
@@ -40,5 +38,10 @@ appropriate support staff when an audit log failure occurs."
   tag fix_id: 'F-38358r623649_fix'
   tag cci: ['CCI-001858']
   tag nist: ['AU-5 (2)']
-end
 
+  describe 'Manually review MySQL Server settings, OS, or third-party logging software settings
+to determine whether a real-time alert will be sent to the appropriate
+personnel when auditing fails for any reason.' do
+    skip
+  end
+end

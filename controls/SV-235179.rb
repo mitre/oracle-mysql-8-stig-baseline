@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235179' do
   title "The MySQL Database Server 8.0 must enforce discretionary access
 control policies, as defined by the data owner, over defined subjects and
@@ -93,7 +91,7 @@ the right to grant permissions to other users:
 
     If any of these rights are not documented and authorized, this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     To correct object ownership:
 
     To revoke any unauthorized permissions:
@@ -122,5 +120,91 @@ the right to grant permissions to other users:
   tag fix_id: 'F-38361r623658_fix'
   tag cci: ['CCI-002165']
   tag nist: ['AC-3 (4)']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  mysql_administrative_users = input('mysql_administrative_users')
+  mysql_administrative_grantees = input('mysql_administrative_grantees')
+
+  query_admins = %(
+  SELECT
+     * 
+  FROM
+     mysql.user 
+  WHERE
+     (
+        mysql.user.user not like 'mysql.%'
+     )
+     AND 
+     (
+        user.Create_priv = 'Y' 
+        OR user.Drop_priv = 'Y' 
+        OR user.Grant_priv = 'Y' 
+        OR user.References_priv = 'Y' 
+        OR user.Index_priv = 'Y' 
+        OR user.Alter_priv = 'Y' 
+        OR user.Super_priv = 'Y' 
+        OR user.Execute_priv = 'Y' 
+        OR user.Create_view_priv = 'Y' 
+        OR user.Create_routine_priv = 'Y' 
+        OR user.Alter_routine_priv = 'Y' 
+        OR user.Create_user_priv = 'Y' 
+        OR user.Event_priv = 'Y' 
+        OR user.Trigger_priv = 'Y' 
+        OR user.Create_role_priv = 'Y' 
+        OR user.Drop_role_priv = 'Y'
+     );
+  )
+
+  query_users_db_admins = %(
+  SELECT
+     * 
+  FROM
+     mysql.db 
+  where
+     (
+        db.Grant_priv = 'Y' 
+        OR db.References_priv = 'Y' 
+        OR db.Index_priv = 'Y' 
+        OR db.Alter_priv = 'Y' 
+        OR db.Create_tmp_table_priv = 'Y' 
+        OR db.Lock_tables_priv = 'Y' 
+        OR db.Create_view_priv = 'Y' 
+        OR db.Show_view_priv = 'Y' 
+        OR db.Create_routine_priv = 'Y' 
+        OR db.Alter_routine_priv = 'Y' 
+        OR db.Execute_priv = 'Y' 
+        OR db.Event_priv = 'Y' 
+        OR db.Trigger_priv
+     )
+     and user not like 'mysql.%';
+  )
+
+
+  query_admin_grantees = %(
+  SELECT
+     USER_PRIVILEGES.GRANTEE,
+     USER_PRIVILEGES.TABLE_CATALOG,
+     USER_PRIVILEGES.PRIVILEGE_TYPE,
+     USER_PRIVILEGES.IS_GRANTABLE 
+  FROM
+     information_schema.USER_PRIVILEGES 
+  where
+     USER_PRIVILEGES.IS_GRANTABLE = 'YES';
+  )
+
+  describe 'List of Users with DDL rights on database objects' do
+    subject { sql_session.query(query_admins).results.column('user') }
+    it { should be_in mysql_administrative_users }
+  end
+
+  describe 'At DB/Schema Level - List of Users with DDL rights on database objects' do
+    subject { sql_session.query(query_users_db_admins).results.column('user') }
+    it { should be_in mysql_administrative_users }
+  end
+
+  describe 'List of users who have been delegated the right to grant permissions to other users' do
+    subject { sql_session.query(query_admin_grantees).results.column('grantee') }
+    it { should be_in mysql_administrative_grantees }
+  end
+end

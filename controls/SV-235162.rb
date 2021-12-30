@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235162' do
   title "The MySQL Database Server 8.0 must protect its audit features from
 unauthorized removal."
@@ -27,7 +25,7 @@ generators.
     If unauthorized accounts have these the AUDIT_ADMIN privilege, this is a
 finding.
   "
-  desc  'fix', "This requirement is a permanent finding and cannot be fixed. An
+  desc 'fix', "This requirement is a permanent finding and cannot be fixed. An
 appropriate mitigation for the system must be implemented, but this finding
 cannot be considered fixed."
   impact 0.5
@@ -39,5 +37,23 @@ cannot be considered fixed."
   tag fix_id: 'F-38344r623607_fix'
   tag cci: ['CCI-001495']
   tag nist: ['AU-9']
-end
 
+
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  audit_admins = input('audit_admins')
+
+  query_audit_admins = %(
+  SELECT
+     * 
+  FROM
+     information_schema.user_privileges 
+  WHERE
+     privilege_type = 'AUDIT_ADMIN';
+  )
+
+  describe 'AUDIT_ADMINs defined' do
+    subject { sql_session.query(query_audit_admins).results.column('grantee') }
+    it { should be_in audit_admins }
+  end
+end

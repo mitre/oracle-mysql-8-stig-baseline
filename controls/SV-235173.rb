@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235173' do
   title "The MySQL Database Server 8.0 must allocate audit record storage
 capacity in accordance with organization-defined audit record storage
@@ -55,7 +53,7 @@ or custom scripts.
 number of audit files allowed will exceed the size of the storage location,
 this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Review the MySQL Audit file location, ensure the destination has enough
 space available to accommodate the maximum total size of all files that could
 be written.
@@ -82,5 +80,24 @@ example:
   tag fix_id: 'F-38355r623640_fix'
   tag cci: ['CCI-001849']
   tag nist: ['AU-4']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_audit_configurations = %(
+  SELECT
+     VARIABLE_NAME,
+     VARIABLE_VALUE 
+  FROM
+     performance_schema.global_variables 
+  WHERE
+     VARIABLE_NAME = 'audit_log_file' 
+     OR VARIABLE_NAME = 'datadir' 
+     OR VARIABLE_NAME = 'audit_log_rotate_on_size';
+  )
+
+  describe "Manually review audit record storage
+capacity in accordance with organization-defined audit record storage
+requirements.\n#{sql_session.query(query_audit_configurations).output}" do
+    skip
+  end
+end

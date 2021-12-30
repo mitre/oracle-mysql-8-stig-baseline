@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235097' do
   title "MySQL Database Server 8.0  must produce audit records containing
 sufficient information to establish what type of events occurred."
@@ -101,7 +99,7 @@ view the results in the audit file, whichever is in use.
     If no audit event is returned for the auditable actions just performed,
 this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Configure DBMS auditing to audit standard and organization-defined
 auditable events, with the audit record to include what type of event occurred.
 
@@ -151,5 +149,73 @@ true } }');
   tag fix_id: 'F-38279r623412_fix'
   tag cci: ['CCI-000130']
   tag nist: ['AU-3']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  audit_log_path = input('audit_log_path')
+
+  audit_log_plugin = %(
+  SELECT
+     PLUGIN_NAME,
+     plugin_status 
+  FROM
+     INFORMATION_SCHEMA.PLUGINS 
+  WHERE
+     PLUGIN_NAME LIKE 'audit_log' ;
+  )
+
+  audit_log_encryption = %(
+  SELECT
+     VARIABLE_NAME,
+     VARIABLE_VALUE 
+  FROM
+     performance_schema.global_variables 
+  WHERE
+     VARIABLE_NAME LIKE 'audit_log_encryption' ;
+  )
+
+  datadir = %(
+    SELECT
+       VARIABLE_NAME,
+       VARIABLE_VALUE 
+    FROM
+       performance_schema.global_variables 
+    WHERE
+       VARIABLE_NAME LIKE 'datadir';
+  )
+
+  describe "Audit Log Plugin status" do
+    subject { sql_session.query(audit_log_plugin).results.column('plugin_status') }
+    it { should cmp 'ACTIVE' }
+  end
+
+  describe "audit_log_encryption config" do
+    subject { sql_session.query(audit_log_encryption).results.column('variable_value') }
+    it { should cmp 'AES' }
+  end
+
+  audit_log_files = command("ls -d #{audit_log_path}").stdout.split
+
+  describe "List of audit_log files" do
+    subject { audit_log_files }
+    it { should_not be_empty }
+  end
+
+  audit_log_files.each do |log_file|
+    describe file(log_file) do
+      its('path') { should match /.*[.]enc$/ }
+      its('owner') { should match /^[_]?mysql$/ }
+      its('group') { should match /^[_]?mysql$/ }
+      it { should_not be_more_permissive_than('0750') }
+    end
+  end
+
+  datadir_path = sql_session.query(datadir).results.column('variable_value').join
+
+  describe "Data Directory: #{datadir_path}" do
+    subject { directory(datadir_path) }
+    its('owner') { should match /^[_]?mysql$/ }
+    its('group') { should match /^[_]?mysql$/ }
+    it { should_not be_more_permissive_than('0750') }
+  end
+end

@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235100' do
   title "The audit information produced by the MySQL Database Server 8.0 must
 be protected from unauthorized modification."
@@ -75,7 +73,7 @@ audit.20190424T191044.log.enc
 Read/Write (RW) and group having Read (R) access to the audit files, aka
 \"750\", this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Apply controls and modify permissions to protect database audit log data
 from unauthorized access, whether stored in the database itself or at the OS
 level.
@@ -106,5 +104,42 @@ level.
   tag fix_id: 'F-38282r623421_fix'
   tag cci: ['CCI-000163']
   tag nist: ['AU-9']
-end
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  audit_log_path = input('audit_log_path')
+
+  datadir = %(
+    SELECT
+       VARIABLE_NAME,
+       VARIABLE_VALUE 
+    FROM
+       performance_schema.global_variables 
+    WHERE
+       VARIABLE_NAME LIKE 'datadir';
+  )
+
+  audit_log_files = command("ls -d #{audit_log_path}").stdout.split
+
+  describe "List of audit_log files" do
+    subject { audit_log_files }
+    it { should_not be_empty }
+  end
+
+  audit_log_files.each do |log_file|
+    describe file(log_file) do
+      its('owner') { should match /^[_]?mysql$/ }
+      its('group') { should match /^[_]?mysql$/ }
+      it { should_not be_more_permissive_than('0750') }
+    end
+  end
+
+  datadir_path = sql_session.query(datadir).results.column('variable_value').join
+
+  describe "Data Directory: #{datadir_path}" do
+    subject { directory(datadir_path) }
+    its('owner') { should match /^[_]?mysql$/ }
+    its('group') { should match /^[_]?mysql$/ }
+    it { should_not be_more_permissive_than('0750') }
+  end
+end

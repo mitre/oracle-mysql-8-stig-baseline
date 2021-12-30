@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235174' do
   title "The MySQL Database Server 8.0 must off-load audit data to a separate
 log management facility; this must be continuous and in near real time for
@@ -33,7 +31,7 @@ finding.
     Verify that the specified audit record content is indeed copied or
 transferred to the central repository. If it is not, this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     If necessary, employ SQL code calls to the audit log read functions or
 other software to copy or transfer the specified audit record content to the
 repository.
@@ -67,5 +65,9 @@ repair the problem.
   tag fix_id: 'F-38356r623643_fix'
   tag cci: ['CCI-001851']
   tag nist: ['AU-4 (1)']
-end
 
+  describe 'Manually review the system documentation for a description of how audit records are
+off-loaded and how local audit log space is managed.' do
+    skip
+  end
+end

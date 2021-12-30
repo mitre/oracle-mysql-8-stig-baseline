@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 control 'SV-235145' do
   title "Unused database components which are integrated in the MySQL Database
 Server 8.0 and cannot be uninstalled must be disabled."
@@ -42,7 +40,7 @@ Database Server 8.0.
 
     If any components are installed, but are not required, this is a finding.
   "
-  desc  'fix', "
+  desc 'fix', "
     Uninstall unused components or features that are installed and can be
 uninstalled. Remove any database objects and applications that are installed to
 support them.
@@ -78,5 +76,35 @@ component is not needed.
   tag fix_id: 'F-38327r623556_fix'
   tag cci: ['CCI-000381']
   tag nist: ['CM-7 a']
-end
 
+  approved_plugins = input('approved_plugins')
+  approved_components = input('approved_components')
+
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  query_plugins = %(
+  SELECT
+     * 
+  FROM
+     information_schema.PLUGINS 
+  where
+     plugin_library is NOT NULL;
+  )
+
+  query_components = %(
+  SELECT
+     * 
+  FROM
+     mysql.component;
+  )
+
+  describe 'Installed plugins' do
+    subject { sql_session.query(query_plugins).results.column('plugin_name') }
+    it { should be_in approved_plugins }
+  end
+
+  describe 'Installed components' do
+    subject { sql_session.query(query_components).results.column('component_urn') }
+    it { should be_in approved_components }
+  end
+end
