@@ -34,7 +34,7 @@ suites:
       pid_one_command: mysqld
   - name: hardened
     driver:
-      image: <%= ENV['REGISTRY'] %><%= ENV['HARDENED_COMPLIANCE_THRESHOLD'] %>
+      image: <%= ENV['REGISTRY'] %><%= ENV['HARDENED_CONTAINER_IMAGE'] %>
       # image: 
       entrypoint:
         - /entrypoint.sh
