@@ -1,0 +1,123 @@
+name: oracle-mysql-8-stig-baseline
+title: Oracle MySQL 8.0 STIG Automated Compliance Validation Profile
+maintainer: DISA DevSecOps Team
+copyright: Defense Information Systems Agency (DISA)
+license: Apache-2.0
+summary: "This Security Technical Implementation Guide is published as a tool to improve the security of Department of Defense (DoD) information systems. The requirements are derived from the National Institute of Standards and Technology (NIST) 800-53 and related documents. Comments or proposed revisions to this document should be sent via email to the following address: disa.stig_spt@mail.mil."
+version: 1.0.0
+inspec_version: ">= 4.0"
+
+inputs:
+  - name: user
+    description: 'privileged account username MySQL DB Server'
+    type: string
+    value: 'root'
+    sensitive: true
+
+  - name: password
+    description: 'password specified user'
+    type: string
+    value: 'mysqlrootpass'
+    sensitive: true
+
+  - name: host
+    description: 'hostname of MySQL DB Server'
+    value: 'localhost'
+    sensitive: true
+
+  - name: port
+    description: 'port MySQL DB Server'
+    type: numeric
+    value: 3306
+
+  - name: audit_log_path
+    description: 'Wildcard based path to list all audit log files'
+    type: string
+    value: '/var/lib/mysql/audit*log*'
+
+  - name: audit_admins
+    description: 'List of documented audit admin accounts.'
+    type: array
+    value: ["'root'@'localhost'", "'root'@'%'"]
+
+  - name: dod_appoved_cert_issuer
+    description: 'Name of the documented server cert issuer.'
+    type: string
+    value: 'DoD Root CA'
+
+  - name: pki_exception_users
+    description: 'List of documented accounts exempted from PKI authentication.'
+    type: array
+    value: ['healthchecker']
+
+  - name: authorized_password_users
+    description: 'List of documented accounts allowed to login with password.'
+    type: array
+    value: ['my_user','healthchecker']
+
+  - name: mysql_administrative_users
+    description: 'List of documented mysql accounts with administrative previlleges.'
+    type: array
+    value: ['root']
+    sensitive: true
+
+  - name: mysql_administrative_grantees
+    description: 'List of documented mysql administrative role grantees'
+    type: array
+    value: ["'root'@'localhost'"]
+    sensitive: true
+
+  - name: max_user_connections
+    description: 'max user connections allowed'
+    type: numeric
+    value: 50
+
+  - name: approved_plugins
+    description: 'List of approved Plugins'
+    type: array
+    value: ['audit_log']
+
+  - name: approved_components
+    description: 'List of approved components'
+    type: array
+    value: ['file://component_validate_password']
+
+  - name: mysql_ports
+    description: 'Authorized MySQL port definitions'
+    type: Hash
+    value:
+      port: 3306
+      admin_port: 33062
+      mysqlx_port: 33060
+
+  - name: mysql_sockets
+    description: 'Authorized MySQL socket definitions'
+    type: Hash
+    value:
+      socket: '/var/lib/mysql/mysql.sock'
+      mysqlx_socket: '/var/run/mysqld/mysqlx.sock'
+
+  - name: mycnf
+    description: 'Location of the my.cnf file'
+    type: string
+    value: '/etc/my.cnf'
+
+  - name: mysqld_auto_cnf
+    description: 'Location of the mysqld-auto.cnf file'
+    type: string
+    value: '/var/lib/mysql/auto.cnf'
+
+  - name: authorized_procedures
+    description: 'Location of the mysqld-auto.cnf file'
+    type: array
+    value: []
+
+  - name: authorized_functions
+    description: 'Location of the mysqld-auto.cnf file'
+    type: array
+    value: []
+
+  - name: minimum_mysql_version
+    description: 'Approved minimum version of MySQL'
+    type: string
+    value: '8.0.25'
