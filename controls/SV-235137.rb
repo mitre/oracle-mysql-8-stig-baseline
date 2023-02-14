@@ -1,17 +1,17 @@
 control 'SV-235137' do
   title "If Database Management System (DBMS) authentication using passwords is
-employed, the DBMS must enforce the DoD standards for password complexity and
+employed, the DBMS must enforce the #{input('org_name')} standards for password complexity and
 lifetime."
   desc  "OS/enterprise authentication and identification must be used
 (SRG-APP-000023-DB-000001). Native DBMS authentication may be used only when
 circumstances make it unavoidable; and must be documented and Authorizing
 Official (AO)-approved.
 
-    The DoD standard for authentication is DoD-approved PKI certificates.
+    The #{input('org_name')} standard for authentication is #{input('org_name')}-approved PKI certificates.
 Authentication based on User ID and Password may be used only when it is not
 possible to employ a PKI certificate, and requires AO approval.
 
-    In such cases, the DoD standards for password complexity and lifetime must
+    In such cases, the #{input('org_name')} standards for password complexity and lifetime must
 be implemented. DBMS products that can inherit the rules for these from the
 operating system or access control program (e.g., Microsoft Active Directory)
 must be configured to do so.  For other DBMSs, the rules must be enforced using

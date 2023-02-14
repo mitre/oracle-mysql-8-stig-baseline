@@ -121,3 +121,8 @@ inputs:
     description: 'Approved minimum version of MySQL'
     type: string
     value: '8.0.25'
+
+  - name: org_name
+    desc: "Name of the organization running this profile"
+    type: string
+    value: "DoD"

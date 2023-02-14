@@ -1,12 +1,12 @@
 control 'SV-235142' do
   title "The MySQL Database Server 8.0 must be configured in accordance with
-the security configuration settings based on DoD security configuration and
+the security configuration settings based on #{input('org_name')} security configuration and
 implementation guidance, including STIGs, NSA configuration guides, CTOs, DTMs,
 and IAVMs."
   desc  "Configuring the Database Management System (DBMS) to implement
 organization-wide security implementation guides and security checklists
 ensures compliance with federal standards and establishes a common security
-baseline across DoD that reflects the most restrictive security posture
+baseline across #{input('org_name')} that reflects the most restrictive security posture
 consistent with operational requirements.
 
     In addition to this SRG, sources of guidance on security and information
@@ -17,7 +17,7 @@ sources.
   desc  'rationale', ''
   desc  'check', "
     Review the MySQL documentation and configuration to determine it is
-configured in accordance with DoD security configuration and implementation
+configured in accordance with #{input('org_name')} security configuration and implementation
 guidance, including STIGs, NSA configuration guides, CTOs, DTMs, and IAVMs.
 
     If the MySQL is not configured in accordance with security configuration
@@ -38,7 +38,7 @@ the STIG, NSA configuration guidelines, CTOs, DTMs, and IAVMs."
   tag nist: ['CM-6 b']
 
   describe 'Manually review the MySQL documentation and configuration to determine it is
-configured in accordance with DoD security configuration and implementation
+configured in accordance with #{input('org_name')} security configuration and implementation
 guidance, including STIGs, NSA configuration guides, CTOs, DTMs, and IAVMs' do
     skip
   end

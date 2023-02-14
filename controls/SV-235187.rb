@@ -66,7 +66,7 @@ Server, run
     If any results list show an uncertified NIST FIPS 140-2 algorithm type,
 this is a finding.
 
-    Check MySQL certificate PEM file(s) for compliance with DoD requirements by
+    Check MySQL certificate PEM file(s) for compliance with #{input('org_name')} requirements by
 running this command:
     openssl x509 -in server-cert.pem -text -noout
 
@@ -109,7 +109,7 @@ tls_ciphersuites='TLS_AES_128_GCM_SHA256,TLS_AES_256_GCM_SHA384,TLS_CHACHA20_POL
 
     After adding any entries to the my.cnf file, restart mysqld.
 
-    Create and use DoD-approved certificates for asymmetric keys used by the
+    Create and use #{input('org_name')}-approved certificates for asymmetric keys used by the
 database.
   "
   impact 0.5

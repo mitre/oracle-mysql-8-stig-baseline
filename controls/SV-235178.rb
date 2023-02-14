@@ -1,9 +1,9 @@
 control 'SV-235178' do
   title "The MySQL Database Server 8.0 must require users to reauthenticate
 when organization-defined circumstances or situations require reauthentication."
-  desc  "The DoD standard for authentication of an interactive user is the
+  desc  "The #{input('org_name')} standard for authentication of an interactive user is the
 presentation of a Common Access Card (CAC) or other physical token bearing a
-valid, current, DoD-issued Public Key Infrastructure (PKI) certificate, coupled
+valid, current, #{input('org_name')}-issued Public Key Infrastructure (PKI) certificate, coupled
 with a Personal Identification Number (PIN) to be entered by the user at the
 beginning of each session and whenever reauthentication is required.
 
@@ -25,7 +25,7 @@ in other situations, including (but not limited to) the following circumstances:
     (v) After a fixed period of time; or
     (vi) Periodically.
 
-    Within the DoD, the minimum circumstances requiring reauthentication are
+    Within the #{input('org_name')}, the minimum circumstances requiring reauthentication are
 privilege escalation and role changes.
   "
   desc  'rationale', ''

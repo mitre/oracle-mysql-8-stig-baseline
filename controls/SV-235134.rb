@@ -2,9 +2,9 @@ control 'SV-235134' do
   title "The MySQL Database Server 8.0, when utilizing PKI-based
 authentication, must validate certificates by performing RFC 5280-compliant
 certification path validation."
-  desc  "The DoD standard for authentication is DoD-approved PKI certificates.
+  desc  "The #{input('org_name')} standard for authentication is #{input('org_name')}-approved PKI certificates.
 
-    A certificate’s certification path is the path from the end entity
+    A certificate's certification path is the path from the end entity
 certificate to a trusted root certification authority (CA). Certification path
 validation is necessary for a relying party to make an informed decision
 regarding acceptance of an end entity certificate. Certification path
@@ -48,7 +48,7 @@ get that path run select @@datadir.
 
     If require_secure_transport is not 1 for ON, this is a finding.
 
-    If the certificate is not a DoD approved certificate, or if no certificate
+    If the certificate is not a #{input('org_name')} approved certificate, or if no certificate
 is listed, this is a finding.
 
     Confirm Issuer and Subject map to the username. Run the following script:
@@ -70,7 +70,7 @@ path with status information to an accepted trust anchor.
 protocols.
     mysql> set persist require_secure_transport=ON;
 
-    Set system variables on the server side specify DoD approved certificate
+    Set system variables on the server side specify #{input('org_name')} approved certificate
 and key files the server uses when permitting clients to establish encrypted
 connections:
 

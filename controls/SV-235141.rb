@@ -2,10 +2,10 @@ control 'SV-235141' do
   title "The MySQL Database Server 8.0 must enforce approved authorizations for
 logical access to information and system resources in accordance with
 applicable access control policies."
-  desc  "Authentication with a DoD-approved PKI certificate does not
+  desc  "Authentication with a #{input('org_name')}-approved PKI certificate does not
 necessarily imply authorization to access the Database Management System
 (DBMS). To mitigate the risk of unauthorized access to sensitive information by
-entities that have been issued certificates by DoD-approved PKIs, all DoD
+entities that have been issued certificates by #{input('org_name')}-approved PKIs, all #{input('org_name')}
 systems, including databases, must be properly configured to implement access
 control policies.
 
