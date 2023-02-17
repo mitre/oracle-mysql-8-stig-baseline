@@ -68,8 +68,8 @@ the site-specific maximum number of sessions and nonzero, this is a finding.
 not configured to do so, configure it to do so.
 
     Connect to the MySQL Database as an administrator.
-    To set the global default to 50:
-    SET PERSIST max_user_connections=50;
+    To set the global default to #{input('max_user_connections')}:
+    SET PERSIST max_user_connections=#{input('max_user_connections')};
 
     Additionally, max user connections can be set per user as well as for a
 given period of time.
