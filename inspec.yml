@@ -40,7 +40,7 @@ inputs:
     type: array
     value: ["'root'@'localhost'", "'root'@'%'"]
 
-  - name: dod_appoved_cert_issuer
+  - name: org_appoved_cert_issuer
     description: 'Name of the documented server cert issuer.'
     type: string
     value: 'DoD Root CA'
