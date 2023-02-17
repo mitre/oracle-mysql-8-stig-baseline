@@ -130,4 +130,4 @@ inputs:
   - name: max_audit_record_storage
     desc: "Allocated percentage of max audit record storage that leads to a warning"
     type: Numeric
-    value: 80
+    value: 75
