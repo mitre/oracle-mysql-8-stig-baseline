@@ -28,7 +28,7 @@ from the operating system or access control program, this is not a finding.
     Review the MySQL Database Server 8.0 settings relating to password
 complexity. Determine whether the following rules are enforced. If any are not,
 this is a finding.
-    a. minimum of 15 characters, including at least one of each of the
+    a. minimum of #{input('min_password_length')} characters, including at least one of each of the
 following character sets:
     - Uppercase
     - Lowercase
@@ -91,7 +91,7 @@ the operating system or access control program, configure it to do so.
     Otherwise, use MySQL Database Server 8.0 configuration parameters and/or
 custom code to enforce the following rules for passwords:
 
-    a. minimum of 15 characters, including at least one of each of the
+    a. minimum of #{input('min_password_length')} characters, including at least one of each of the
 following character sets:
     - Uppercase
     - Lowercase
@@ -114,7 +114,7 @@ five
     set persist validate_password.check_user_name='ON';
     set persist validate_password.dictionary_file='<FILENAME OF DICTIONARY
 FILE';
-    set persist validate_password.length=15;
+    set persist validate_password.length=#{input('min_password_length')};
     set persist validate_password.mixed_case_count=1;
     set persist validate_password.special_char_count=2;
     set persist validate_password.number_count=2;
@@ -169,7 +169,7 @@ FILE';
   describe "Password requirement:" do
     subject { password_params }
     its(['validate_password.check_user_name']) { should cmp 'ON' }
-    its(['validate_password.length']) { should cmp >= 15 }
+    its(['validate_password.length']) { should cmp >= input('min_password_length') }
     its(['validate_password.mixed_case_count']) { should cmp >= 1 }
     its(['validate_password.special_char_count']) { should cmp >= 1 }
     its(['validate_password.number_count']) { should cmp >= 1 }
