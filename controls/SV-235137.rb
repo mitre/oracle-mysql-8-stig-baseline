@@ -176,6 +176,6 @@ FILE';
     its(['validate_password.policy']) { should cmp 'STRONG' }
     its(['password_history']) { should cmp >= input('password_history') }
     its(['password_reuse_interval']) { should cmp >= 365 }
-    its(['default_password_lifetime']) { should cmp >= 180 }
+    its(['default_password_lifetime']) { should cmp >= input('max_password_lifetime') }
   end
 end

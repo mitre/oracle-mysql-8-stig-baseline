@@ -171,3 +171,8 @@ inputs:
     desc: "Number of subsequent account password changes that must occur before the password can be reused"
     type: Numeric
     value: 5
+
+  - name: max_password_lifetime
+    desc: "Number of days that defined the password lifetime"
+    type: Numeric
+    value: 180
