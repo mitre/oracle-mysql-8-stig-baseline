@@ -48,7 +48,7 @@ that is issued by a valid #{input('org_name')} certificate authorities.
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  org_appoved_cert_issuer = input('org_appoved_cert_issuer')
+  org_approved_cert_issuer = input('org_approved_cert_issuer')
 
   query_ssl_params = %(
   SELECT @@datadir,
@@ -64,6 +64,6 @@ that is issued by a valid #{input('org_name')} certificate authorities.
   end
 
   describe x509_certificate(full_cert_path) do
-    its('issuer.CN') { should match org_appoved_cert_issuer }
+    its('issuer.CN') { should match org_approved_cert_issuer }
   end
 end

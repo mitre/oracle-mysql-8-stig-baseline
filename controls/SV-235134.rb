@@ -167,10 +167,10 @@ names as necessary:
     it { should exist }
   end
 
-  org_appoved_cert_issuer = input('org_appoved_cert_issuer')
+  org_approved_cert_issuer = input('org_approved_cert_issuer')
 
   describe x509_certificate(full_cert_path) do
-    its('issuer.CN') { should match org_appoved_cert_issuer }
+    its('issuer.CN') { should match org_approved_cert_issuer }
   end
 
   pki_exception_users = input('pki_exception_users')

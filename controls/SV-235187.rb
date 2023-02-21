@@ -201,7 +201,7 @@ database.
     it { should be_in approved_tls_ciphersuites }
   end
 
-  org_appoved_cert_issuer = input('org_appoved_cert_issuer')
+  org_approved_cert_issuer = input('org_approved_cert_issuer')
 
   full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
   describe "SSL Certificate file: #{full_cert_path}" do
@@ -210,6 +210,6 @@ database.
   end
 
   describe x509_certificate(full_cert_path) do
-    its('issuer.CN') { should match org_appoved_cert_issuer}
+    its('issuer.CN') { should match org_approved_cert_issuer}
   end
 end
