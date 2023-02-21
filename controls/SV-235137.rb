@@ -171,8 +171,8 @@ FILE';
     its(['validate_password.check_user_name']) { should cmp 'ON' }
     its(['validate_password.length']) { should cmp >= input('min_password_length') }
     its(['validate_password.mixed_case_count']) { should cmp >= input('password_mixed_case_count') }
-    its(['validate_password.special_char_count']) { should cmp >= 1 }
-    its(['validate_password.number_count']) { should cmp >= 1 }
+    its(['validate_password.special_char_count']) { should cmp >= input('password_special_character_count') }
+    its(['validate_password.number_count']) { should cmp >= input('password_number_count') }
     its(['validate_password.policy']) { should cmp 'STRONG' }
     its(['password_history']) { should cmp >= 5 }
     its(['password_reuse_interval']) { should cmp >= 365 }

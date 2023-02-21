@@ -148,6 +148,16 @@ inputs:
     value: 15
 
   - name: password_mixed_case_count
-    desc: "Mixed case count required in the password"
+    desc: "Count of uppercase and lowercase characters required in the password. The password must have that many lowercase characters, and that many uppercase characters"
+    type: Numeric
+    value: 1
+
+  - name: password_number_count
+    desc: "Count of numeric characters required in the password"
+    type: Numeric
+    value: 1
+
+  - name: password_special_character_count
+    desc: "Count of special characters required in the password"
     type: Numeric
     value: 1
