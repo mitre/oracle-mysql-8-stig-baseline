@@ -69,7 +69,7 @@ policies to ensure required password complexity is met.
     'validate_password.check_user_name',’ON’
     'validate_password.dictionary_file',''
     'validate_password.length','8'
-    'validate_password.mixed_case_count','#{input('password_mixed_case_count')}'
+    'validate_password.mixed_case_count','1'
     'validate_password.number_count','1'
     'validate_password.policy','MEDIUM'
     'validate_password.special_char_count','1'
@@ -114,8 +114,8 @@ five
     set persist validate_password.check_user_name='ON';
     set persist validate_password.dictionary_file='<FILENAME OF DICTIONARY
 FILE';
-    set persist validate_password.length=#{input('min_password_length')};
-    set persist validate_password.mixed_case_count=#{input('password_mixed_case_count')};
+    set persist validate_password.length=15;
+    set persist validate_password.mixed_case_count=1;
     set persist validate_password.special_char_count=2;
     set persist validate_password.number_count=2;
     set persist validate_password.policy='STRONG';
