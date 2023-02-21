@@ -147,7 +147,7 @@ inputs:
     type: Numeric
     value: 15
 
-  - name: mixed_case_count
+  - name: password_mixed_case_count
     desc: "Mixed case count required in the password"
     type: Numeric
     value: 1

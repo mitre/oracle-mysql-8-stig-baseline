@@ -69,7 +69,7 @@ policies to ensure required password complexity is met.
     'validate_password.check_user_name',’ON’
     'validate_password.dictionary_file',''
     'validate_password.length','8'
-    'validate_password.mixed_case_count','#{input('mixed_case_count')}'
+    'validate_password.mixed_case_count','#{input('password_mixed_case_count')}'
     'validate_password.number_count','1'
     'validate_password.policy','MEDIUM'
     'validate_password.special_char_count','1'
@@ -115,7 +115,7 @@ five
     set persist validate_password.dictionary_file='<FILENAME OF DICTIONARY
 FILE';
     set persist validate_password.length=#{input('min_password_length')};
-    set persist validate_password.mixed_case_count=#{input('mixed_case_count')};
+    set persist validate_password.mixed_case_count=#{input('password_mixed_case_count')};
     set persist validate_password.special_char_count=2;
     set persist validate_password.number_count=2;
     set persist validate_password.policy='STRONG';
@@ -170,7 +170,7 @@ FILE';
     subject { password_params }
     its(['validate_password.check_user_name']) { should cmp 'ON' }
     its(['validate_password.length']) { should cmp >= input('min_password_length') }
-    its(['validate_password.mixed_case_count']) { should cmp >= input('mixed_case_count') }
+    its(['validate_password.mixed_case_count']) { should cmp >= input('password_mixed_case_count') }
     its(['validate_password.special_char_count']) { should cmp >= 1 }
     its(['validate_password.number_count']) { should cmp >= 1 }
     its(['validate_password.policy']) { should cmp 'STRONG' }
