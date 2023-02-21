@@ -161,3 +161,13 @@ inputs:
     desc: "Count of special characters required in the password"
     type: Numeric
     value: 1
+
+  - name: password_special_character_count
+    desc: "Count of special characters required in the password"
+    type: Numeric
+    value: 1
+
+  - name: password_history
+    desc: "Number of subsequent account password changes that must occur before the password can be reused"
+    type: Numeric
+    value: 5

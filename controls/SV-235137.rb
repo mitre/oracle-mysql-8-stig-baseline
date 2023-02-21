@@ -174,7 +174,7 @@ FILE';
     its(['validate_password.special_char_count']) { should cmp >= input('password_special_character_count') }
     its(['validate_password.number_count']) { should cmp >= input('password_number_count') }
     its(['validate_password.policy']) { should cmp 'STRONG' }
-    its(['password_history']) { should cmp >= 5 }
+    its(['password_history']) { should cmp >= input('password_history') }
     its(['password_reuse_interval']) { should cmp >= 365 }
     its(['default_password_lifetime']) { should cmp >= 180 }
   end
