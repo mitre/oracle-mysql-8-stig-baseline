@@ -1,5 +1,5 @@
 control 'SV-235187' do
-  title "The MySQL Database Server 8.0 must use NSA-approved cryptography to
+  title "The MySQL Database Server 8.0 must use #{input('org_approved_cryptography')}-approved cryptography to
 protect classified information in accordance with the data owner's
 requirements."
   desc  "Use of weak or untested encryption algorithms undermines the purposes
@@ -11,7 +11,7 @@ government since this provides assurance they have been tested and validated.
 requirements in light of applicable federal laws, Executive Orders, directives,
 policies, regulations, and standards.
 
-    NSA-approved cryptography for classified networks is hardware based. This
+    #{input('org_approved_cryptography')}-approved cryptography for classified networks is hardware based. This
 requirement addresses the compatibility of a DBMS with the encryption devices.
   "
   desc  'rationale', ''
@@ -73,7 +73,7 @@ running this command:
     If any PEM file is not in compliance, this is a finding.
   "
   desc 'fix', "
-    Configure cryptographic functions to use NSA-approved
+    Configure cryptographic functions to use #{input('org_approved_cryptography')}-approved
 cryptography-compliant algorithms.
 
     Turn on MySQL FIPS mode.
