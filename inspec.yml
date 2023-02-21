@@ -131,3 +131,8 @@ inputs:
     desc: "Allocated percentage of max audit record storage that leads to a warning"
     type: Numeric
     value: 75
+
+  - name: org_guidance
+    desc: "Name of the organization that provides security configuration and implementation guidance"
+    type: string
+    value: "STIGs, NSA configuration guides, CTOs, DTMs, and IAVMs"

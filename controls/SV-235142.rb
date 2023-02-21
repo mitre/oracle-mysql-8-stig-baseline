@@ -1,8 +1,7 @@
 control 'SV-235142' do
   title "The MySQL Database Server 8.0 must be configured in accordance with
 the security configuration settings based on #{input('org_name')} security configuration and
-implementation guidance, including STIGs, NSA configuration guides, CTOs, DTMs,
-and IAVMs."
+implementation guidance, including #{input('org_guidance')}."
   desc  "Configuring the Database Management System (DBMS) to implement
 organization-wide security implementation guides and security checklists
 ensures compliance with federal standards and establishes a common security
@@ -10,7 +9,7 @@ baseline across #{input('org_name')} that reflects the most restrictive security
 consistent with operational requirements.
 
     In addition to this SRG, sources of guidance on security and information
-assurance exist. These include NSA configuration guides, CTOs, DTMs, and IAVMs.
+assurance exist. These include #{input('org_guidance')}.
 The DBMS must be configured in compliance with guidance from all such relevant
 sources.
   "
@@ -18,7 +17,7 @@ sources.
   desc  'check', "
     Review the MySQL documentation and configuration to determine it is
 configured in accordance with #{input('org_name')} security configuration and implementation
-guidance, including STIGs, NSA configuration guides, CTOs, DTMs, and IAVMs.
+guidance, including #{input('org_guidance')}.
 
     If the MySQL is not configured in accordance with security configuration
 settings, this is a finding.
@@ -26,7 +25,7 @@ settings, this is a finding.
   desc 'fix', "Configure MySQL in accordance with security configuration
 settings by reviewing the Operation System and MySQL documentation and applying
 the necessary configuration parameters to meet the configurations required by
-the STIG, NSA configuration guidelines, CTOs, DTMs, and IAVMs."
+the #{input('org_guidance')}."
   impact 0.5
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000516-DB-000363'
@@ -37,9 +36,9 @@ the STIG, NSA configuration guidelines, CTOs, DTMs, and IAVMs."
   tag cci: ['CCI-000366']
   tag nist: ['CM-6 b']
 
-  describe 'Manually review the MySQL documentation and configuration to determine it is
+  describe "Manually review the MySQL documentation and configuration to determine it is
 configured in accordance with #{input('org_name')} security configuration and implementation
-guidance, including STIGs, NSA configuration guides, CTOs, DTMs, and IAVMs' do
+guidance, including #{input('org_guidance')}" do
     skip
   end
 end
