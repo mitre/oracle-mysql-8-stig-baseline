@@ -1,7 +1,7 @@
 control 'SV-235136' do
   title "The MySQL Database Server 8.0 must map the PKI-authenticated identity
 to an associated user account."
-  desc  "The DoD standard for authentication is DoD-approved PKI certificates.
+  desc  "The #{input('org_name')} standard for authentication is #{input('org_name')}-approved PKI certificates.
 Once a PKI certificate has been validated, it must be mapped to a Database
 Management System (DBMS) user account for the authenticated identity to be
 meaningful to the DBMS and useful for authorization decisions."

@@ -1,17 +1,17 @@
 control 'SV-235137' do
   title "If Database Management System (DBMS) authentication using passwords is
-employed, the DBMS must enforce the DoD standards for password complexity and
+employed, the DBMS must enforce the #{input('org_name')} standards for password complexity and
 lifetime."
   desc  "OS/enterprise authentication and identification must be used
 (SRG-APP-000023-DB-000001). Native DBMS authentication may be used only when
 circumstances make it unavoidable; and must be documented and Authorizing
 Official (AO)-approved.
 
-    The DoD standard for authentication is DoD-approved PKI certificates.
+    The #{input('org_name')} standard for authentication is #{input('org_name')}-approved PKI certificates.
 Authentication based on User ID and Password may be used only when it is not
 possible to employ a PKI certificate, and requires AO approval.
 
-    In such cases, the DoD standards for password complexity and lifetime must
+    In such cases, the #{input('org_name')} standards for password complexity and lifetime must
 be implemented. DBMS products that can inherit the rules for these from the
 operating system or access control program (e.g., Microsoft Active Directory)
 must be configured to do so.  For other DBMSs, the rules must be enforced using
@@ -28,7 +28,7 @@ from the operating system or access control program, this is not a finding.
     Review the MySQL Database Server 8.0 settings relating to password
 complexity. Determine whether the following rules are enforced. If any are not,
 this is a finding.
-    a. minimum of 15 characters, including at least one of each of the
+    a. minimum of #{input('min_password_length')} characters, including at least one of each of the
 following character sets:
     - Uppercase
     - Lowercase
@@ -91,7 +91,7 @@ the operating system or access control program, configure it to do so.
     Otherwise, use MySQL Database Server 8.0 configuration parameters and/or
 custom code to enforce the following rules for passwords:
 
-    a. minimum of 15 characters, including at least one of each of the
+    a. minimum of #{input('min_password_length')} characters, including at least one of each of the
 following character sets:
     - Uppercase
     - Lowercase
@@ -169,13 +169,13 @@ FILE';
   describe "Password requirement:" do
     subject { password_params }
     its(['validate_password.check_user_name']) { should cmp 'ON' }
-    its(['validate_password.length']) { should cmp >= 15 }
-    its(['validate_password.mixed_case_count']) { should cmp >= 1 }
-    its(['validate_password.special_char_count']) { should cmp >= 1 }
-    its(['validate_password.number_count']) { should cmp >= 1 }
+    its(['validate_password.length']) { should cmp >= input('min_password_length') }
+    its(['validate_password.mixed_case_count']) { should cmp >= input('password_mixed_case_count') }
+    its(['validate_password.special_char_count']) { should cmp >= input('password_special_character_count') }
+    its(['validate_password.number_count']) { should cmp >= input('password_number_count') }
     its(['validate_password.policy']) { should cmp 'STRONG' }
-    its(['password_history']) { should cmp >= 5 }
+    its(['password_history']) { should cmp >= input('password_history') }
     its(['password_reuse_interval']) { should cmp >= 365 }
-    its(['default_password_lifetime']) { should cmp >= 180 }
+    its(['default_password_lifetime']) { should cmp >= input('max_password_lifetime') }
   end
 end

@@ -4,7 +4,7 @@ maintainer: MITRE SAF Team
 copyright: MITRE, 2022
 license: Apache-2.0
 summary: "This Security Technical Implementation Guide is published as a tool to improve the security of Department of Defense (DoD) information systems. The requirements are derived from the National Institute of Standards and Technology (NIST) 800-53 and related documents. Comments or proposed revisions to this document should be sent via email to the following address: disa.stig_spt@mail.mil."
-version: 1.1.0
+version: 1.1.1
 inspec_version: ">= 4.0"
 
 inputs:
@@ -40,7 +40,7 @@ inputs:
     type: array
     value: ["'root'@'localhost'", "'root'@'%'"]
 
-  - name: dod_appoved_cert_issuer
+  - name: org_approved_cert_issuer
     description: 'Name of the documented server cert issuer.'
     type: string
     value: 'DoD Root CA'
@@ -121,3 +121,58 @@ inputs:
     description: 'Approved minimum version of MySQL'
     type: string
     value: '8.0.25'
+
+  - name: org_name
+    desc: "Name of the organization running this profile"
+    type: string
+    value: "DoD"
+
+  - name: org_approved_cryptography
+    desc: "Name of the organization providing the approved cryptography-compliant algorithms"
+    type: string
+    value: "NSA"
+
+  - name: max_audit_record_storage
+    desc: "Allocated percentage of max audit record storage that leads to a warning"
+    type: Numeric
+    value: 75
+
+  - name: org_guidance
+    desc: "Name of the organization that provides security configuration and implementation guidance"
+    type: string
+    value: "NSA configuration guides, CTOs, DTMs, and IAVMs"
+
+  - name: min_password_length
+    desc: "Minimum password length"
+    type: Numeric
+    value: 15
+
+  - name: password_mixed_case_count
+    desc: "Count of uppercase and lowercase characters required in the password. The password must have that many lowercase characters, and that many uppercase characters"
+    type: Numeric
+    value: 1
+
+  - name: password_number_count
+    desc: "Count of numeric characters required in the password"
+    type: Numeric
+    value: 1
+
+  - name: password_special_character_count
+    desc: "Count of special characters required in the password"
+    type: Numeric
+    value: 1
+
+  - name: password_special_character_count
+    desc: "Count of special characters required in the password"
+    type: Numeric
+    value: 1
+
+  - name: password_history
+    desc: "Number of subsequent account password changes that must occur before the password can be reused"
+    type: Numeric
+    value: 5
+
+  - name: max_password_lifetime
+    desc: "Number of days that defined the password lifetime"
+    type: Numeric
+    value: 180

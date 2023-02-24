@@ -2,7 +2,7 @@ control 'SV-235140' do
   title "The MySQL Database Server 8.0 must obscure feedback of authentication
 information during the authentication process to protect the information from
 possible exploitation/use by unauthorized individuals."
-  desc  "The DoD standard for authentication is DoD-approved PKI certificates.
+  desc  "The #{input('org_name')} standard for authentication is #{input('org_name')}-approved PKI certificates.
 
     Normally, with PKI authentication, the interaction with the user for
 authentication will be handled by a software component separate from the

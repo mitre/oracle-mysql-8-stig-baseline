@@ -1,13 +1,13 @@
 control 'SV-235135' do
   title "The MySQL Database Server 8.0 must enforce authorized access to all
 PKI private keys stored/utilized by the MySQL Database Server 8.0."
-  desc  "The DoD standard for authentication is DoD-approved PKI certificates.
+  desc  "The #{input('org_name')} standard for authentication is #{input('org_name')}-approved PKI certificates.
 PKI certificate-based authentication is performed by requiring the certificate
 holder to cryptographically prove possession of the corresponding private key.
 
     If the private key is stolen, an attacker can use it to impersonate the
 certificate holder. In cases where the Database Management System (DBMS)-stored
-private keys are used to authenticate the DBMS to the system’s clients, loss of
+private keys are used to authenticate the DBMS to the system's clients, loss of
 the corresponding private keys would allow an attacker to successfully perform
 undetected man-in-the-middle attacks against the DBMS system and its clients.
 

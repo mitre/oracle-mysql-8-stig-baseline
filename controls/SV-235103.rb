@@ -1,6 +1,6 @@
 control 'SV-235103' do
   title "The MySQL Database Server 8.0 must be configured to provide audit
-record generation capability for DoD-defined auditable events within all
+record generation capability for #{input('org_name')}-defined auditable events within all
 database components."
   desc  "Without the capability to generate audit records, it would be
 difficult to establish, correlate, and investigate the events relating to an
@@ -13,7 +13,7 @@ of events for which audits are to be generated. This set of events is typically
 a subset of the list of all events for which the system is capable of
 generating audit records.
 
-    DoD has defined the list of events for which the DBMS will provide an audit
+    #{input('org_name')} has defined the list of events for which the DBMS will provide an audit
 record generation capability as the following:
 
     (i) Successful and unsuccessful attempts to access, modify, or delete
@@ -52,11 +52,11 @@ events are being audited by the system.
 \"AES\", this is a finding.
   "
   desc 'fix', "
-    Deploy a MySQL Database Server 8.0 that supports the DoD minimum set of
+    Deploy a MySQL Database Server 8.0 that supports the #{input('org_name')} minimum set of
 auditable events.
 
     Configure the MySQL Database Server 8.0 to generate audit records for at
-least the DoD minimum set of events.
+least the #{input('org_name')} minimum set of events.
 
     sudo vi /etc/my.cnf
     [mysqld]

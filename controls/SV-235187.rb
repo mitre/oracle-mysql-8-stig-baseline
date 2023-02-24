@@ -1,5 +1,5 @@
 control 'SV-235187' do
-  title "The MySQL Database Server 8.0 must use NSA-approved cryptography to
+  title "The MySQL Database Server 8.0 must use #{input('org_approved_cryptography')}-approved cryptography to
 protect classified information in accordance with the data owner's
 requirements."
   desc  "Use of weak or untested encryption algorithms undermines the purposes
@@ -11,7 +11,7 @@ government since this provides assurance they have been tested and validated.
 requirements in light of applicable federal laws, Executive Orders, directives,
 policies, regulations, and standards.
 
-    NSA-approved cryptography for classified networks is hardware based. This
+    #{input('org_approved_cryptography')}-approved cryptography for classified networks is hardware based. This
 requirement addresses the compatibility of a DBMS with the encryption devices.
   "
   desc  'rationale', ''
@@ -66,14 +66,14 @@ Server, run
     If any results list show an uncertified NIST FIPS 140-2 algorithm type,
 this is a finding.
 
-    Check MySQL certificate PEM file(s) for compliance with DoD requirements by
+    Check MySQL certificate PEM file(s) for compliance with #{input('org_name')} requirements by
 running this command:
     openssl x509 -in server-cert.pem -text -noout
 
     If any PEM file is not in compliance, this is a finding.
   "
   desc 'fix', "
-    Configure cryptographic functions to use NSA-approved
+    Configure cryptographic functions to use #{input('org_approved_cryptography')}-approved
 cryptography-compliant algorithms.
 
     Turn on MySQL FIPS mode.
@@ -109,7 +109,7 @@ tls_ciphersuites='TLS_AES_128_GCM_SHA256,TLS_AES_256_GCM_SHA384,TLS_CHACHA20_POL
 
     After adding any entries to the my.cnf file, restart mysqld.
 
-    Create and use DoD-approved certificates for asymmetric keys used by the
+    Create and use #{input('org_name')}-approved certificates for asymmetric keys used by the
 database.
   "
   impact 0.5
@@ -201,7 +201,7 @@ database.
     it { should be_in approved_tls_ciphersuites }
   end
 
-  dod_appoved_cert_issuer = input('dod_appoved_cert_issuer')
+  org_approved_cert_issuer = input('org_approved_cert_issuer')
 
   full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
   describe "SSL Certificate file: #{full_cert_path}" do
@@ -210,6 +210,6 @@ database.
   end
 
   describe x509_certificate(full_cert_path) do
-    its('issuer.CN') { should match dod_appoved_cert_issuer}
+    its('issuer.CN') { should match org_approved_cert_issuer}
   end
 end

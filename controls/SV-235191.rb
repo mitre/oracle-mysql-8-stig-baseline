@@ -1,15 +1,15 @@
 control 'SV-235191' do
   title "The MySQL Database Server 8.0 must only accept end entity certificates
-issued by DoD PKI or DoD-approved PKI Certification Authorities (CAs) for the
+issued by #{input('org_name')} PKI or #{input('org_name')}-approved PKI Certification Authorities (CAs) for the
 establishment of all encrypted sessions."
-  desc  "Only DoD-approved external PKIs have been evaluated to ensure they
+  desc  "Only #{input('org_name')}-approved external PKIs have been evaluated to ensure they
 have security controls and identity vetting procedures in place that are
-sufficient for DoD systems to rely on the identity asserted in the certificate.
+sufficient for #{input('org_name')} systems to rely on the identity asserted in the certificate.
 PKIs lacking sufficient security controls and identity vetting procedures risk
 being compromised and issuing certificates that enable adversaries to
 impersonate legitimate users.
 
-    The authoritative list of DoD-approved PKIs is published at
+    The authoritative list of #{input('org_name')}-approved PKIs is published at
 https://cyber.mil/pki-pke/interoperability.
 
     This requirement focuses on communications protection for the DBMS session
@@ -21,20 +21,20 @@ rather than for the network packet.
 certificate authority.
 
     Before starting the MySQL database in SSL mode, verify the certificate used
-is issued by a valid DoD certificate authority.
+is issued by a valid #{input('org_name')} certificate authority.
 
     Run this command:
     openssl x509 -in <path_to_certificate_pem_file> -text | grep -i \"issuer\"
 
     If there is any issuer present in the certificate that is not a
-DoD-approved certificate authority, this is a finding.
+#{input('org_name')}-approved certificate authority, this is a finding.
   "
   desc 'fix', "
-    Remove any certificate that was not issued by a valid DoD certificate
+    Remove any certificate that was not issued by a valid #{input('org_name')} certificate
 authority.
 
     Contact the organization's certificate issuer and request a new certificate
-that is issued by a valid DoD certificate authorities.
+that is issued by a valid #{input('org_name')} certificate authorities.
   "
   impact 0.5
   tag severity: 'medium'
@@ -48,7 +48,7 @@ that is issued by a valid DoD certificate authorities.
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  dod_appoved_cert_issuer = input('dod_appoved_cert_issuer')
+  org_approved_cert_issuer = input('org_approved_cert_issuer')
 
   query_ssl_params = %(
   SELECT @@datadir,
@@ -64,6 +64,6 @@ that is issued by a valid DoD certificate authorities.
   end
 
   describe x509_certificate(full_cert_path) do
-    its('issuer.CN') { should match dod_appoved_cert_issuer }
+    its('issuer.CN') { should match org_approved_cert_issuer }
   end
 end

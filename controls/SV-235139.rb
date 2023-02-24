@@ -1,7 +1,7 @@
 control 'SV-235139' do
   title "If passwords are used for authentication, the MySQL Database Server
 8.0 must transmit only encrypted representations of passwords."
-  desc  "The DoD standard for authentication is DoD-approved PKI certificates.
+  desc  "The #{input('org_name')} standard for authentication is #{input('org_name')}-approved PKI certificates.
 
     Authentication based on User ID and Password may be used only when it is
 not possible to employ a PKI certificate, and requires Authorizing Official
@@ -38,7 +38,7 @@ other details:
     select @@ssl_ca, @@ssl_capath, @@ssl_cert, @@ssl_cipher, @@ssl_crl,
 @@ssl_crlpath, @@ssl_fips_mode, @@ssl_key;
 
-    If the certificate is not a DoD certificate, or if no certificate is
+    If the certificate is not a #{input('org_name')} certificate, or if no certificate is
 listed, this is a finding.
   "
   desc 'fix', "
@@ -51,7 +51,7 @@ encryption at the OS or network level.
     connect to MySQL as admin (root)
     mysql> set persist require_secure_transport=ON;
 
-    Set system variables on the server side specify  DoD approved certificate
+    Set system variables on the server side specify  #{input('org_name')} approved certificate
 and key files the server uses when permitting clients to establish encrypted
 connections:
 
@@ -86,7 +86,7 @@ names as necessary:
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  dod_appoved_cert_issuer = input('dod_appoved_cert_issuer')
+  org_approved_cert_issuer = input('org_approved_cert_issuer')
 
   query_ssl_params = %(
   SELECT @@ssl_ca,
@@ -115,6 +115,6 @@ names as necessary:
   end
 
   describe x509_certificate(full_cert_path) do
-    its('issuer.CN') { should match dod_appoved_cert_issuer}
+    its('issuer.CN') { should match org_approved_cert_issuer}
   end
 end

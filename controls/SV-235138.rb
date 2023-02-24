@@ -1,7 +1,7 @@
 control 'SV-235138' do
   title "If passwords are used for authentication, the MySQL Database Server
 8.0 must store only hashed, salted representations of passwords."
-  desc  "The DoD standard for authentication is DoD-approved PKI certificates.
+  desc  "The #{input('org_name')} standard for authentication is #{input('org_name')}-approved PKI certificates.
 
     Authentication based on User ID and Password may be used only when it is
 not possible to employ a PKI certificate, and requires Authorizing Official

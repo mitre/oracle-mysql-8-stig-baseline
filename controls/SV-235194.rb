@@ -1,6 +1,6 @@
 control 'SV-235194' do
   title "Security-relevant software updates to the MySQL Database Server 8.0
-must be installed within the time period directed by an authoritative source
+must be installed within the time period directed by an authoritative source	
 (e.g., IAVM, CTOs, DTMs, and STIGs)."
   desc  "Security flaws with software applications, including database
 management systems, are discovered daily. Vendors are constantly updating and
@@ -22,13 +22,13 @@ that are not part of that patch management solution. For example, many browsers
 today provide the capability to install their own patch software. Patch
 criticality, as well as system criticality, will vary. Therefore, the tactical
 situations regarding the patch management process will also vary. This means
-that the time period utilized must be a configurable parameter. Time frames for
-application of security-relevant software updates may be dependent upon the
+that the time period utilized must be a configurable parameter. Time frames for	
+application of security-relevant software updates may be dependent upon the	
 Information Assurance Vulnerability Management (IAVM) process.
 
-    The application will be configured to check for and install
-security-relevant software updates within an identified time period from the
-availability of the update. The specific time period will be defined by an
+    The application will be configured to check for and install	
+security-relevant software updates within an identified time period from the	
+availability of the update. The specific time period will be defined by an	
 authoritative source (e.g., IAVM, CTOs, DTMs, and STIGs).
   "
   desc  'rationale', ''

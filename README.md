@@ -64,7 +64,7 @@ audit_admins: ["'root'@'localhost'", "'root'@'%'"]
 
 #Description: Name of the documented server cert issuer.
 #Value Type: string
-dod_appoved_cert_issuer: DoD Root CA
+org_appoved_cert_issuer: DoD Root CA
 
 #Description: List of documented accounts exempted from PKI authentication.
 #Value Type: array
