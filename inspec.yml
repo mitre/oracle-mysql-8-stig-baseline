@@ -140,7 +140,7 @@ inputs:
   - name: org_guidance
     desc: "Name of the organization that provides security configuration and implementation guidance"
     type: string
-    value: "STIGs, NSA configuration guides, CTOs, DTMs, and IAVMs"
+    value: "NSA configuration guides, CTOs, DTMs, and IAVMs"
 
   - name: min_password_length
     desc: "Minimum password length"

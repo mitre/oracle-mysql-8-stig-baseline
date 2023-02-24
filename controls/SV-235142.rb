@@ -1,7 +1,7 @@
 control 'SV-235142' do
   title "The MySQL Database Server 8.0 must be configured in accordance with
 the security configuration settings based on #{input('org_name')} security configuration and
-implementation guidance, including #{input('org_guidance')}."
+implementation guidance, including STIGs, #{input('org_guidance')}."
   desc  "Configuring the Database Management System (DBMS) to implement
 organization-wide security implementation guides and security checklists
 ensures compliance with federal standards and establishes a common security
@@ -17,7 +17,7 @@ sources.
   desc  'check', "
     Review the MySQL documentation and configuration to determine it is
 configured in accordance with #{input('org_name')} security configuration and implementation
-guidance, including #{input('org_guidance')}.
+guidance, including STIGs, #{input('org_guidance')}.
 
     If the MySQL is not configured in accordance with security configuration
 settings, this is a finding.
@@ -25,7 +25,7 @@ settings, this is a finding.
   desc 'fix', "Configure MySQL in accordance with security configuration
 settings by reviewing the Operation System and MySQL documentation and applying
 the necessary configuration parameters to meet the configurations required by
-the #{input('org_guidance')}."
+the STIG, #{input('org_guidance')}."
   impact 0.5
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000516-DB-000363'
@@ -38,7 +38,7 @@ the #{input('org_guidance')}."
 
   describe "Manually review the MySQL documentation and configuration to determine it is
 configured in accordance with #{input('org_name')} security configuration and implementation
-guidance, including #{input('org_guidance')}" do
+guidance, including STIGs, #{input('org_guidance')}" do
     skip
   end
 end
