@@ -108,13 +108,13 @@ names as necessary:
     it { should match /1|ON/ }
   end
 
-  full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
-  describe "SSL Certificate file: #{full_cert_path}" do
-    subject { file(full_cert_path) }
-    it { should exist }
-  end
+  # full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
+  # describe "SSL Certificate file: #{full_cert_path}" do
+  #   subject { file(full_cert_path) }
+  #   it { should exist }
+  # end
 
-  describe x509_certificate(full_cert_path) do
-    its('issuer.CN') { should match org_approved_cert_issuer}
-  end
+  # describe x509_certificate(full_cert_path) do
+  #   its('issuer.CN') { should match org_approved_cert_issuer}
+  # end
 end

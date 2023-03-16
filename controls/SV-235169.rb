@@ -86,14 +86,23 @@ and \"rw r\" to \"640\".
   tag cci: ['CCI-001813']
   tag nist: ['CM-5 (1)']
 
-  mycnf = input('mycnf')
-  mysqld_auto_cnf = input('mysqld_auto_cnf')
+  if !input('aws_rds')
 
-  describe file(mycnf) do
-    it { should_not be_more_permissive_than('0644') }
-  end
+    mycnf = input('mycnf')
+    mysqld_auto_cnf = input('mysqld_auto_cnf')
 
-  describe file(mysqld_auto_cnf) do
-    it { should_not be_more_permissive_than('0644') }
+    describe file(mycnf) do
+      it { should_not be_more_permissive_than('0644') }
+    end
+
+    describe file(mysqld_auto_cnf) do
+      it { should_not be_more_permissive_than('0644') }
+    end
+    
+  else
+    impact 0.0
+    describe 'Not applicable since these requirements are handled within AWS RDS' do
+      skip 'Not applicable since these requirements are handled within AWS RDS'
+    end
   end
 end

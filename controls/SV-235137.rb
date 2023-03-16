@@ -150,6 +150,7 @@ FILE';
   GROUP  BY component_urn; 
   )
 
+  # file://?
   describe "List of installed components" do
     subject { sql_session.query(query_component).results.column('component_urn') }
     it { should include 'file://component_validate_password' }

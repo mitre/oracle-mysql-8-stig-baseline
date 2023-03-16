@@ -57,7 +57,12 @@ personnel to select which auditable events are audited.
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  audit_admins = input('audit_admins')
+  # Test then implement for all other user inputs
+  if !input('aws_rds')
+    audit_admins = input('audit_admins')
+  else
+    audit_admins = input('audit_admins').concat(["'rdsadmin'@'localhost'"])
+
 
   query_audit_admins = %(
     SELECT

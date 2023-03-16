@@ -46,6 +46,8 @@ that is issued by a valid #{input('org_name')} certificate authorities.
   tag cci: ['CCI-002470']
   tag nist: ['SC-23 (5)']
 
+  if !input('aws_rds')
+
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
   org_approved_cert_issuer = input('org_approved_cert_issuer')
@@ -65,5 +67,12 @@ that is issued by a valid #{input('org_name')} certificate authorities.
 
   describe x509_certificate(full_cert_path) do
     its('issuer.CN') { should match org_approved_cert_issuer }
+  end
+
+  else
+    impact 0.0
+    describe 'Not applicable since these requirements are handled within AWS RDS' do
+      skip 'Not applicable since these requirements are handled within AWS RDS'
+    end
   end
 end

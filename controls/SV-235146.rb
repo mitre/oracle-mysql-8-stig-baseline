@@ -130,6 +130,7 @@ mysqlx=0 in the MySQL configuration file, or by passing in either --mysqlx=0 or
     end
   end
 
+  # File paths: expected: /var/lib/mysql/mysql.sock | got: /tmp/mysql.sock
   sql_session.query(query_sockets).results.rows.each do |row|
     describe "MySQL socket: #{row['variable_name']}" do
       subject { row['variable_value'] }

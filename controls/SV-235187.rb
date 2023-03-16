@@ -201,15 +201,18 @@ database.
     it { should be_in approved_tls_ciphersuites }
   end
 
-  org_approved_cert_issuer = input('org_approved_cert_issuer')
+  if !input('aws_rds')
 
-  full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
-  describe "SSL Certificate file: #{full_cert_path}" do
-    subject { file(full_cert_path) }
-    it { should exist }
-  end
+    org_approved_cert_issuer = input('org_approved_cert_issuer')
 
-  describe x509_certificate(full_cert_path) do
-    its('issuer.CN') { should match org_approved_cert_issuer}
+    full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
+    describe "SSL Certificate file: #{full_cert_path}" do
+      subject { file(full_cert_path) }
+      it { should exist }
+    end
+
+    describe x509_certificate(full_cert_path) do
+      its('issuer.CN') { should match org_approved_cert_issuer}
+    end
   end
 end

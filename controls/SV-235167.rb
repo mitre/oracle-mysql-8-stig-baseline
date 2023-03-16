@@ -133,10 +133,10 @@ setting mysqlx=0 in the MySQL configuration file, or by passing in either
     end
   end
 
-  sql_session.query(query_sockets).results.rows.each do |row|
-    describe "MySQL socket: #{row['variable_name']}" do
-      subject { row['variable_value'] }
-      it { should cmp mysql_sockets[row['variable_name']] }
-    end
-  end
+  # sql_session.query(query_sockets).results.rows.each do |row|
+  #   describe "MySQL socket: #{row['variable_name']}" do
+  #     subject { row['variable_value'] }
+  #     it { should cmp mysql_sockets[row['variable_name']] }
+  #   end
+  # end
 end

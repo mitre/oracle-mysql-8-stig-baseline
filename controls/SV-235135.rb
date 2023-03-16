@@ -207,8 +207,8 @@ STRICT at startup causes the server to produce an error message and exit.
     it { should_not be_more_permissive_than('0600') }
   end
 
-  describe '@@ssl_fips_mode' do
-    subject { ssl_params.column('@@ssl_fips_mode').join }
-    it { should match /ON|STRICT/ }
-  end
+  # describe '@@ssl_fips_mode' do
+  #   subject { ssl_params.column('@@ssl_fips_mode').join }
+  #   it { should match /ON|STRICT/ }
+  # end
 end

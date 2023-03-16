@@ -30,6 +30,11 @@ inputs:
     type: numeric
     value: 3306
 
+  - name: aws_rds
+    description: 'State if your database is an AWS RDS instance'
+    type: Boolean
+    value: False
+
   - name: audit_log_path
     description: 'Wildcard based path to list all audit log files'
     type: string
@@ -38,7 +43,7 @@ inputs:
   - name: audit_admins
     description: 'List of documented audit admin accounts.'
     type: array
-    value: ["'root'@'localhost'", "'root'@'%'"]
+    value: ["'root'@'localhost'", "'root'@'%'", "'rdsadmin'@'localhost'"] # rdsadmin?
 
   - name: org_approved_cert_issuer
     description: 'Name of the documented server cert issuer.'
@@ -53,18 +58,18 @@ inputs:
   - name: authorized_password_users
     description: 'List of documented accounts allowed to login with password.'
     type: array
-    value: ['my_user','healthchecker']
+    value: ['my_user','healthchecker'] # rdsadmin?
 
   - name: mysql_administrative_users
     description: 'List of documented mysql accounts with administrative previlleges.'
     type: array
-    value: ['root']
+    value: ['root'] # rdsadmin?
     sensitive: true
 
   - name: mysql_administrative_grantees
     description: 'List of documented mysql administrative role grantees'
     type: array
-    value: ["'root'@'localhost'"]
+    value: ["'root'@'localhost'"] # rdsadmin?
     sensitive: true
 
   - name: max_user_connections
@@ -90,11 +95,11 @@ inputs:
       admin_port: 33062
       mysqlx_port: 33060
 
-  - name: mysql_sockets
+  - name: mysql_sockets # 146 | 167
     description: 'Authorized MySQL socket definitions'
     type: Hash
     value:
-      socket: '/var/lib/mysql/mysql.sock'
+      socket: '/var/lib/mysql/mysql.sock' # append /tmp/mysql.sock
       mysqlx_socket: '/var/run/mysqld/mysqlx.sock'
 
   - name: mycnf

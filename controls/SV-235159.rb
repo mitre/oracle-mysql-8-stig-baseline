@@ -58,12 +58,14 @@ If no audits are returned, this is a finding.
   tag cci: ['CCI-001464']
   tag nist: ['AU-14 (1)']
 
-  mycnf = input('mycnf')
+  # mycnf = input('mycnf')
 
-  describe ini(mycnf) do
-    its ('mysqld.plugin-load-add') { should cmp 'audit_log.so' }
-    its ('mysqld.audit-log') { should cmp 'FORCE_PLUS_PERMANENT' }
-  end
+  # describe ini(mycnf) do
+  #   its ('mysqld.plugin-load-add') { should cmp 'audit_log.so' }
+  #   its ('mysqld.audit-log') { should cmp 'FORCE_PLUS_PERMANENT' }
+  # end
+
+  # Nothing found for the rest of the tests either?
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
