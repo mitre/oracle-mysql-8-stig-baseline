@@ -64,21 +64,22 @@ personnel to select which auditable events are audited.
     audit_admins = input('audit_admins').concat(["'rdsadmin'@'localhost'"])
 
 
-  query_audit_admins = %(
-    SELECT
-     * 
-  FROM
-     INFORMATION_SCHEMA.USER_PRIVILEGES 
-  where
-     PRIVILEGE_TYPE in 
-     (
-        'AUDIT_ADMIN',
-        'SUPER'
-     );
-  )
+    query_audit_admins = %(
+      SELECT
+       * 
+    FROM
+       INFORMATION_SCHEMA.USER_PRIVILEGES 
+    where
+       PRIVILEGE_TYPE in 
+       (
+          'AUDIT_ADMIN',
+          'SUPER'
+       );
+    )
 
-  describe "List of configured audit admins" do
-    subject { sql_session.query(query_audit_admins).results.column('grantee') }
-    it { should match_array audit_admins }
-  end
+    describe "List of configured audit admins" do
+      subject { sql_session.query(query_audit_admins).results.column('grantee') }
+      it { should match_array audit_admins }
+    end
+  end 
 end
