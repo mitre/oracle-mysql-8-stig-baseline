@@ -144,17 +144,34 @@ FILE';
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  query_component = %(
-  SELECT component_urn
-  FROM   mysql.component
-  GROUP  BY component_urn; 
-  )
+  if !input('aws_rds')
 
-  # file://?
-  describe "List of installed components" do
-    subject { sql_session.query(query_component).results.column('component_urn') }
-    it { should include 'file://component_validate_password' }
+    query_component = %(
+    SELECT component_urn
+    FROM   mysql.component
+    GROUP  BY component_urn; 
+    )
+
+    # file://?
+    describe "List of installed components" do
+      subject { sql_session.query(query_component).results.column('component_urn') }
+      it { should include 'file://component_validate_password' }
+    end
+  
+  else
+    
+    query_component = %(
+    SELECT plugin_name, plugin_status, plugin_type, plugin_library FROM information_schema.plugins WHERE plugin_name='validate_password';
+    )
+
+    # file://?
+    describe "Validate_password Plugin Status" do
+      subject { sql_session.query(query_component).results.column('plugin_status') }
+      it { should cmp 'ACTIVE' }
+    end
   end
+
+    
 
   query_password_params = %(
   SELECT variable_name,
