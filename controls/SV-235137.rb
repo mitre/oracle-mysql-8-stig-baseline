@@ -50,15 +50,27 @@ five
 
     SELECT component_urn FROM mysql.component
     where component_urn='file://component_validate_password' group by
-component_urn;
+    component_urn;
 
     If the \"validate password\" component is installed the result will be
-file://component_validate_password.
+    file://component_validate_password.
 
     If \"validate password\" component is not installed, this is a finding.
 
     If the \"component_validate_password\" is installed, review the password
-policies to ensure required password complexity is met.
+    policies to ensure required password complexity is met.
+
+*** On AWS RDS:
+    SELECT plugin_name, plugin_status, plugin_type, plugin_library FROM 
+    information_schema.plugins WHERE plugin_name='validate_password';
+
+    If the \"validate_password\" password plugin is installed it's status will be \"ACTIVE\".
+
+    If the \"validate_password\" password plugin is not installed, this is a finding.
+
+    If the \"validate_password\" password plugin is installed, review the password
+    policies to ensure required password complexity is met.
+***
 
     Run the following to review the password policy:
     SELECT VARIABLE_NAME, VARIABLE_VALUE
@@ -66,13 +78,13 @@ policies to ensure required password complexity is met.
 'valid%password%' or VARIABLE_NAME like 'password_%'  ;
 
     For example the results may look like the following:
-    'validate_password.check_user_name',’ON’
-    'validate_password.dictionary_file',''
-    'validate_password.length','8'
-    'validate_password.mixed_case_count','1'
-    'validate_password.number_count','1'
-    'validate_password.policy','MEDIUM'
-    'validate_password.special_char_count','1'
+    'validate_password.check_user_name',’ON’    # On AWS RDS the variable name is: 'validate_password_check_user_name', but it is OFF and cannot be configured
+    'validate_password.dictionary_file',''      # On AWS RDS the variable name is: 'validate_password_dictionary_file', but has no dictionary and cannot be configured
+    'validate_password.length','8'              # On AWS RDS the variable name is: 'validate_password_length'
+    'validate_password.mixed_case_count','1'    # On AWS RDS the variable name is: 'validate_password_mixed_case_count'
+    'validate_password.number_count','1'        # On AWS RDS the variable name is: 'validate_password_number_count'
+    'validate_password.policy','MEDIUM'         # On AWS RDS the variable name is: 'validate_password_policy'
+    'validate_password.special_char_count','1'  # On AWS RDS the variable name is: 'validate_password_special_char_count'
     'password_reuse_interval','0'
     'password_require_current','OFF'
     'password_history','0'
@@ -112,13 +124,12 @@ five
 
     # Set Password Policies - For Example
     set persist validate_password.check_user_name='ON';
-    set persist validate_password.dictionary_file='<FILENAME OF DICTIONARY
-FILE';
-    set persist validate_password.length=15;
-    set persist validate_password.mixed_case_count=1;
-    set persist validate_password.special_char_count=2;
-    set persist validate_password.number_count=2;
-    set persist validate_password.policy='STRONG';
+    set persist validate_password.dictionary_file='<FILENAME OF DICTIONARY FILE>';
+    set persist validate_password.length=15;            # On AWS RDS the variable name is: 'validate_password_length'
+    set persist validate_password.mixed_case_count=1;   # On AWS RDS the variable name is: 'validate_password_mixed_case_count'
+    set persist validate_password.special_char_count=2; # On AWS RDS the variable name is: 'validate_password_special_char_count'
+    set persist validate_password.number_count=2;       # On AWS RDS the variable name is: 'validate_password_number_count'
+    set persist validate_password.policy='STRONG';      # On AWS RDS the variable name is: 'validate_password_policy'
     set persist password_history = 5;
     set persist password_reuse_interval = 365;
     SET GLOBAL default_password_lifetime = 180;
@@ -201,7 +212,6 @@ FILE';
     
     describe "Password requirement:" do
       subject { password_params }
-      its(['validate_password_check_user_name']) { should cmp 'ON' }
       its(['validate_password_length']) { should cmp >= input('min_password_length') }
       its(['validate_password_mixed_case_count']) { should cmp >= input('password_mixed_case_count') }
       its(['validate_password_special_char_count']) { should cmp >= input('password_special_character_count') }
