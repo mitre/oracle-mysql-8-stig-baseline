@@ -64,7 +64,7 @@ five
     SELECT plugin_name, plugin_status, plugin_type, plugin_library FROM 
     information_schema.plugins WHERE plugin_name='validate_password';
 
-    If the \"validate_password\" password plugin is installed it's status will be \"ACTIVE\".
+    If the \"validate_password\" password plugin is installed its status will be \"ACTIVE\".
 
     If the \"validate_password\" password plugin is not installed, this is a finding.
 
