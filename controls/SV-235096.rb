@@ -101,8 +101,7 @@ given period of time.
      VARIABLE_NAME LIKE 'max_user_connections' ;
   )
 
-  mysql_administrative_users = input('mysql_administrative_users')
-  
+
   user_concurrent_sessions = %(
   SELECT
      user,
