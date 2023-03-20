@@ -101,7 +101,6 @@ given period of time.
      VARIABLE_NAME LIKE 'max_user_connections' ;
   )
 
-
   user_concurrent_sessions = %(
   SELECT
      user,
