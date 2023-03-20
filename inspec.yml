@@ -63,7 +63,7 @@ inputs:
   - name: mysql_administrative_users
     description: 'List of documented mysql accounts with administrative previlleges.'
     type: array
-    value: ['root'] # rdsadmin?
+    value: ['root','rdsadmin'] # rdsadmin added for aws rds deployments
     sensitive: true
 
   - name: mysql_administrative_grantees
