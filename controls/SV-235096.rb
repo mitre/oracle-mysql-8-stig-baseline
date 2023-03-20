@@ -101,6 +101,8 @@ given period of time.
      VARIABLE_NAME LIKE 'max_user_connections' ;
   )
 
+  mysql_administrative_users = input('mysql_administrative_users')
+  
   user_concurrent_sessions = %(
   SELECT
      user,
@@ -110,7 +112,7 @@ given period of time.
      mysql.user 
   WHERE
      user not like 'mysql.%' 
-     and user not like 'root';
+     and user not in 'mysql_administrative_users';
   )
 
   describe "Global value of max_user_connections" do
