@@ -112,7 +112,7 @@ given period of time.
      mysql.user 
   WHERE
      user not like 'mysql.%' 
-     and user not in 'mysql_administrative_users';
+     and user not in ('mysql_administrative_users');
   )
 
   describe "Global value of max_user_connections" do
