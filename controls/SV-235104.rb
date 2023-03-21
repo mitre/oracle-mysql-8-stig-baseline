@@ -76,7 +76,8 @@ personnel to select which auditable events are audited.
           'SUPER'
        );
     )
-put query_audit_admins
+puts query_audit_admins
+  
     describe "List of configured audit admins #{query_audit_admins}" do
       subject { sql_session.query(query_audit_admins).results.column('grantee') }
       it { should match_array audit_admins }
