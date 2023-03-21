@@ -80,7 +80,7 @@ inputs:
   - name: approved_plugins
     description: 'List of approved Plugins'
     type: array
-    value: ['audit_log']
+    value: ['audit_log','validate_password','RDS_PROCESSLIST','RDS_EVENTS_THREADS_WAITS_CURRENT'] # 'validate_password','RDS_PROCESSLIST','RDS_EVENTS_THREADS_WAITS_CURRENT' for RDS instances
 
   - name: approved_components
     description: 'List of approved components'
