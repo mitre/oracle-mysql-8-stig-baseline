@@ -99,7 +99,7 @@ inputs:
     description: 'Authorized MySQL socket definitions'
     type: Hash
     value:
-      socket: '/var/lib/mysql/mysql.sock' # append /tmp/mysql.sock
+      socket: ['/var/lib/mysql/mysql.sock','/tmp/mysql.sock'] #  /tmp/mysql.sock for AWS RDS
       mysqlx_socket: '/var/run/mysqld/mysqlx.sock'
 
   - name: mycnf
