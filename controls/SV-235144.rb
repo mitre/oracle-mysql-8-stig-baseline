@@ -94,8 +94,10 @@ component is not needed.
     it { should be_in approved_plugins }
   end
 
-  describe 'Installed components' do
-    subject { sql_session.query(query_components).results.column('component_urn') }
-    it { should be_in approved_components }
+  if !input('aws_rds')
+    describe 'Installed components' do
+      subject { sql_session.query(query_components).results.column('component_urn') }
+      it { should be_in approved_components }
+    end
   end
 end
