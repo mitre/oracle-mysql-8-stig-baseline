@@ -40,10 +40,10 @@ inputs:
     type: string
     value: '/var/lib/mysql/audit*log*'
 
-  - name: audit_admins
+  - name: audit_admins # SV-235104 SV-235160 SV-235161 SV-235162
     description: 'List of documented audit admin accounts.'
     type: array
-    value: ["'root'@'localhost'", "'root'@'%'", "'rdsadmin'@'localhost'"] # rdsadmin?
+    value: ["'root'@'localhost'", "'root'@'%'"]
 
   - name: org_approved_cert_issuer
     description: 'Name of the documented server cert issuer.'

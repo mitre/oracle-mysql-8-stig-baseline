@@ -50,7 +50,11 @@ to have them.
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  audit_admins = input('audit_admins')
+  if !input('aws_rds')
+    audit_admins = input('audit_admins')
+  else
+    audit_admins = input('audit_admins').concat(["'rdsadmin'@'localhost'"])
+  end
 
   query_audit_admins = %(
   SELECT
