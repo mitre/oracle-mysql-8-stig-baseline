@@ -58,7 +58,7 @@ inputs:
   - name: authorized_password_users
     description: 'List of documented accounts allowed to login with password.'
     type: array
-    value: ['my_user','healthchecker'] # rdsadmin?
+    value: ['my_user','healthchecker','rdsadmin'] # rdsadmin?
 
   - name: mysql_administrative_users
     description: 'List of documented mysql accounts with administrative previlleges.'
