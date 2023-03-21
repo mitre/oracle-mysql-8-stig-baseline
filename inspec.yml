@@ -53,7 +53,7 @@ inputs:
   - name: pki_exception_users
     description: 'List of documented accounts exempted from PKI authentication.'
     type: array
-    value: ['healthchecker']
+    value: ['healthchecker','rdsadmin']
 
   - name: authorized_password_users
     description: 'List of documented accounts allowed to login with password.'
