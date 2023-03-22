@@ -35,7 +35,7 @@ The following inputs may be configured in an inputs ".yml" file for the profile 
 #Description: State if your database is an AWS RDS instance
 #Value type: Boolean
 aws_rds: False
-
+ 
 #Description: privileged account username MySQL DB Server
 #Value Type: string
 user: (example) root
