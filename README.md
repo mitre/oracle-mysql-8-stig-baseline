@@ -32,9 +32,9 @@ This profile can be executed against a remote target using the ssh transport, do
 The following inputs may be configured in an inputs ".yml" file for the profile to run correctly for your specific environment. More information about InSpec inputs can be found in the [InSpec Profile Documentation](https://www.inspec.io/docs/reference/profiles/).
 
 ```yaml
- #Description: State if your database is an AWS RDS instance
- #Value type: Boolean
- aws_rds: False
+#Description: State if your database is an AWS RDS instance
+#Value type: Boolean
+aws_rds: False
 
 #Description: privileged account username MySQL DB Server
 #Value Type: string
