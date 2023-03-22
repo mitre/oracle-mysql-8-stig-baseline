@@ -77,9 +77,13 @@ https://dev.mysql.com/doc/refman/8.0/en/access-control.html.
   tag cci: ['CCI-001082']
   tag nist: ['SC-2']
 
-  mysql_administrative_users = input('mysql_administrative_users')
-
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  if !input('aws_rds')
+    mysql_administrative_users = input('mysql_administrative_users')
+  else
+    mysql_administrative_users = input('mysql_administrative_users').concat(['rdsadmin'])
+  end
 
   query_accounts = %(
   SELECT
