@@ -58,18 +58,18 @@ inputs:
   - name: authorized_password_users # SV-235138
     description: 'List of documented accounts allowed to login with password.'
     type: array
-    value: ['my_user','healthchecker'] # rdsadmin + admin?
+    value: ['my_user','healthchecker']
 
-  - name: mysql_administrative_users # SV-235150 SV-235168 SV-235179
+  - name: mysql_administrative_users # SV-235096 SV-235150 SV-235168 SV-235179
     description: 'List of documented mysql accounts with administrative previlleges.'
     type: array
-    value: ['root'] # rdsadmin + admin?
+    value: ['root']
     sensitive: true
 
   - name: mysql_administrative_grantees # SV-235179
     description: 'List of documented mysql administrative role grantees'
     type: array
-    value: ["'root'@'localhost'"] # 'rdsadmin'@'localhost' + 'admin'@'%'?
+    value: ["'root'@'localhost'"]
     sensitive: true
 
   - name: max_user_connections
