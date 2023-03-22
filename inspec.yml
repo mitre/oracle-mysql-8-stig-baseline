@@ -50,7 +50,7 @@ inputs:
     type: string
     value: 'DoD Root CA'
 
-  - name: pki_exception_users
+  - name: pki_exception_users # SV-235134 SV-235136
     description: 'List of documented accounts exempted from PKI authentication.'
     type: array
     value: ['healthchecker']

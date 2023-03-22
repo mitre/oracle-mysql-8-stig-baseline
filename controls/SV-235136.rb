@@ -53,7 +53,11 @@ directly to the MySQL Database Server 8.0 user account.
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  pki_exception_users = input('pki_exception_users')
+  if !input('aws_rds')
+   pki_exception_users = input('pki_exception_users')
+  else
+   pki_exception_users = input('pki_exception_users').concat(['rdsadmin'])
+  end
 
   query_user_params = "
       SELECT user.Host,
