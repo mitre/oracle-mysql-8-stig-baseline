@@ -2,7 +2,7 @@
 
 InSpec profile to validate the secure configuration of Oracle MySQL 8.0 against [DISA's](https://iase.disa.mil/stigs/Pages/index.aspx) Oracle MySQL 8.0 (STIG) Version 1 Release 1.
 
-#### AWS-RDS-Ready: Profile updated to adapt checks when the running against an AWS RDS instance of MySQL, by setting the input *"aws_rds"* to *"true"*. See [Tailoring to Your Environment](#tailoring-to-your-environment) below.
+#### AWS-RDS-Ready: Profile updated to adapt checks when running against an AWS RDS instance of MySQL, by setting the input `aws_rds` to `true`. See [Tailoring to Your Environment](#tailoring-to-your-environment) below.
 
 ## Getting Started
 
@@ -34,7 +34,7 @@ The following inputs may be configured in an inputs ".yml" file for the profile 
 ```yaml
 #Description: State if your database is an AWS RDS instance
 #Value type: Boolean
-aws_rds: False
+aws_rds: false
  
 #Description: privileged account username MySQL DB Server
 #Value Type: string
