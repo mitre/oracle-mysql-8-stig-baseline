@@ -33,7 +33,7 @@ inputs:
   - name: aws_rds
     description: 'State if your database is an AWS RDS instance'
     type: Boolean
-    value: False
+    value: false
 
   - name: audit_log_path
     description: 'Wildcard based path to list all audit log files'
