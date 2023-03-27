@@ -82,6 +82,6 @@ databases) were added, remove them by executing:
 
   describe 'Defined schemas' do
     subject { sql_session.query(query_schemas).results.column('schema_name') }
-    it { should_not be_in ['sakila','world','world_x','menager'] }
+    it { should_not be_in ['sakila','world','world_x','menagerie'] }
   end
 end
