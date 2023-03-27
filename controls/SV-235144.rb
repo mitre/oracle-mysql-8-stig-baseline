@@ -73,6 +73,12 @@ component is not needed.
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
+  if !input('aws_rds')
+   approved_plugins = input('approved_plugins')
+  else
+   approved_plugins = input('approved_plugins').concat(['validate_password','RDS_PROCESSLIST','RDS_EVENTS_THREADS_WAITS_CURRENT'])
+  end
+
   query_plugins = %(
   SELECT
      * 
@@ -82,20 +88,22 @@ component is not needed.
      plugin_library is NOT NULL;
   )
 
-  query_components = %(
-  SELECT
-     * 
-  FROM
-     mysql.component;
-  )
-
   describe 'Installed plugins' do
     subject { sql_session.query(query_plugins).results.column('plugin_name') }
     it { should be_in approved_plugins }
   end
 
-  describe 'Installed components' do
-    subject { sql_session.query(query_components).results.column('component_urn') }
-    it { should be_in approved_components }
+	if !input('aws_rds')
+    query_components = %(
+    SELECT
+      * 
+    FROM
+      mysql.component;
+    )
+
+    describe 'Installed components' do
+      subject { sql_session.query(query_components).results.column('component_urn') }
+      it { should be_in approved_components }
+    end
   end
 end
