@@ -91,10 +91,10 @@ mysqlx=0 in the MySQL configuration file, or by passing in either --mysqlx=0 or
   tag cci: ['CCI-000382']
   tag nist: ['CM-7 b']
 
+  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
   mysql_ports = input('mysql_ports')
   mysql_sockets = input('mysql_sockets')
-
-  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
   query_ports = %(
   SELECT
@@ -130,11 +130,10 @@ mysqlx=0 in the MySQL configuration file, or by passing in either --mysqlx=0 or
     end
   end
 
-  # File paths: expected: /var/lib/mysql/mysql.sock | got: /tmp/mysql.sock
   sql_session.query(query_sockets).results.rows.each do |row|
     describe "MySQL socket: #{row['variable_name']}" do
       subject { row['variable_value'] }
-      it { should cmp mysql_sockets[row['variable_name']] }
+      it { should be_in mysql_sockets[row['variable_name']] }
     end
   end
 end
