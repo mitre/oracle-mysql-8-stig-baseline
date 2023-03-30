@@ -48,26 +48,26 @@ that is issued by a valid #{input('org_name')} certificate authorities.
 
   if !input('aws_rds')
 
-  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+    sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  org_approved_cert_issuer = input('org_approved_cert_issuer')
+    org_approved_cert_issuer = input('org_approved_cert_issuer')
 
-  query_ssl_params = %(
-  SELECT @@datadir,
-         @@ssl_cert;
-  )
+    query_ssl_params = %(
+    SELECT @@datadir,
+          @@ssl_cert;
+    )
 
-  ssl_params = sql_session.query(query_ssl_params).results
+    ssl_params = sql_session.query(query_ssl_params).results
 
-  full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
-  describe "SSL Certificate file: #{full_cert_path}" do
-    subject { file(full_cert_path) }
-    it { should exist }
-  end
+    full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
+    describe "SSL Certificate file: #{full_cert_path}" do
+      subject { file(full_cert_path) }
+      it { should exist }
+    end
 
-  describe x509_certificate(full_cert_path) do
-    its('issuer.CN') { should match org_approved_cert_issuer }
-  end
+    describe x509_certificate(full_cert_path) do
+      its('issuer.CN') { should match org_approved_cert_issuer }
+    end
 
   else
     impact 0.0
