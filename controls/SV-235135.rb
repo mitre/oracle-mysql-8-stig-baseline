@@ -213,10 +213,5 @@ STRICT at startup causes the server to produce an error message and exit.
       its('group') { should cmp 'mysql' }
       it { should_not be_more_permissive_than('0600') }
     end
-  else
-    impact 0.0
-    describe 'Not applicable since these requirements are handled within AWS RDS' do
-      skip 'Not applicable since these requirements are handled within AWS RDS'
-    end
   end
 end
