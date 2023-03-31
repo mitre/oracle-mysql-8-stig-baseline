@@ -157,7 +157,11 @@ using ALTER TABLE.
 
   tablespaces = sql_session.query(query_tablespaces).results.rows
 
-  aws_rds_tablespaces = ['mysql/rds_configuration', 'mysql/rds_history', 'mysql/rds_replication_status', 'mysql/rds_global_status_history', 'mysql/rds_global_status_history_old', 'mysql/rds_heartbeat2', 'mysql/rds_sysinfo']
+  if !input('aws_rds')
+    aws_rds_tablespaces = []
+  else
+    aws_rds_tablespaces = ['mysql/rds_configuration', 'mysql/rds_history', 'mysql/rds_replication_status', 'mysql/rds_global_status_history', 'mysql/rds_global_status_history_old', 'mysql/rds_heartbeat2', 'mysql/rds_sysinfo']
+  end
 
   tablespaces.each do |tablespace|
     unless aws_rds_tablespaces.include? tablespace['name']
