@@ -194,28 +194,32 @@ true } }');
     it { should cmp 'AES' }
   end
 
-  audit_log_files = command("ls -d #{audit_log_path}").stdout.split
+  if !input('aws_rds')
 
-  describe "List of audit_log files" do
-    subject { audit_log_files }
-    it { should_not be_empty }
-  end
+    audit_log_files = command("ls -d #{audit_log_path}").stdout.split
 
-  audit_log_files.each do |log_file|
-    describe file(log_file) do
-      its('path') { should match /.*[.]enc$/ }
+    describe "List of audit_log files" do
+      subject { audit_log_files }
+      it { should_not be_empty }
+    end
+
+    audit_log_files.each do |log_file|
+      describe file(log_file) do
+        its('path') { should match /.*[.]enc$/ }
+        its('owner') { should match /^[_]?mysql$/ }
+        its('group') { should match /^[_]?mysql$/ }
+        it { should_not be_more_permissive_than('0750') }
+      end
+    end
+
+    datadir_path = sql_session.query(datadir).results.column('variable_value').join
+
+    describe "Data Directory: #{datadir_path}" do
+      subject { directory(datadir_path) }
       its('owner') { should match /^[_]?mysql$/ }
       its('group') { should match /^[_]?mysql$/ }
       it { should_not be_more_permissive_than('0750') }
     end
-  end
 
-  datadir_path = sql_session.query(datadir).results.column('variable_value').join
-
-  describe "Data Directory: #{datadir_path}" do
-    subject { directory(datadir_path) }
-    its('owner') { should match /^[_]?mysql$/ }
-    its('group') { should match /^[_]?mysql$/ }
-    it { should_not be_more_permissive_than('0750') }
   end
 end

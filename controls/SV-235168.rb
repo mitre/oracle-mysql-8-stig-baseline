@@ -77,9 +77,13 @@ of CREATE ROUTINE.
   tag cci: ['CCI-001812']
   tag nist: ['CM-11 (2)']
 
-  mysql_administrative_users = input('mysql_administrative_users')
-
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+
+  if !input('aws_rds')
+    mysql_administrative_users = input('mysql_administrative_users')
+  else
+    mysql_administrative_users = input('mysql_administrative_users') + ['rdsadmin']
+  end
 
   query_users = %(
   SELECT

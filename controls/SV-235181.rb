@@ -89,7 +89,11 @@ than intended, this is a finding.
 
   query_functions = %(SHOW FUNCTION STATUS where security_type <> 'INVOKER';)
 
-  authorized_procedures = input('authorized_procedures')
+  if !input('aws_rds')
+    authorized_procedures = input('authorized_procedures')
+  else
+    authorized_procedures = input('authorized_procedures') + ['rds_collect_global_status_history', 'rds_disable_gsh_collector', 'rds_disable_gsh_rotation', 'rds_enable_gsh_collector', 'rds_enable_gsh_rotation', 'rds_external_master', 'rds_innodb_buffer_pool_dump_now', 'rds_innodb_buffer_pool_load_abort', 'rds_innodb_buffer_pool_load_now', 'rds_kill', 'rds_kill_query', 'rds_next_master_log', 'rds_reset_external_master', 'rds_rotate_general_log', 'rds_rotate_global_status_history', 'rds_rotate_slow_log', 'rds_set_configuration', 'rds_set_external_master', 'rds_set_external_master_with_auto_position', 'rds_set_external_master_with_delay', 'rds_set_fk_checks_off', 'rds_set_fk_checks_on', 'rds_set_gsh_collector', 'rds_set_gsh_rotation', 'rds_set_master_auto_position', 'rds_set_source_delay', 'rds_show_configuration', 'rds_skip_repl_error', 'rds_skip_transaction_with_gtid', 'rds_start_replication', 'rds_start_replication_until', 'rds_start_replication_until_gtid', 'rds_stop_replication']
+  end
 
   authorized_functions = input('authorized_functions')
 

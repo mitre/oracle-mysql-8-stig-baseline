@@ -2,14 +2,7 @@
 
 InSpec profile to validate the secure configuration of Oracle MySQL 8.0 against [DISA's](https://iase.disa.mil/stigs/Pages/index.aspx) Oracle MySQL 8.0 (STIG) Version 1 Release 1.
 
-## Oracle MySQL 8.0 STIG Overview
-
-The Oracle MySQL 8.0 STIG, created by the United States Defense Information Systems Agency (DISA) offers a comprehensive compliance guide for the configuration and operation of the database. 
-DISA created and maintains a set of security guidelines for applications, computer systems or networks connected to DOD.
-
-[STIG](https://public.cyber.mil/stigs/)s are the configuration standards for United States Department of Defense (DoD) Information Assurance (IA) and IA-enabled devices/systems published by the United States Defense Information Systems Agency (DISA).
-
-This InSpec profile automates the validation of Oracle MySQL 8.0 databases against the equivalent STIG.
+#### AWS-RDS-Ready: Profile updated to adapt checks when running against an AWS RDS instance of MySQL, by setting the input `aws_rds` to `true`. See [Tailoring to Your Environment](#tailoring-to-your-environment) below.
 
 ## Getting Started
 
@@ -23,7 +16,6 @@ This InSpec profile automates the validation of Oracle MySQL 8.0 databases again
 - git
 - [InSpec](https://www.chef.io/products/chef-inspec/)
 
-### Setup Environment on MySQL Database machine 
 #### Install InSpec
 Goto https://www.inspec.io/downloads/ and consult the documentation for your Operating System to download and install InSpec.
 
@@ -35,16 +27,22 @@ inspec --version
 ### How to execute this instance  
 This profile can be executed against a remote target using the ssh transport, docker transport, or winrm transport of InSpec. Profiles can also be executed directly on the host where InSpec is installed (see https://www.inspec.io/docs/reference/cli/). 
 
-#### Required Inputs
-You must specify inputs in an `inputs.yml` file. See `example_inputs.yml` in the profile root folder for a sample. Each input is required for proper execution of the profile.
+## Tailoring to Your Environment
+
+The following inputs may be configured in an inputs ".yml" file for the profile to run correctly for your specific environment. More information about InSpec inputs can be found in the [InSpec Profile Documentation](https://www.inspec.io/docs/reference/profiles/).
+
 ```yaml
+#Description: State if your database is an AWS RDS instance
+#Value type: Boolean
+aws_rds: false
+ 
 #Description: privileged account username MySQL DB Server
 #Value Type: string
-user: root
+user: (example) root
 
 #Description: password specified user
 #Value Type: string
-password: mysqlrootpass
+password: (example) mysqlrootpass
 
 #Description: hostname of MySQL DB Server
 #Value Type:
@@ -128,25 +126,24 @@ authorized_functions: []
 minimum_mysql_version: 8.0.25
 
 ```
-Some default values have been added to `inspec.yml`, but can be overridden by defining new values in `inputs.yml` and passing that file to `inspec exec` at runtime.
 
 #### Execute a single control in the profile 
 ```bash
-inspec exec <path to profile on runner> --input-file=inputs.yml --controls=SV-235096 -t <target>
+inspec exec <path to profile on runner> --input-file=<name of your inputs file>.yml --controls=SV-235096 -t <target>
 ```
 #### Execute a single control in the profile and save results as JSON
 ```bash
-inspec exec <path to profile on runner> --input-file=inputs.yml --controls=<control id> -t <target> --reporter cli json:results.json
+inspec exec <path to profile on runner> --input-file=<name of your inputs file>.yml --controls=<control id> -t <target> --reporter cli json:results.json
 ```
 #### Execute all controls in the profile 
 ```bash
-inspec exec <path to profile on runner> --input-file=inputs.yml -t <target>
+inspec exec <path to profile on runner> --input-file=<name of your inputs file>.yml -t <target>
 ```
 #### Execute all controls in the profile and save results as JSON
 ```bash
-inspec exec <path to profile on runner> --input-file=inputs.yml -t <target> --reporter cli json:results.json
+inspec exec <path to profile on runner> --input-file=<name of your inputs file>.yml -t <target> --reporter cli json:results.json
 ```
 #### Execute the profile directly on the MySQL database host
 ```bash
-inspec exec <path to profile on the host> --input-file=inputs.yml --reporter cli json:results.json
+inspec exec <path to profile on the host> --input-file=<name of your inputs file>.yml --reporter cli json:results.json
 ```

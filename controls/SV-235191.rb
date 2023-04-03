@@ -46,24 +46,33 @@ that is issued by a valid #{input('org_name')} certificate authorities.
   tag cci: ['CCI-002470']
   tag nist: ['SC-23 (5)']
 
-  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+  if !input('aws_rds')
 
-  org_approved_cert_issuer = input('org_approved_cert_issuer')
+    sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  query_ssl_params = %(
-  SELECT @@datadir,
-         @@ssl_cert;
-  )
+    org_approved_cert_issuer = input('org_approved_cert_issuer')
 
-  ssl_params = sql_session.query(query_ssl_params).results
+    query_ssl_params = %(
+    SELECT @@datadir,
+          @@ssl_cert;
+    )
 
-  full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
-  describe "SSL Certificate file: #{full_cert_path}" do
-    subject { file(full_cert_path) }
-    it { should exist }
-  end
+    ssl_params = sql_session.query(query_ssl_params).results
 
-  describe x509_certificate(full_cert_path) do
-    its('issuer.CN') { should match org_approved_cert_issuer }
+    full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
+    describe "SSL Certificate file: #{full_cert_path}" do
+      subject { file(full_cert_path) }
+      it { should exist }
+    end
+
+    describe x509_certificate(full_cert_path) do
+      its('issuer.CN') { should match org_approved_cert_issuer }
+    end
+
+  else
+    impact 0.0
+    describe 'Not applicable since these requirements are handled within AWS RDS' do
+      skip 'Not applicable since these requirements are handled within AWS RDS'
+    end
   end
 end

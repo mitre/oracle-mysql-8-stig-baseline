@@ -157,10 +157,18 @@ using ALTER TABLE.
 
   tablespaces = sql_session.query(query_tablespaces).results.rows
 
+  if !input('aws_rds')
+    aws_rds_tablespaces = []
+  else
+    aws_rds_tablespaces = ['mysql/rds_configuration', 'mysql/rds_history', 'mysql/rds_replication_status', 'mysql/rds_global_status_history', 'mysql/rds_global_status_history_old', 'mysql/rds_heartbeat2', 'mysql/rds_sysinfo']
+  end
+
   tablespaces.each do |tablespace|
-    describe "Tablespace #{tablespace['name']} encryption" do
-      subject { tablespace }
-      its(['encryption']) { should cmp 'Y' }
+    unless aws_rds_tablespaces.include? tablespace['name']
+      describe "Tablespace #{tablespace['name']} encryption" do
+        subject { tablespace }
+        its(['encryption']) { should cmp 'Y' }
+      end
     end
   end
 end

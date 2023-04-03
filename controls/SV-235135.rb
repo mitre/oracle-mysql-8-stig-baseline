@@ -160,55 +160,58 @@ STRICT at startup causes the server to produce an error message and exit.
 
   ssl_params = sql_session.query(query_ssl_params).results
 
-  if ssl_params.column('@@ssl_crlpath').join.eql?('NULL')
-    crl_path = ssl_params.column('@@datadir').join
-  else
-    crl_path = ssl_params.column('@@ssl_crlpath').join
-  end
-
-  full_crl_path = "#{crl_path}#{ssl_params.column('@@ssl_crl').join}"
-  describe "SSL CRL file: #{full_crl_path}" do
-    subject { file(full_crl_path) }
-    it { should exist }
-    its('owner') { should cmp 'mysql' }
-    its('group') { should cmp 'mysql' }
-    it { should_not be_more_permissive_than('0600') }
-  end
-
-  if ssl_params.column('@@ssl_capath').join.eql?('NULL')
-    ca_path = ssl_params.column('@@datadir').join
-  else
-    ca_path = ssl_params.column('@@ssl_capath').join
-  end
-
-  full_ca_path = "#{ca_path}#{ssl_params.column('@@ssl_ca').join}"
-  describe "SSL CA file: #{full_ca_path}" do
-    subject { file(full_ca_path) }
-    it { should exist }
-    its('owner') { should cmp 'mysql' }
-    its('group') { should cmp 'mysql' }
-    it { should_not be_more_permissive_than('0644') }
-  end
-
-  full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
-  describe "SSL Certificate file: #{full_cert_path}" do
-    subject { file(full_cert_path) }
-    it { should exist }
-    its('owner') { should cmp 'mysql' }
-    its('group') { should cmp 'mysql' }
-    it { should_not be_more_permissive_than('0644') }
-  end
-
-  full_key_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_key').join}"
-  describe "SSL Private Key file: #{full_key_path}" do
-    subject { file(full_key_path) }
-    its('owner') { should cmp 'mysql' }
-    its('group') { should cmp 'mysql' }
-    it { should_not be_more_permissive_than('0600') }
-  end
-
   describe '@@ssl_fips_mode' do
     subject { ssl_params.column('@@ssl_fips_mode').join }
     it { should match /ON|STRICT/ }
+  end
+
+  if !input('aws_rds')
+
+    if ssl_params.column('@@ssl_crlpath').join.eql?('NULL')
+      crl_path = ssl_params.column('@@datadir').join
+    else
+      crl_path = ssl_params.column('@@ssl_crlpath').join
+    end
+
+    full_crl_path = "#{crl_path}#{ssl_params.column('@@ssl_crl').join}"
+    describe "SSL CRL file: #{full_crl_path}" do
+      subject { file(full_crl_path) }
+      it { should exist }
+      its('owner') { should cmp 'mysql' }
+      its('group') { should cmp 'mysql' }
+      it { should_not be_more_permissive_than('0600') }
+    end
+
+    if ssl_params.column('@@ssl_capath').join.eql?('NULL')
+      ca_path = ssl_params.column('@@datadir').join
+    else
+      ca_path = ssl_params.column('@@ssl_capath').join
+    end
+
+    full_ca_path = "#{ca_path}#{ssl_params.column('@@ssl_ca').join}"
+    describe "SSL CA file: #{full_ca_path}" do
+      subject { file(full_ca_path) }
+      it { should exist }
+      its('owner') { should cmp 'mysql' }
+      its('group') { should cmp 'mysql' }
+      it { should_not be_more_permissive_than('0644') }
+    end
+
+    full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
+    describe "SSL Certificate file: #{full_cert_path}" do
+      subject { file(full_cert_path) }
+      it { should exist }
+      its('owner') { should cmp 'mysql' }
+      its('group') { should cmp 'mysql' }
+      it { should_not be_more_permissive_than('0644') }
+    end
+
+    full_key_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_key').join}"
+    describe "SSL Private Key file: #{full_key_path}" do
+      subject { file(full_key_path) }
+      its('owner') { should cmp 'mysql' }
+      its('group') { should cmp 'mysql' }
+      it { should_not be_more_permissive_than('0600') }
+    end
   end
 end

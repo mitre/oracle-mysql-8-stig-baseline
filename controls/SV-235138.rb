@@ -189,7 +189,11 @@ plain-text password option and in how to keep the password hidden.
      or user = 'root');
   )
 
-  authorized_password_users = input('authorized_password_users')
+  if !input('aws_rds')
+    authorized_password_users = input('authorized_password_users')
+  else
+    authorized_password_users = input('authorized_password_users') + ['rdsadmin']
+  end
 
   describe 'List of password users' do
     subject { sql_session.query(query_password_users).results.column('user') }
