@@ -76,7 +76,7 @@ component is not needed.
   if !input('aws_rds')
    approved_plugins = input('approved_plugins')
   else
-   approved_plugins = input('approved_plugins').concat(['validate_password','RDS_PROCESSLIST','RDS_EVENTS_THREADS_WAITS_CURRENT'])
+   approved_plugins = input('approved_plugins') + ['validate_password','RDS_PROCESSLIST','RDS_EVENTS_THREADS_WAITS_CURRENT']
   end
 
   query_plugins = %(

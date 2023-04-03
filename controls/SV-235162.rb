@@ -44,7 +44,7 @@ cannot be considered fixed."
   if !input('aws_rds')
     audit_admins = input('audit_admins')
   else
-    audit_admins = input('audit_admins').concat(["'rdsadmin'@'localhost'"])
+    audit_admins = input('audit_admins') + ["'rdsadmin'@'localhost'"]
   end
 
   query_audit_admins = %(

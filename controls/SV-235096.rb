@@ -122,7 +122,7 @@ given period of time.
   if !input('aws_rds')
     mysql_administrative_users = input('mysql_administrative_users')
   else
-    mysql_administrative_users = input('mysql_administrative_users').concat(['rdsadmin'])
+    mysql_administrative_users = input('mysql_administrative_users') + ['rdsadmin']
   end
 
   sql_session.query(user_concurrent_sessions).results.rows.each do |row|

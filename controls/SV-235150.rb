@@ -82,7 +82,7 @@ https://dev.mysql.com/doc/refman/8.0/en/access-control.html.
   if !input('aws_rds')
     mysql_administrative_users = input('mysql_administrative_users')
   else
-    mysql_administrative_users = input('mysql_administrative_users').concat(['rdsadmin'])
+    mysql_administrative_users = input('mysql_administrative_users') + ['rdsadmin']
   end
 
   query_accounts = %(

@@ -126,13 +126,13 @@ the right to grant permissions to other users:
   if !input('aws_rds')
    mysql_administrative_users = input('mysql_administrative_users')
   else
-   mysql_administrative_users = input('mysql_administrative_users').concat(['rdsadmin'])
+   mysql_administrative_users = input('mysql_administrative_users') + ['rdsadmin']
   end
 
   if !input('aws_rds')
    mysql_administrative_grantees = input('mysql_administrative_grantees')
   else
-   mysql_administrative_grantees = input('mysql_administrative_grantees').concat(["'rdsadmin'@'localhost'"])
+   mysql_administrative_grantees = input('mysql_administrative_grantees') + ["'rdsadmin'@'localhost'"]
   end
 
   query_admins = %(

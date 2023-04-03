@@ -124,7 +124,7 @@ names as necessary:
   if !input('aws_rds')
    pki_exception_users = input('pki_exception_users')
   else
-   pki_exception_users = input('pki_exception_users').concat(['rdsadmin'])
+   pki_exception_users = input('pki_exception_users') + ['rdsadmin']
   end
 
   query_ssl_params = %(

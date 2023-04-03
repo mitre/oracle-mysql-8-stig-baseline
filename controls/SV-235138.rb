@@ -192,7 +192,7 @@ plain-text password option and in how to keep the password hidden.
   if !input('aws_rds')
     authorized_password_users = input('authorized_password_users')
   else
-    authorized_password_users = input('authorized_password_users').concat(['rdsadmin'])
+    authorized_password_users = input('authorized_password_users') + ['rdsadmin']
   end
 
   describe 'List of password users' do

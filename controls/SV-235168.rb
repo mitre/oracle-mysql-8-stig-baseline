@@ -82,7 +82,7 @@ of CREATE ROUTINE.
   if !input('aws_rds')
     mysql_administrative_users = input('mysql_administrative_users')
   else
-    mysql_administrative_users = input('mysql_administrative_users').concat(['rdsadmin'])
+    mysql_administrative_users = input('mysql_administrative_users') + ['rdsadmin']
   end
 
   query_users = %(
