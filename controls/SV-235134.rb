@@ -151,9 +151,15 @@ names as necessary:
     it { should exist }
   end
 
-  describe '@@require_secure_transport' do
-    subject { ssl_params.column('@@require_secure_transport').join }
-    it { should match /1|ON/ }
+  describe.one do
+    describe '@@require_secure_transport' do
+      subject { ssl_params.column('@@require_secure_transport').join }
+      it { should cmp 'ON' }
+    end
+    describe '@@require_secure_transport' do
+      subject { ssl_params.column('@@require_secure_transport').join }
+      it { should cmp '1' }
+    end
   end
 
   describe '@@ssl_cert' do
