@@ -57,7 +57,11 @@ personnel to select which auditable events are audited.
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  audit_admins = input('audit_admins')
+  if !input('aws_rds')
+    audit_admins = input('audit_admins')
+  else
+    audit_admins = input('audit_admins') + ["'rdsadmin'@'localhost'"]
+  end
 
   query_audit_admins = %(
     SELECT
@@ -74,6 +78,6 @@ personnel to select which auditable events are audited.
 
   describe "List of configured audit admins" do
     subject { sql_session.query(query_audit_admins).results.column('grantee') }
-    it { should match_array audit_admins }
+    it { should be_in audit_admins }
   end
 end

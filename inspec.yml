@@ -4,7 +4,7 @@ maintainer: MITRE SAF Team
 copyright: MITRE, 2022
 license: Apache-2.0
 summary: "This Security Technical Implementation Guide is published as a tool to improve the security of Department of Defense (DoD) information systems. The requirements are derived from the National Institute of Standards and Technology (NIST) 800-53 and related documents. Comments or proposed revisions to this document should be sent via email to the following address: disa.stig_spt@mail.mil."
-version: 1.1.1
+version: 1.1.2
 inspec_version: ">= 4.0"
 
 inputs:
@@ -30,12 +30,17 @@ inputs:
     type: numeric
     value: 3306
 
+  - name: aws_rds
+    description: 'State if your database is an AWS RDS instance'
+    type: Boolean
+    value: false
+
   - name: audit_log_path
     description: 'Wildcard based path to list all audit log files'
     type: string
     value: '/var/lib/mysql/audit*log*'
 
-  - name: audit_admins
+  - name: audit_admins # SV-235104 SV-235160 SV-235161 SV-235162
     description: 'List of documented audit admin accounts.'
     type: array
     value: ["'root'@'localhost'", "'root'@'%'"]
@@ -45,23 +50,23 @@ inputs:
     type: string
     value: 'DoD Root CA'
 
-  - name: pki_exception_users
+  - name: pki_exception_users # SV-235134 SV-235136
     description: 'List of documented accounts exempted from PKI authentication.'
     type: array
     value: ['healthchecker']
 
-  - name: authorized_password_users
+  - name: authorized_password_users # SV-235138
     description: 'List of documented accounts allowed to login with password.'
     type: array
     value: ['my_user','healthchecker']
 
-  - name: mysql_administrative_users
+  - name: mysql_administrative_users # SV-235096 SV-235150 SV-235168 SV-235179
     description: 'List of documented mysql accounts with administrative previlleges.'
     type: array
     value: ['root']
     sensitive: true
 
-  - name: mysql_administrative_grantees
+  - name: mysql_administrative_grantees # SV-235179
     description: 'List of documented mysql administrative role grantees'
     type: array
     value: ["'root'@'localhost'"]
@@ -82,7 +87,7 @@ inputs:
     type: array
     value: ['file://component_validate_password']
 
-  - name: mysql_ports
+  - name: mysql_ports # SV-235146 SV-235167
     description: 'Authorized MySQL port definitions'
     type: Hash
     value:
@@ -90,11 +95,11 @@ inputs:
       admin_port: 33062
       mysqlx_port: 33060
 
-  - name: mysql_sockets
+  - name: mysql_sockets # SV-235146 SV-235167
     description: 'Authorized MySQL socket definitions'
     type: Hash
     value:
-      socket: '/var/lib/mysql/mysql.sock'
+      socket: ['/var/lib/mysql/mysql.sock', '/tmp/mysql.sock']
       mysqlx_socket: '/var/run/mysqld/mysqlx.sock'
 
   - name: mycnf

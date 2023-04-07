@@ -123,8 +123,17 @@ the right to grant permissions to other users:
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  mysql_administrative_users = input('mysql_administrative_users')
-  mysql_administrative_grantees = input('mysql_administrative_grantees')
+  if !input('aws_rds')
+   mysql_administrative_users = input('mysql_administrative_users')
+  else
+   mysql_administrative_users = input('mysql_administrative_users') + ['rdsadmin']
+  end
+
+  if !input('aws_rds')
+   mysql_administrative_grantees = input('mysql_administrative_grantees')
+  else
+   mysql_administrative_grantees = input('mysql_administrative_grantees') + ["'rdsadmin'@'localhost'"]
+  end
 
   query_admins = %(
   SELECT

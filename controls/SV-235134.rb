@@ -119,6 +119,14 @@ names as necessary:
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
+  org_approved_cert_issuer = input('org_approved_cert_issuer')
+
+  if !input('aws_rds')
+   pki_exception_users = input('pki_exception_users')
+  else
+   pki_exception_users = input('pki_exception_users') + ['rdsadmin']
+  end
+
   query_ssl_params = %(
   SELECT @@ssl_ca,
          @@ssl_capath,
@@ -167,19 +175,23 @@ names as necessary:
     it { should_not cmp 'NULL' }
   end
 
-  full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
-  describe "SSL Certificate file: #{full_cert_path}" do
-    subject { file(full_cert_path) }
-    it { should exist }
+  if !input('aws_rds')
+    full_crl_path = "#{crl_path}#{ssl_params.column('@@ssl_crl').join}"
+    describe "SSL CRL file: #{full_crl_path}" do
+      subject { file(full_crl_path) }
+      it { should exist }
+    end
+
+    full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
+    describe "SSL Certificate file: #{full_cert_path}" do
+      subject { file(full_cert_path) }
+      it { should exist }
+    end
+
+    describe x509_certificate(full_cert_path) do
+      its('issuer.CN') { should match org_approved_cert_issuer }
+    end
   end
-
-  org_approved_cert_issuer = input('org_approved_cert_issuer')
-
-  describe x509_certificate(full_cert_path) do
-    its('issuer.CN') { should match org_approved_cert_issuer }
-  end
-
-  pki_exception_users = input('pki_exception_users')
 
   query_user_params = "
       SELECT user.Host,

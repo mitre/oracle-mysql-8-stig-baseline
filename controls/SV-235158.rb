@@ -133,6 +133,7 @@ placed in PROTECTING (active blocking) or DETECTING(logging) mode.
     it { should cmp 'ON' }
   end
 
+  # Enable the MySQL Enterprise Firewall by running this script, which is located in the mysql home share sub directory. Sub directory accessible?
   if sql_session.query(query_firewall_mode).results.column('value').join.eql?('ON')
     describe 'List of MYSQL_FIREWALL_USERS' do
       subject { sql_session.query(query_firewall_users).results }

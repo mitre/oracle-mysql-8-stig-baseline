@@ -119,11 +119,19 @@ given period of time.
     it { should cmp <= max_user_connections }
   end
 
+  if !input('aws_rds')
+    mysql_administrative_users = input('mysql_administrative_users')
+  else
+    mysql_administrative_users = input('mysql_administrative_users') + ['rdsadmin']
+  end
+
   sql_session.query(user_concurrent_sessions).results.rows.each do |row|
-    describe "User value of max_user_connections for user:#{row['user']} host:#{row['host']}" do
-      subject { row['max_user_connections'] }
-      it { should_not cmp 0 }
-      it { should cmp <= max_user_connections }
+    unless mysql_administrative_users.include? row['user']
+      describe "User value of max_user_connections for user:#{row['user']} host:#{row['host']}" do
+        subject { row['max_user_connections'] }
+        it { should_not cmp 0 }
+        it { should cmp <= max_user_connections }
+      end
     end
   end
 end
