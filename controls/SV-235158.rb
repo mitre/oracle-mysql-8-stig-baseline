@@ -140,12 +140,22 @@ placed in PROTECTING (active blocking) or DETECTING(logging) mode.
       it { should_not be_empty }
     end
 
-    sql_session.query(query_firewall_users).results.rows.each do |fw_user|
-      describe "USERHOST #{fw_user['userhost']}" do
+    describe.one do
+        sql_session.query(query_firewall_users).results.rows.each do |fw_user|
+            describe "USERHOST #{fw_user['userhost']}" do
+              subject { fw_user }
+              its(['mode']) { should cmp 'LEARNING' }
+        end
+        describe "USERHOST #{fw_user['userhost']}" do
         subject { fw_user }
-        its(['mode']) { should match /LEARNING|DETECTING|PROTECTING/ }
+        its(['mode']) { should cmp 'DETECTING' }
+        end
+        describe "USERHOST #{fw_user['userhost']}" do
+        subject { fw_user }
+        its(['mode']) { should cmp 'PROTECTING' }
+        end
+        end
       end
-    end
 
   end
 end
