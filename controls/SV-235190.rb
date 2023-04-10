@@ -67,8 +67,14 @@ exact behavior of FIPS mode for ON or STRICT depends on the OpenSSL version.
 
   ssl_params = sql_session.query(query_ssl_params).results
 
+
+describe.one do
   describe '@@ssl_fips_mode' do
     subject { ssl_params.column('@@ssl_fips_mode').join }
-    it { should match /1|ON/ }
+    it { should cmp 'ON' }
+  end
+  describe '@@ssl_fips_mode' do
+    subject { ssl_params.column('@@ssl_fips_mode').join }
+    it { should cmp '1' }
   end
 end
