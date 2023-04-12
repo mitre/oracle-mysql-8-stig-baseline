@@ -68,7 +68,7 @@ https://dev.mysql.com/doc/refman/8.0/en/fips-mode.html
   query_ssl_params = %(
   SELECT @@ssl_fips_mode;
   )
-
+  ssl_params = sql_session.query(query_ssl_params).results
 describe.one do
   describe '@@ssl_fips_mode' do
     subject { ssl_params.column('@@ssl_fips_mode').join }
