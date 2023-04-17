@@ -69,5 +69,7 @@ organizationally required information.
 
   describe 'Manually validate that documented audit requirements are satisfied.' do
     skip
+    describe 'Manually validate that documented audit requirements are satisfied.' do
   end
+end
 end
