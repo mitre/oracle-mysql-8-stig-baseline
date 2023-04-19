@@ -89,9 +89,9 @@ to the fewest persons possible.
 
   describe "Manually review MySQL accounts and determine if any are shared accounts and 
   that they are compliant with the specified requirements.\n#{accounts}" do
-    skip
-    describe "Manually review MySQL accounts and determine if any are shared accounts and 
-  that they are compliant with the specified requirements." do
+    skip "Manually review MySQL accounts and determine if any are shared accounts and 
+    that they are compliant with the specified requirements.\n#{accounts}" 
+
   end
 end
 end

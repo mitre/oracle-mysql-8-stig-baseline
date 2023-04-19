@@ -68,8 +68,8 @@ organizationally required information.
   tag nist: ['AU-3 (1)']
 
   describe 'Manually validate that documented audit requirements are satisfied.' do
-    skip
-    describe 'Manually validate that documented audit requirements are satisfied.' do
+    skip 'Manually validate that documented audit requirements are satisfied.'
+  
   end
 end
 end
