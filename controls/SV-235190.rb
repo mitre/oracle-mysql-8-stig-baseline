@@ -73,8 +73,9 @@ describe.one do
     subject { ssl_params.column('@@ssl_fips_mode').join }
     it { should cmp 'ON' }
   end
-  describe '@@ssl_fips_mode' do
-    subject { ssl_params.column('@@ssl_fips_mode').join }
-    it { should cmp '1' }
+    describe '@@ssl_fips_mode' do
+      subject { ssl_params.column('@@ssl_fips_mode').join }
+      it { should cmp '1' }
+    end
   end
 end

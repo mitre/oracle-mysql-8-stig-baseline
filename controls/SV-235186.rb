@@ -59,8 +59,9 @@ describe.one do
     subject { ssl_params.column('@@require_secure_transport').join }
     it { should cmp 'ON' }
   end
-  describe '@@require_secure_transport' do
-    subject { ssl_params.column('@@require_secure_transport').join }
-    it { should cmp '1' }
+    describe '@@require_secure_transport' do
+      subject { ssl_params.column('@@require_secure_transport').join }
+      it { should cmp '1' }
+    end
   end
 end
