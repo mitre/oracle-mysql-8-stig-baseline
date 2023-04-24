@@ -104,12 +104,19 @@ other root directories located on the same disk directory or any subdirectories.
     If any non-MySQL Database Server 8.0 software directories exist on the
 datadir, basedir, or other non tmpdir directories, examine or investigate their
 use.\n#{sql_session.query(query_directory_variables).output}" do
-    skip
+    skip "Review the MySQL Database Server 8.0  software library directory and note
+    other root directories located on the same disk directory or any subdirectories.
+    
+        If any non-MySQL Database Server 8.0 software directories exist on the
+    datadir, basedir, or other non tmpdir directories, examine or investigate their
+    use.\n#{sql_session.query(query_directory_variables).output}"
   end
 
   describe "Manually review result of VARIABLE_PATH shows that configuration values are not stored
 in files dedicated directories separate from the host os or other applications,
 this is a finding.\n#{sql_session.query(query_configuration_variables).output}" do
-    skip
+    skip "Manually review result of VARIABLE_PATH shows that configuration values are not stored
+  in files dedicated directories separate from the host os or other applications,
+  this is a finding.\n#{sql_session.query(query_configuration_variables).output}"
   end
 end
