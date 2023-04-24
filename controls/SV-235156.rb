@@ -67,6 +67,9 @@ required in the database.
 triggers), application code, settings, column and field definitions, triggers,
 and constraints to determine whether the database is protected against invalid
 input.' do
-    skip
+    skip 'Manualy review MySQL Database Server 8.0 code (stored procedures, functions,
+    triggers), application code, settings, column and field definitions, triggers,
+    and constraints to determine whether the database is protected against invalid
+    input.'
   end
 end

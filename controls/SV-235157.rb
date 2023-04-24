@@ -45,6 +45,7 @@ typed parameters, modify the code to do so."
 
   describe 'Manually review MySQL source code (trigger procedures, functions) and application
 source code, to identify cases of dynamic code execution.' do
-    skip 'Requires manual review at this time.'
+    skip 'Manually review MySQL source code (trigger procedures, functions) and application
+    source code, to identify cases of dynamic code execution.'
   end
 end
