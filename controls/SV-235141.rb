@@ -119,6 +119,7 @@ requirements.
 
   describe 'Manually validate appropriate access controls are in place to restrict the access of those users to objects and data
 they are authorized to see' do
-    skip
+    skip 'Manually validate appropriate access controls are in place to restrict the access of those users to objects and data
+    they are authorized to see'
   end
 end

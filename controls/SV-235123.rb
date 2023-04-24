@@ -41,11 +41,13 @@ categories of information are deleted.
 
   describe 'Manually review DBMS documentation to verify that audit records can be produced when
 categories of information are deleted.' do
-    skip
+    skip 'Manually review DBMS documentation to verify that audit records can be produced when
+    categories of information are deleted.'
   end
 
   describe 'Manually review the DBMS/database security and audit configurations to verify that
 audit records are produced when categories of information are deleted.' do
-    skip
+    skip 'Manually review the DBMS/database security and audit configurations to verify that
+    audit records are produced when categories of information are deleted.' 
   end
 end
