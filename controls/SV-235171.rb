@@ -37,6 +37,7 @@ centralized log management system."
 
   describe 'Manually review the system documentation for a description of how audit records are
 off-loaded and how local audit log space is managed.' do
-    skip
+    skip 'Manually review the system documentation for a description of how audit records are
+    off-loaded and how local audit log space is managed.'
   end
 end
