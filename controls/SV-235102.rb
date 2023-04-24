@@ -93,4 +93,3 @@ to the fewest persons possible.
     that they are compliant with the specified requirements.\n#{accounts}" 
   end
 end
-end
