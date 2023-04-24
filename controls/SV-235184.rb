@@ -60,6 +60,6 @@ provide reliable security labeling of information in storage."
   tag nist: ['AC-16 a']
 
   describe 'Manually review organization-defined security labeling of information in storage are satisfied.' do
-    skip
+    skip 'Manually review organization-defined security labeling of information in storage are satisfied.'
   end
 end

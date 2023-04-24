@@ -80,6 +80,7 @@ privileges.
 
   describe 'Manually review MySql requires users to reauthenticate
 when organization-defined circumstances or situations require reauthentication.' do
-    skip
+    skip 'Manually review MySql requires users to reauthenticate
+when organization-defined circumstances or situations require reauthentication.'
   end
 end
