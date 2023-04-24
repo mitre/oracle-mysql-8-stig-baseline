@@ -40,6 +40,8 @@ appropriate personnel when #{input('max_audit_record_storage')} percent of audit
   describe "Manually review OS, or third-party logging application settings to determine whether
 a warning will be provided when #{input('max_audit_record_storage')} percent of DBMS audit log storage capacity
 is reached." do
-    skip
+    skip "Manually review OS, or third-party logging application settings to determine whether
+    a warning will be provided when #{input('max_audit_record_storage')} percent of DBMS audit log storage capacity
+    is reached."
   end
 end

@@ -86,6 +86,7 @@ authentication_ldap_sasl_bind_root_dn=\"cn=admin,cn=users,dc=MYSQL,dc=LOCAL\"
 
   describe 'Manually review the LDAP server for the maximum lifetime of the
 Kerberos service Tickets expiration policy meets organization-defined time period.' do
-    skip
+    skip 'Manually review the LDAP server for the maximum lifetime of the
+    Kerberos service Tickets expiration policy meets organization-defined time period.'
   end
 end
