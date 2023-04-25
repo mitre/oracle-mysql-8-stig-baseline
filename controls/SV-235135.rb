@@ -162,8 +162,10 @@ STRICT at startup causes the server to produce an error message and exit.
 
   ssl_fips_mode = ssl_params.column('@@ssl_fips_mode').join
   describe '@@ssl_fips_mode' do
-    failure_message = "@@ssl_fips_mode should be set to ON or STRICT and not #{ssl_fips_mode}"
-    expect(ssl_fips_mode).to  be_in(['ON', 'STRICT']), failure_message
+    it 'shoud be ON or STRICT' do
+      failure_message = "@@ssl_fips_mode should be set to ON or STRICT and not #{ssl_fips_mode}"
+      expect(ssl_fips_mode).to  be_in(['ON', 'STRICT']), failure_message
+    end
   end
 
   describe.one do
