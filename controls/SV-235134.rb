@@ -153,6 +153,14 @@ names as necessary:
     crl_path = ssl_params.column('@@ssl_crlpath').join
   end
 
+  require_secure_transport = ssl_params.column('@@require_secure_transport').join
+  describe '@@require_secure_transport' do
+    it 'shoud be ON or 1' do
+      failure_message = "@@require_secure_transport should be set to ON or 1 and not #{require_secure_transport}"
+      expect(require_secure_transport).to  be_in(['ON', '1']), failure_message
+    end
+  end
+
   describe.one do
     describe '@@require_secure_transport' do
       subject { ssl_params.column('@@require_secure_transport').join }
