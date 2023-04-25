@@ -160,6 +160,12 @@ STRICT at startup causes the server to produce an error message and exit.
 
   ssl_params = sql_session.query(query_ssl_params).results
 
+  describe '@@ssl_fips_mode' do
+    subject { ssl_params.column('@@ssl_fips_mode').join }
+    failure_message = "@@ssl_fips_mode should be set to ON or STRICT and not #{subject}"
+    expect(subject).to  be_in(['ON', 'STRICT']), failure_message
+  end
+
   describe.one do
     describe '@@ssl_fips_mode' do
       subject { ssl_params.column('@@ssl_fips_mode').join }
