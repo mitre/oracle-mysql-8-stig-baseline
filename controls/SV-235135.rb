@@ -160,29 +160,29 @@ STRICT at startup causes the server to produce an error message and exit.
 
   ssl_params = sql_session.query(query_ssl_params).results
 
-  describe '@@ssl_fips_mode' do
-    subject { ssl_params.column('@@ssl_fips_mode').join }
-    it { should be_in ['ON', 'STRICT'] }
-  end
+  # describe '@@ssl_fips_mode' do
+  #   subject { ssl_params.column('@@ssl_fips_mode').join }
+  #   it { should be_in ['ON', 'STRICT'] }
+  # end
 
   ssl_fips_mode = ssl_params.column('@@ssl_fips_mode').join
   describe '@@ssl_fips_mode' do
-    it 'shoud be ON or STRICT' do
-      failure_message = "Expected value for @@ssl_fips_mode: ON or STRICT. Got: #{ssl_fips_mode}"
-      expect(ssl_fips_mode).to be_in(['ON', 'STRICT']), failure_message
+    it "shoud be ON or STRICT. Got #{ssl_fips_mode}" do
+      # failure_message = "@@ssl_fips_mode should be ON or STRICT. Got #{ssl_fips_mode}"
+      expect(ssl_fips_mode).to be_in(['ON', 'STRICT'])#, failure_message
     end
   end
 
-  describe.one do
-    describe '@@ssl_fips_mode' do
-      subject { ssl_params.column('@@ssl_fips_mode').join }
-      it { should cmp 'ON' }
-    end
-    describe '@@ssl_fips_mode' do
-      subject { ssl_params.column('@@ssl_fips_mode').join }
-      it { should cmp 'STRICT' }
-    end
-  end
+  # describe.one do
+  #   describe '@@ssl_fips_mode' do
+  #     subject { ssl_params.column('@@ssl_fips_mode').join }
+  #     it { should cmp 'ON' }
+  #   end
+  #   describe '@@ssl_fips_mode' do
+  #     subject { ssl_params.column('@@ssl_fips_mode').join }
+  #     it { should cmp 'STRICT' }
+  #   end
+  # end
 
   if !input('aws_rds')
 
