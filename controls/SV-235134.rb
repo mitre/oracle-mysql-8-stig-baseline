@@ -155,7 +155,7 @@ names as necessary:
 
   require_secure_transport = ssl_params.column('@@require_secure_transport').join
   describe '@@require_secure_transport' do
-    it "shoud be ON or STRICT. Got #{require_secure_transport}" do
+    it "shoud be ON or 1. Got #{require_secure_transport}" do
       expect(require_secure_transport).to be_in(['ON', '1'])
     end
   end
