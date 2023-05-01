@@ -161,8 +161,10 @@ STRICT at startup causes the server to produce an error message and exit.
   ssl_params = sql_session.query(query_ssl_params).results
 
   ssl_fips_mode = ssl_params.column('@@ssl_fips_mode').join
-  describe "@@ssl_fips_mode shoud be ON or STRICT. Got #{ssl_fips_mode}" do
-    expect(ssl_fips_mode).to be_in(['ON', 'STRICT'])
+  describe '@@ssl_fips_mode' do
+    it "shoud be ON or STRICT. Got #{ssl_fips_mode}" do
+      expect(ssl_fips_mode).to be_in(['ON', 'STRICT'])
+    end
   end
 
   if !input('aws_rds')
