@@ -69,14 +69,11 @@ https://dev.mysql.com/doc/refman/8.0/en/fips-mode.html
   SELECT @@ssl_fips_mode;
   )
   ssl_params = sql_session.query(query_ssl_params).results
-describe.one do
+  
+  ssl_fips_mode = ssl_params.column('@@ssl_fips_mode').join
   describe '@@ssl_fips_mode' do
-    subject { ssl_params.column('@@ssl_fips_mode').join }
-    it { should cmp 'ON' }
-  end
-    describe '@@ssl_fips_mode' do
-      subject { ssl_params.column('@@ssl_fips_mode').join }
-      it { should cmp 'STRICT' }
+    it "shoud be ON or STRICT. Got #{ssl_fips_mode}" do
+      expect(ssl_fips_mode).to be_in(['ON', 'STRICT'])
     end
   end
 end

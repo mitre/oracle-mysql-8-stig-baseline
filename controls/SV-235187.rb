@@ -132,16 +132,13 @@ database.
   )
 
   ssl_params = sql_session.query(query_ssl_params).results
-  describe.one do
+
+  ssl_fips_mode = ssl_params.column('@@ssl_fips_mode').join
   describe '@@ssl_fips_mode' do
-    subject { ssl_params.column('@@ssl_fips_mode').join }
-    it { should cmp 'ON' }
+    it "shoud be ON or STRICT. Got #{ssl_fips_mode}" do
+      expect(ssl_fips_mode).to be_in(['ON', 'STRICT'])
+    end
   end
-  describe '@@ssl_fips_mode' do
-    subject { ssl_params.column('@@ssl_fips_mode').join }
-    it { should cmp '1' }
-  end
-end
 
   describe '@@tls_version' do
     subject { ssl_params.column('@@tls_version').join.split(',') }

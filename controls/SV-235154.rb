@@ -64,25 +64,17 @@ algorithms.
 
   ssl_params = sql_session.query(query_ssl_params).results
 
-  describe.one do
-    describe '@@ssl_fips_mode' do
-      subject { ssl_params.column('@@ssl_fips_mode').join }
-      it { should cmp 'ON' }
-    end
-    describe '@@ssl_fips_mode' do
-      subject { ssl_params.column('@@ssl_fips_mode').join }
-      it { should cmp 'STRICT' }
+  ssl_fips_mode = ssl_params.column('@@ssl_fips_mode').join
+  describe '@@ssl_fips_mode' do
+    it "shoud be ON or STRICT. Got #{ssl_fips_mode}" do
+      expect(ssl_fips_mode).to be_in(['ON', 'STRICT'])
     end
   end
 
-describe.one do
+  require_secure_transport = ssl_params.column('@@require_secure_transport').join
   describe '@@require_secure_transport' do
-    subject { ssl_params.column('@@require_secure_transport').join }
-    it { should cmp 'ON' }
-  end
-    describe '@@require_secure_transport' do
-      subject { ssl_params.column('@@require_secure_transport').join }
-      it { should cmp '1' }
+    it "shoud be 1 or ON. Got #{require_secure_transport}" do
+      expect(require_secure_transport).to be_in(['1', 'ON'])
     end
   end
 end
