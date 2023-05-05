@@ -142,7 +142,7 @@ placed in PROTECTING (active blocking) or DETECTING(logging) mode.
 
       query_firewall_users = ssl_params.column('@@query_firewall_users').join
         describe '@@query_firewall_users' do
-        it "shoud be LEARNING or DETECTING or PROTECTING. Got #{query_firewall_users}" do
+        it "should be LEARNING or DETECTING or PROTECTING. Got #{query_firewall_users}" do
         expect(query_firewall_users).to be_in(['LEARNING', 'DETECTING', 'PROTECTING'])
         end
     end

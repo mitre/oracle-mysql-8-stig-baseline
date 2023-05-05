@@ -63,7 +63,7 @@ exact behavior of FIPS mode for ON or STRICT depends on the OpenSSL version.
 
   ssl_fips_mode = ssl_params.column('@@ssl_fips_mode').join
   describe '@@ssl_fips_mode' do
-    it "shoud be ON or STRICT. Got #{ssl_fips_mode}" do
+    it "should be ON or STRICT. Got #{ssl_fips_mode}" do
       expect(ssl_fips_mode).to be_in(['ON', 'STRICT'])
     end
   end
