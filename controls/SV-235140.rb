@@ -77,6 +77,6 @@ keyrings. Following is an example:
   tag nist: ['IA-6']
 
   describe 'Manually review users are trained to use alternatives to command line password parameters.' do
-    skip
+    skip 'Manually review users are trained to use alternatives to command line password parameters.'
   end
 end

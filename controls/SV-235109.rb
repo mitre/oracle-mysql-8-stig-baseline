@@ -186,13 +186,13 @@ well as providing the details for the audit event.
   end
 
   describe "Manually validate `audit_log` plugin is active:\n #{audit_log_plugin_status.output}" do
-    skip
+    skip "Manually validate `audit_log` plugin is active:\n #{audit_log_plugin_status.output}"
   end
   describe "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}" do
-    skip
+    skip "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}"
   end
   describe "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}" do
-    skip
+    skip "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}"
   end
   describe "Manually validate that required audit logs are generated when the following query is executed:
   CREATE TABLE `test_trigger`.`info_cat_test` ( `id` INT NOT NULL, `name` VARCHAR(20) NULL, `desc` VARCHAR(20) NULL, `sec_level` CHAR(1) NULL, PRIMARY KEY (`id`));
@@ -226,6 +226,37 @@ well as providing the details for the audit event.
      IF(`info_cat_test`.`sec_level` = 'H', audit_api_message_emit_udf('sec_level_selected', 'audit_select_attempt', ' H level sec data was accessed', 'FOR ', name ), 'Not Audited') 
   FROM
      `test_trigger`.`info_cat_test`;" do
-    skip
+    skip "Manually validate that required audit logs are generated when the following query is executed:
+    CREATE TABLE `test_trigger`.`info_cat_test` ( `id` INT NOT NULL, `name` VARCHAR(20) NULL, `desc` VARCHAR(20) NULL, `sec_level` CHAR(1) NULL, PRIMARY KEY (`id`));
+    DELIMITER $$ 
+    INSERT INTO
+       `test_trigger`.`info_cat_test` (`id`, `name`, `desc`, `sec_level`) 
+    VALUES
+       (
+          '1', 'fred', 'engineer', 'H'
+       )
+    ;
+    INSERT INTO
+       `test_trigger`.`info_cat_test` (`id`, `name`, `desc`, `sec_level`) 
+    VALUES
+       (
+          '2', 'jill', 'program manager', 'M'
+       )
+    ;
+    INSERT INTO
+       `test_trigger`.`info_cat_test` (`id`, `name`, `desc`, `sec_level`) 
+    VALUES
+       (
+          '3', 'joe', 'maintenance', 'L'
+       )
+    ;
+    SELECT
+       `info_cat_test`.`id`,
+       `info_cat_test`.`name`,
+       `info_cat_test`.`desc`,
+       `info_cat_test`.`sec_level`,
+       IF(`info_cat_test`.`sec_level` = 'H', audit_api_message_emit_udf('sec_level_selected', 'audit_select_attempt', ' H level sec data was accessed', 'FOR ', name ), 'Not Audited') 
+    FROM
+       `test_trigger`.`info_cat_test`;" 
   end
 end

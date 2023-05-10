@@ -138,15 +138,15 @@ records when privileges/permissions are deleted.
   end
 
   describe "Manually validate `audit_log` plugin is active:\n #{audit_log_plugin_status.output}" do
-    skip
+    skip "Manually validate `audit_log` plugin is active:\n #{audit_log_plugin_status.output}"
   end
   describe "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}" do
-    skip
+    skip  "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}"
   end
   describe "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}" do
-    skip
+    skip "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}"
   end
   describe 'Manually validate that required audit logs are generated when the specified query is executed.' do
-    skip
+    skip 'Manually validate that required audit logs are generated when the specified query is executed.'
   end
 end

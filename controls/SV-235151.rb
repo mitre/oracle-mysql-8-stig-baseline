@@ -122,6 +122,10 @@ functionality is stored.
 
     If security-related database objects or code are not kept separate, this is
 a finding.\n#{schemas}" do
-    skip
+    skip "Manually review the database structure to determine where security-related
+    functionality is stored.
+    
+        If security-related database objects or code are not kept separate, this is
+    a finding.\n#{schemas}"
   end
 end

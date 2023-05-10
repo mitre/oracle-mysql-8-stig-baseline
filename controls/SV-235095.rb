@@ -196,8 +196,10 @@ https://dev.mysql.com/doc/refman/8.0/en/grant.html.
 
   if auth_plugins_installed
     describe "Manually review authentication variables are configured as per guidance\n#{sql_session.query(auth_variables).output}" do
-      skip 
+      skip "Manually review authentication variables are configured as per guidance\n#{sql_session.query(auth_variables).output}"
+      
     end
+
   else
     describe "List of installed authentication plugins" do
       subject { sql_session.query(auth_plugins).results.rows }
@@ -205,5 +207,3 @@ https://dev.mysql.com/doc/refman/8.0/en/grant.html.
     end
   end
 end
-  
-

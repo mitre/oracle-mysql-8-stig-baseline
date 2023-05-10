@@ -72,6 +72,6 @@ CHECK (i BETWEEN 7 AND 12 ) );
   constraints = sql_session.query(query_constraints).output
 
   describe "Manually review organizationally defined constraints that have been put in place.\n#{constraints}" do
-    skip
+    skip "Manually review organizationally defined constraints that have been put in place.\n#{constraints}"
   end
 end

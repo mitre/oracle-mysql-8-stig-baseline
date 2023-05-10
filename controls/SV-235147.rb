@@ -140,14 +140,14 @@ relevant circumstances.
   )
 
   describe "Manually review authentication plugins are configured as per guidance\n#{sql_session.query(query_auth_plugins).output}" do
-    skip 
+    skip "Manually review authentication plugins are configured as per guidance\n#{sql_session.query(query_auth_plugins).output}"
   end
 
   describe "Manually review authentication variables are configured as per guidance\n#{sql_session.query(query_auth_variables).output}" do
-    skip 
+    skip "Manually review authentication variables are configured as per guidance\n#{sql_session.query(query_auth_variables).output}"
   end
 
   describe "Manually review organizational users are uniquely identified and authenticated\n#{sql_session.query(query_users).output}" do
-    skip 
+    skip "Manually review organizational users are uniquely identified and authenticated\n#{sql_session.query(query_users).output}"
   end
 end

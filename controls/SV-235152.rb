@@ -41,6 +41,7 @@ locations."
 
   describe 'Manually review that procedures for the refreshing of development/test data from
 production meet organization-defined data transfer policy .' do
-    skip
+    skip 'Manually review that procedures for the refreshing of development/test data from
+    production meet organization-defined data transfer policy .'
   end
 end

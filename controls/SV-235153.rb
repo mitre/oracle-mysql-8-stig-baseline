@@ -135,6 +135,7 @@ certificate, key, or other directories."
 
   describe "Manually review access to database files must be limited to relevant processes and to
 authorized, administrative users.\n#{locations}" do
-    skip
+    skip "Manually review access to database files must be limited to relevant processes and to
+    authorized, administrative users.\n#{locations}"
   end
 end

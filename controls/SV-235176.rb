@@ -42,6 +42,8 @@ appropriate support staff when an audit log failure occurs."
   describe 'Manually review MySQL Server settings, OS, or third-party logging software settings
 to determine whether a real-time alert will be sent to the appropriate
 personnel when auditing fails for any reason.' do
-    skip
+    skip 'Manually review MySQL Server settings, OS, or third-party logging software settings
+    to determine whether a real-time alert will be sent to the appropriate
+    personnel when auditing fails for any reason.'
   end
 end

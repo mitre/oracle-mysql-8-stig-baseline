@@ -39,6 +39,8 @@ the STIG, #{input('org_guidance')}."
   describe "Manually review the MySQL documentation and configuration to determine it is
 configured in accordance with #{input('org_name')} security configuration and implementation
 guidance, including STIGs, #{input('org_guidance')}" do
-    skip
+    skip "Manually review the MySQL documentation and configuration to determine it is
+    configured in accordance with #{input('org_name')} security configuration and implementation
+    guidance, including STIGs, #{input('org_guidance')}"
   end
 end

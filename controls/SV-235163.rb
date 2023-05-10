@@ -89,15 +89,18 @@ update access to the mysql.plugin or mysql.component table."
 groups with modify rights for this SQL instance`s binary files. Additionally
 check the owner and users or groups with modify rights for shared software
 library paths on disk.' do
-    skip 
+    skip 'Manually Review Server documentation to determine the authorized owner and users or
+    groups with modify rights for this SQL instance`s binary files. Additionally
+    check the owner and users or groups with modify rights for shared software
+    library paths on disk.'
   end
 
 
   describe "Manually review table specific privileges.\n#{sql_session.query(query_table_privileges).output}" do
-    skip
+    skip "Manually review table specific privileges.\n#{sql_session.query(query_table_privileges).output}"
   end
 
   describe "Manually review INSERT and DELETE privileges.\n#{sql_session.query(query_privileges).output}" do
-    skip
+    skip "Manually review INSERT and DELETE privileges.\n#{sql_session.query(query_privileges).output}"
   end
 end

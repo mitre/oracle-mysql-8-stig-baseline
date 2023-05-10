@@ -98,6 +98,8 @@ example:
   describe "Manually review audit record storage
 capacity in accordance with organization-defined audit record storage
 requirements.\n#{sql_session.query(query_audit_configurations).output}" do
-    skip
+    skip "Manually review audit record storage
+    capacity in accordance with organization-defined audit record storage
+    requirements.\n#{sql_session.query(query_audit_configurations).output}"
   end
 end

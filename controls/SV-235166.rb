@@ -62,37 +62,37 @@ the database objects, this is a finding.
 
   if table_names.include?('SCHEMA_PRIVILEGES')
     describe "Manually review SCHEMA_PRIVILEGES.\n#{sql_session.query('SELECT * FROM information_schema.SCHEMA_PRIVILEGES;').output}" do
-      skip
+      skip "Manually review SCHEMA_PRIVILEGES.\n#{sql_session.query('SELECT * FROM information_schema.SCHEMA_PRIVILEGES;').output}"
     end
   end
 
   if table_names.include?('TABLE_PRIVILEGES')
     describe "Manually review TABLE_PRIVILEGES.\n#{sql_session.query('SELECT * FROM information_schema.TABLE_PRIVILEGES;').output}" do
-      skip
+      skip "Manually review TABLE_PRIVILEGES.\n#{sql_session.query('SELECT * FROM information_schema.TABLE_PRIVILEGES;').output}"
     end
   end
 
   if table_names.include?('COLUMN_PRIVILEGES')
     describe "Manually review COLUMN_PRIVILEGES.\n#{sql_session.query('SELECT * FROM information_schema.COLUMN_PRIVILEGES;').output}" do
-      skip
+      skip "Manually review COLUMN_PRIVILEGES.\n#{sql_session.query('SELECT * FROM information_schema.COLUMN_PRIVILEGES;').output}"
     end
   end
 
   if table_names.include?('USER_PRIVILEGES')
     describe "Manually review USER_PRIVILEGES.\n#{sql_session.query('SELECT * FROM information_schema.USER_PRIVILEGES;').output}" do
-      skip
+      skip "Manually review USER_PRIVILEGES.\n#{sql_session.query('SELECT * FROM information_schema.USER_PRIVILEGES;').output}"
     end
   end
 
   if table_names.include?('ROLE_COLUMN_GRANTS')
     describe "Manually review ROLE_COLUMN_GRANTS.\n#{sql_session.query('SELECT * FROM information_schema.ROLE_COLUMN_GRANTS;').output}" do
-      skip
+      skip "Manually review ROLE_COLUMN_GRANTS.\n#{sql_session.query('SELECT * FROM information_schema.ROLE_COLUMN_GRANTS;').output}"
     end
   end
 
   if table_names.include?('ROLE_TABLE_GRANTS')
     describe "Manually review ROLE_TABLE_GRANTS.\n#{sql_session.query('SELECT * FROM information_schema.ROLE_TABLE_GRANTS;').output}" do
-      skip
+      skip "Manually review ROLE_TABLE_GRANTS.\n#{sql_session.query('SELECT * FROM information_schema.ROLE_TABLE_GRANTS;').output}"
     end
   end
 end

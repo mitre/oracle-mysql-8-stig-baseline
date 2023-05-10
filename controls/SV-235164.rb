@@ -42,6 +42,7 @@ track use of the MySQL Database Server 8.0 software installation account."
 
   describe 'Manually review procedures for controlling and granting access to use of the DBMS
 software installation account.' do
-    skip
+    skip 'Manually review procedures for controlling and granting access to use of the DBMS
+    software installation account.'
   end
 end
