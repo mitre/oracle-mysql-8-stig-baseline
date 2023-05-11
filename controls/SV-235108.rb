@@ -100,7 +100,8 @@ records when unsuccessful attempts to retrieve privileges/permissions occur.
   FROM
      INFORMATION_SCHEMA.PLUGINS
   WHERE
-     PLUGIN_NAME LIKE 'audit_log' ;
+     PLUGIN_NAME LIKE 'audit_log' OR
+     PLUGIN_NAME LIKE 'SERVER_AUDIT' ;
   )
 
   audit_log_plugin_status = sql_session.query(audit_log_plugin)
