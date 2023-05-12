@@ -140,11 +140,11 @@ placed in PROTECTING (active blocking) or DETECTING(logging) mode.
       it { should_not be_empty }
     end
 
-      query_firewall_users = ssl_params.column('@@query_firewall_users').join
-        describe '@@query_firewall_users' do
-        it "should be LEARNING or DETECTING or PROTECTING. Got #{query_firewall_users}" do
-        expect(query_firewall_users).to be_in(['LEARNING', 'DETECTING', 'PROTECTING'])
+    sql_session.query(query_firewall_users).results.rows.each do |fw_user|
+        describe "USERHOST #{fw_user['userhost']}" do
+          subject { fw_user }
+          its(['mode']) { should be_in ['LEARNING', 'DETECTING', 'PROTECTING'] }
         end
-    end
+      end
   end
 end
