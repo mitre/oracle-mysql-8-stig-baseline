@@ -96,7 +96,8 @@ and \"rw r\" to \"640\".
     end
 
     describe file(mysqld_auto_cnf) do
-      it { should_not be_more_permissive_than('0644') }
+      its('owner') { should eq 'mysql' }
+      it { should_not be_more_permissive_than('0640') }
     end
     
   else
