@@ -41,7 +41,11 @@ events are being audited by the system.
 
     SELECT PLUGIN_NAME, plugin_status FROM INFORMATION_SCHEMA.PLUGINS
           WHERE PLUGIN_NAME LIKE 'audit_log' ;
-
+          
+NOTE: for Community Server instances the MariaDB audit plugin \"SERVER_AUDIT\" may be used:
+    SELECT PLUGIN_NAME, plugin_status FROM INFORMATION_SCHEMA.PLUGINS
+          WHERE PLUGIN_NAME LIKE 'SERVER_AUDIT' ;
+          
     If the results are not 'audit_log' and plugin_status='ACTIVE' , this is a
 finding.
 
@@ -52,6 +56,7 @@ finding.
 
     If nothing is returned or the value for audit_log_encryption is not AES,
 this is a finding.
+(NOTE: Community Server using MariaDB audit plugin does not support the audit_log_encryption parameter)
 
     Review the audit files in the file systems.
 
