@@ -215,7 +215,7 @@ https://dev.mysql.com/doc/refman/8.0/en/grant.html.
       skip "Manually review authentication variables are configured as per guidance\n#{sql_session.query(auth_variables).output}"
     end
   else
-    describe 'No external authentication plugins found, therefore this list of local users\n#{sql_session.query(query_accounts).output}' do
+    describe 'No external authentication plugins found, therefore this list of local users' do
       subject { sql_session.query(query_accounts).results.column('user') }
       it { should be_in mysql_authorized_local_users }
     end
