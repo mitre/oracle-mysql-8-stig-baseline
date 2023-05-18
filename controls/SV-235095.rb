@@ -170,6 +170,20 @@ https://dev.mysql.com/doc/refman/8.0/en/grant.html.
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
+  query_accounts = %(
+  SELECT
+     user
+  FROM
+     mysql.user 
+  WHERE
+     user not in 
+     (
+        'mysql.infoschema',
+        'mysql.session',
+        'mysql.sys'
+     );
+     )
+
   auth_plugins = %(
   SELECT
      plugin_name,
@@ -197,13 +211,11 @@ https://dev.mysql.com/doc/refman/8.0/en/grant.html.
   if auth_plugins_installed
     describe "Manually review authentication variables are configured as per guidance\n#{sql_session.query(auth_variables).output}" do
       skip "Manually review authentication variables are configured as per guidance\n#{sql_session.query(auth_variables).output}"
-      
     end
-
   else
-    describe "List of installed authentication plugins" do
-      subject { sql_session.query(auth_plugins).results.rows }
-      it { should_not be_empty }
+    describe 'No external authentication plugins found, therefore this list of local users\n#{sql_session.query(query_accounts).output}' do
+      subject { sql_session.query(query_accounts).results.column('user') }
+      it { should be_in mysql_authorized_local_users }
     end
   end
 end
