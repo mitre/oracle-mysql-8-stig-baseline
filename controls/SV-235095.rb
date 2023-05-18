@@ -168,6 +168,8 @@ https://dev.mysql.com/doc/refman/8.0/en/grant.html.
   tag cci: ['CCI-000015']
   tag nist: ['AC-2 (1)']
 
+  mysql_authorized_local_users = input('mysql_authorized_local_users')
+
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
   query_accounts = %(
