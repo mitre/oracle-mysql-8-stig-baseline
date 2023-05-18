@@ -60,8 +60,14 @@ inputs:
     type: array
     value: ['my_user','healthchecker']
 
+  - name: mysql_authorized_local_users # SV-235095
+    description: 'List of documented authorized local mysql accounts.'
+    type: array
+    value: ['root']
+    sensitive: true
+    
   - name: mysql_administrative_users # SV-235096 SV-235150 SV-235168 SV-235179
-    description: 'List of documented mysql accounts with administrative previlleges.'
+    description: 'List of documented mysql accounts with administrative privileges.'
     type: array
     value: ['root']
     sensitive: true
