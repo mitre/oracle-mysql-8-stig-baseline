@@ -122,7 +122,7 @@ select @@basedir;
            WHERE PLUGIN_NAME LIKE 'audit%';
     The value for audit_log should return ACTIVE.
 
-NOTE: for Community Server instances the MariaDB audit plugin "SERVER_AUDIT" may be used:
+NOTE: for Community Server instances the MariaDB audit plugin \"SERVER_AUDIT\" may be used:
     Verify the plugin installation by running:
     SELECT PLUGIN_NAME, PLUGIN_STATUS
            FROM INFORMATION_SCHEMA.PLUGINS
