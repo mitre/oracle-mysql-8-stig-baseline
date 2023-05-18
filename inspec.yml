@@ -35,6 +35,11 @@ inputs:
     type: Boolean
     value: false
 
+  - name: community_server
+    description: 'State if your database is a Community Server (not Enterprise Edition) instance'
+    type: Boolean
+    value: false
+
   - name: audit_log_path
     description: 'Wildcard based path to list all audit log files'
     type: string
