@@ -68,11 +68,15 @@ org_appoved_cert_issuer: DoD Root CA
 #Value Type: array
 pki_exception_users: ["healthchecker"]
 
+#Description: List of documented authorized local mysql accounts. # SV-235095
+#Value Type: array
+mysql_authorized_local_users: ['root']
+
 #Description: List of documented accounts allowed to login with password.
 #Value Type: array
 authorized_password_users: ["healthchecker"]
 
-#Description: List of documented mysql accounts with administrative previlleges.
+#Description: List of documented mysql accounts with administrative privileges.
 #Value Type: array
 mysql_administrative_users: ["root"]
 
