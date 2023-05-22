@@ -39,6 +39,13 @@ events are being audited by the system.
 
     SELECT PLUGIN_NAME, plugin_status FROM INFORMATION_SCHEMA.PLUGINS
            WHERE PLUGIN_NAME LIKE 'audit_log' ;
+          
+[NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 
+Community Server (also used by AWS RDS) has reduced or different features. 
+For Community Server, the MariaDB audit plugin may be used. 
+This InSpec profile is adapted to measure accordingly when using Community Server]:    
+    SELECT PLUGIN_NAME, plugin_status FROM INFORMATION_SCHEMA.PLUGINS
+          WHERE PLUGIN_NAME LIKE 'SERVER_AUDIT' ;
 
     If nothing is returned OR if the results are not \"audit_log\" and
 \"plugin_status='ACTIVE'\" , this is a finding.
@@ -50,6 +57,7 @@ events are being audited by the system.
 
     If nothing is returned OR the value for audit_log_encryption is not
 \"AES\", this is a finding.
+[NOTE: Community Server using MariaDB audit plugin does not support the audit_log_encryption parameter]
   "
   desc 'fix', "
     Deploy a MySQL Database Server 8.0 that supports the #{input('org_name')} minimum set of
@@ -91,16 +99,28 @@ true } }');
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  audit_log_plugin = %(
-  SELECT
-     PLUGIN_NAME,
-     plugin_status 
-  FROM
-     INFORMATION_SCHEMA.PLUGINS 
-  WHERE
-     PLUGIN_NAME LIKE 'audit_log' ;
-  )
-
+  if !input('aws_rds')
+    audit_log_plugin = %(
+    SELECT
+       PLUGIN_NAME,
+       plugin_status 
+    FROM
+       INFORMATION_SCHEMA.PLUGINS 
+    WHERE
+       PLUGIN_NAME LIKE 'audit_log' ;
+    )
+  else
+    audit_log_plugin = %(
+    SELECT
+       PLUGIN_NAME,
+       plugin_status 
+    FROM
+       INFORMATION_SCHEMA.PLUGINS 
+    WHERE
+       PLUGIN_NAME LIKE 'SERVER_AUDIT' ;
+    )
+  end
+  
   audit_log_encryption = %(
   SELECT
      VARIABLE_NAME,
@@ -111,13 +131,17 @@ true } }');
      VARIABLE_NAME LIKE 'audit_log_encryption' ;
   )
 
-  describe "Audit Log Plugin status" do
-    subject { sql_session.query(audit_log_plugin).results.column('plugin_status') }
-    it { should cmp 'ACTIVE' }
-  end
+    describe "Audit Log Plugin status" do
+      subject { sql_session.query(audit_log_plugin).results.column('plugin_status') }
+      it { should cmp 'ACTIVE' }
+    end
+  
+  if !input('aws_rds')
 
-  describe "audit_log_encryption config" do
-    subject { sql_session.query(audit_log_encryption).results.column('variable_value') }
-    it { should cmp 'AES' }
+    describe "audit_log_encryption config" do
+      subject { sql_session.query(audit_log_encryption).results.column('variable_value') }
+      it { should cmp 'AES' }
+    end
+    
   end
 end
