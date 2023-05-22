@@ -206,8 +206,10 @@ records when audit when privileges/permissions are retrieved.
     end
 
     describe 'Community Server server_audit_events settings' do
-      subject { server_audit_events_setting.results.column('value') }
-      it { should cmp 'CONNECT,QUERY' }
+      subject { Set[server_audit_events_setting.results.column('value').split(',')] }
+      it { should cmp Set['CONNECT,QUERY'.split(',')] }
+#      subject { server_audit_events_setting.results.column('value') }
+#      it { should cmp 'CONNECT,QUERY' }
     end
     
   end
