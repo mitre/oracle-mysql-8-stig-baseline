@@ -59,7 +59,7 @@ finding.
 
     If nothing is returned or the value for audit_log_encryption is not AES,
 this is a finding.
-(NOTE: Community Server using MariaDB audit plugin does not support the audit_log_encryption parameter)
+[NOTE: Community Server using MariaDB audit plugin does not support the audit_log_encryption parameter]
 
     Review the audit files in the file systems.
 
