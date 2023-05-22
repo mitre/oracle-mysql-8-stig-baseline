@@ -42,7 +42,10 @@ events are being audited by the system.
     SELECT PLUGIN_NAME, plugin_status FROM INFORMATION_SCHEMA.PLUGINS
           WHERE PLUGIN_NAME LIKE 'audit_log' ;
           
-NOTE: for Community Server instances the MariaDB audit plugin \"SERVER_AUDIT\" may be used:
+[NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 
+Community Server (also used by AWS RDS) has reduced or different features. 
+For Community Server, the MariaDB audit plugin may be used. 
+This InSpec profile is adapted to measure accordingly when using Community Server]:    
     SELECT PLUGIN_NAME, plugin_status FROM INFORMATION_SCHEMA.PLUGINS
           WHERE PLUGIN_NAME LIKE 'SERVER_AUDIT' ;
           
@@ -127,7 +130,10 @@ select @@basedir;
            WHERE PLUGIN_NAME LIKE 'audit%';
     The value for audit_log should return ACTIVE.
 
-NOTE: for Community Server instances the MariaDB audit plugin \"SERVER_AUDIT\" may be used:
+[NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 
+Community Server (also used by AWS RDS) has reduced or different features. 
+For Community Server, the MariaDB audit plugin may be used. 
+This InSpec profile is adapted to measure accordingly when using Community Server]:
     Verify the plugin installation by running:
     SELECT PLUGIN_NAME, PLUGIN_STATUS
            FROM INFORMATION_SCHEMA.PLUGINS
