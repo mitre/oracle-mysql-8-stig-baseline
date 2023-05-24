@@ -160,12 +160,12 @@ STRICT at startup causes the server to produce an error message and exit.
 
   ssl_params = sql_session.query(query_ssl_params).results
 
-  describe '@@ssl_fips_mode' do
-    subject { ssl_params.column('@@ssl_fips_mode').join }
-    it { should match /ON|STRICT/ }
-  end
-
   if !input('aws_rds')
+
+    describe '@@ssl_fips_mode' do
+      subject { ssl_params.column('@@ssl_fips_mode').join }
+      it { should match /ON|STRICT/ }
+    end
 
     if ssl_params.column('@@ssl_crlpath').join.eql?('NULL')
       crl_path = ssl_params.column('@@datadir').join
@@ -212,6 +212,11 @@ STRICT at startup causes the server to produce an error message and exit.
       its('owner') { should cmp 'mysql' }
       its('group') { should cmp 'mysql' }
       it { should_not be_more_permissive_than('0600') }
+    end
+  else
+    impact 0.0
+    describe 'Not applicable since ssl_fips_mode is set to 0 (OFF) and cannot be configured in AWS RDS' do
+      skip 'Not applicable since ssl_fips_mode is set to 0 (OFF) and cannot be configured in AWS RDS'
     end
   end
 end
