@@ -119,33 +119,43 @@ placed in PROTECTING (active blocking) or DETECTING(logging) mode.
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  query_firewall_mode = %(SHOW GLOBAL VARIABLES LIKE 'mysql_firewall_mode';)
+  if !input('aws_rds')
 
-  query_firewall_users = %(
-  SELECT
-     * 
-  FROM
-     INFORMATION_SCHEMA.MYSQL_FIREWALL_USERS;
-  )
+    query_firewall_mode = %(SHOW GLOBAL VARIABLES LIKE 'mysql_firewall_mode';)
 
-  describe 'mysql_firewall_mode' do
-    subject { sql_session.query(query_firewall_mode).results.column('value').join }
-    it { should cmp 'ON' }
-  end
+    query_firewall_users = %(
+    SELECT
+       * 
+    FROM
+       INFORMATION_SCHEMA.MYSQL_FIREWALL_USERS;
+    )
 
-  # Enable the MySQL Enterprise Firewall by running this script, which is located in the mysql home share sub directory. Sub directory accessible?
-  if sql_session.query(query_firewall_mode).results.column('value').join.eql?('ON')
-    describe 'List of MYSQL_FIREWALL_USERS' do
-      subject { sql_session.query(query_firewall_users).results }
-      it { should_not be_empty }
+    describe 'mysql_firewall_mode' do
+      subject { sql_session.query(query_firewall_mode).results.column('value').join }
+      it { should cmp 'ON' }
     end
 
-    sql_session.query(query_firewall_users).results.rows.each do |fw_user|
-      describe "USERHOST #{fw_user['userhost']}" do
-        subject { fw_user }
-        its(['mode']) { should match /LEARNING|DETECTING|PROTECTING/ }
+    # Enable the MySQL Enterprise Firewall by running this script, which is located in the mysql home share sub directory. Sub directory accessible?
+    if sql_session.query(query_firewall_mode).results.column('value').join.eql?('ON')
+      describe 'List of MYSQL_FIREWALL_USERS' do
+        subject { sql_session.query(query_firewall_users).results }
+        it { should_not be_empty }
       end
-    end
 
+      sql_session.query(query_firewall_users).results.rows.each do |fw_user|
+        describe "USERHOST #{fw_user['userhost']}" do
+          subject { fw_user }
+          its(['mode']) { should match /LEARNING|DETECTING|PROTECTING/ }
+        end
+      end
+
+    else
+    
+    impact 0.0
+    describe 'Not applicable since the feature is not available in AWS RDS' do
+      skip 'Not applicable since the feature is not available in AWS RDS'
+    end  
+    
   end
+  
 end
