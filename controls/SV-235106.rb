@@ -156,6 +156,10 @@ records when unsuccessful attempts to retrieve privileges/permissions occur.
 
   audit_log_user_entries = sql_session.query(query_audit_log_user)
 
+  query_server_audit_events = %(SHOW variables LIKE 'server_audit_events';)
+
+  server_audit_events_setting = sql_session.query(query_server_audit_events)
+
   if !input('aws_rds')
   
     # Following code design will allow for adaptive tests in this partially automatable control
