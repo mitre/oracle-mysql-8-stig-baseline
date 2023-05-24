@@ -36,7 +36,7 @@ This InSpec profile is adapted to measure accordingly when using Community Serve
     SELECT PLUGIN_NAME, PLUGIN_STATUS
            FROM INFORMATION_SCHEMA.PLUGINS
            WHERE PLUGIN_NAME LIKE 'SERVER%';
-    The value for audit_log should return ACTIVE.]
+    The value for SERVER_AUDIT should return ACTIVE.]
 
     The status of the audit_log plugin should be \"active\". If it is not
 \"active\", this is a finding.
