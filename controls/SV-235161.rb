@@ -148,13 +148,18 @@ keyring_oci_management_endpoint=shortAlphaNumericString-management.kms.us-ashbur
     it { should be_in audit_admins }
   end
 
-  describe "List of installed keyring plugins" do
-    subject { sql_session.query(query_keyring_plugins).results.column('variable_value') }
-    it { should_not be_empty }
-  end
+  if !input('aws_rds')
 
-  describe "audit_log_encryption config" do
-    subject { sql_session.query(audit_log_encryption).results.column('variable_value') }
-    it { should cmp 'AES' }
+    describe "List of installed keyring plugins" do
+      subject { sql_session.query(query_keyring_plugins).results.column('variable_value') }
+      it { should_not be_empty }
+    end
+
+    describe "audit_log_encryption config" do
+      subject { sql_session.query(audit_log_encryption).results.column('variable_value') }
+      it { should cmp 'AES' }
+    end
+    
   end
+  
 end
