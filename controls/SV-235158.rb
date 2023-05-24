@@ -135,21 +135,22 @@ placed in PROTECTING (active blocking) or DETECTING(logging) mode.
       it { should cmp 'ON' }
     end
 
-    # Enable the MySQL Enterprise Firewall by running this script, which is located in the mysql home share sub directory. Sub directory accessible?
-    if sql_session.query(query_firewall_mode).results.column('value').join.eql?('ON')
-      describe 'List of MYSQL_FIREWALL_USERS' do
-        subject { sql_session.query(query_firewall_users).results }
-        it { should_not be_empty }
-      end
+      # Enable the MySQL Enterprise Firewall by running this script, which is located in the mysql home share sub directory. Sub directory accessible?
+      if sql_session.query(query_firewall_mode).results.column('value').join.eql?('ON')
+        describe 'List of MYSQL_FIREWALL_USERS' do
+          subject { sql_session.query(query_firewall_users).results }
+          it { should_not be_empty }
+        end
 
-      sql_session.query(query_firewall_users).results.rows.each do |fw_user|
-        describe "USERHOST #{fw_user['userhost']}" do
-          subject { fw_user }
-          its(['mode']) { should match /LEARNING|DETECTING|PROTECTING/ }
+        sql_session.query(query_firewall_users).results.rows.each do |fw_user|
+          describe "USERHOST #{fw_user['userhost']}" do
+            subject { fw_user }
+            its(['mode']) { should match /LEARNING|DETECTING|PROTECTING/ }
+          end
         end
       end
 
-    else
+  else
     
     impact 0.0
     describe 'Not applicable since the feature is not available in AWS RDS' do
