@@ -142,65 +142,72 @@ names as necessary:
 
   ssl_params = sql_session.query(query_ssl_params).results
 
-  describe '@@ssl_crl' do
-    subject { ssl_params.column('@@ssl_crl').join }
-    it { should_not cmp 'NULL' }
-  end
-
-  if ssl_params.column('@@ssl_crlpath').join.eql?('NULL')
-    crl_path = ssl_params.column('@@datadir').join
-  else
-    crl_path = ssl_params.column('@@ssl_crlpath').join
-  end
-
-  describe '@@require_secure_transport' do
-    subject { ssl_params.column('@@require_secure_transport').join }
-    it { should match /1|ON/ }
-  end
-
-  describe '@@ssl_cert' do
-    subject { ssl_params.column('@@ssl_cert').join }
-    it { should_not cmp 'NULL' }
-  end
-
   if !input('aws_rds')
-    full_crl_path = "#{crl_path}#{ssl_params.column('@@ssl_crl').join}"
-    describe "SSL CRL file: #{full_crl_path}" do
-      subject { file(full_crl_path) }
-      it { should exist }
+
+    describe '@@ssl_crl' do
+      subject { ssl_params.column('@@ssl_crl').join }
+      it { should_not cmp 'NULL' }
+    end
+  
+  else
+    
+    if ssl_params.column('@@ssl_crlpath').join.eql?('NULL')
+      crl_path = ssl_params.column('@@datadir').join
+    else
+      crl_path = ssl_params.column('@@ssl_crlpath').join
     end
 
-    full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
-    describe "SSL Certificate file: #{full_cert_path}" do
-      subject { file(full_cert_path) }
-      it { should exist }
+    describe '@@require_secure_transport' do
+      subject { ssl_params.column('@@require_secure_transport').join }
+      it { should match /1|ON/ }
     end
 
-    describe x509_certificate(full_cert_path) do
-      its('issuer.CN') { should match org_approved_cert_issuer }
+    describe '@@ssl_cert' do
+      subject { ssl_params.column('@@ssl_cert').join }
+      it { should_not cmp 'NULL' }
     end
+
+    if !input('aws_rds')
+      full_crl_path = "#{crl_path}#{ssl_params.column('@@ssl_crl').join}"
+      describe "SSL CRL file: #{full_crl_path}" do
+        subject { file(full_crl_path) }
+        it { should exist }
+      end
+
+      full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
+      describe "SSL Certificate file: #{full_cert_path}" do
+        subject { file(full_cert_path) }
+        it { should exist }
+      end
+
+      describe x509_certificate(full_cert_path) do
+        its('issuer.CN') { should match org_approved_cert_issuer }
+      end
+    end
+
+    query_user_params = "
+        SELECT user.Host,
+          user.User,
+          user.ssl_type,
+          CAST(user.x509_issuer as CHAR) as Issuer,
+          CAST(user.x509_subject as CHAR) as Subject
+      FROM mysql.user
+      WHERE  user NOT LIKE 'mysql.%'
+             AND user NOT LIKE 'root'
+            AND user NOT IN ( '#{pki_exception_users.join("', '")}' );"
+
+    user_params = sql_session.query(query_user_params)
+
+    describe "List of users Issuer fields\n#{user_params.output}" do
+      subject { user_params.results.column('issuer') }
+      it { should_not include nil }
+    end
+
+    describe "List of users Subject fields\n#{user_params.output}" do
+      subject { user_params.results.column('subject') }
+      it { should_not include nil }
+    end
+    
   end
-
-  query_user_params = "
-      SELECT user.Host,
-        user.User,
-        user.ssl_type,
-        CAST(user.x509_issuer as CHAR) as Issuer,
-        CAST(user.x509_subject as CHAR) as Subject
-    FROM mysql.user
-    WHERE  user NOT LIKE 'mysql.%'
-           AND user NOT LIKE 'root'
-          AND user NOT IN ( '#{pki_exception_users.join("', '")}' );"
-
-  user_params = sql_session.query(query_user_params)
-
-  describe "List of users Issuer fields\n#{user_params.output}" do
-    subject { user_params.results.column('issuer') }
-    it { should_not include nil }
-  end
-
-  describe "List of users Subject fields\n#{user_params.output}" do
-    subject { user_params.results.column('subject') }
-    it { should_not include nil }
-  end
+  
 end
