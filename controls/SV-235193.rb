@@ -116,64 +116,76 @@ or other supported protocols.
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  query_encryption_params = %(
-  SELECT
-     VARIABLE_NAME,
-     VARIABLE_VALUE 
-  FROM
-     performance_schema.global_variables 
-  WHERE
-     VARIABLE_NAME like '%encrypt%';
-  )
-
-  encryption_params = sql_session.query(query_encryption_params).results.rows.map{|x| {x['variable_name']=> x['variable_value']}}.reduce({}, :merge)
-
-  describe "Encryption Param:" do
-    subject { encryption_params }
-    its(['audit_log_encryption']) { should cmp 'AES' }
-    its(['binlog_encryption']) { should cmp 'ON' }
-    its(['innodb_redo_log_encrypt']) { should cmp 'ON' }
-    its(['innodb_undo_log_encrypt']) { should cmp 'ON' }
-    its(['table_encryption_privilege_check']) { should cmp 'ON' }
-  end
-
-  query_general_log = %(
-  SELECT
-     VARIABLE_NAME,
-     VARIABLE_VALUE 
-  FROM
-     performance_schema.global_variables 
-  WHERE
-     VARIABLE_NAME like 'general_log';
-  )
-
-  describe "general_log config" do
-    subject { sql_session.query(query_general_log).results.column('variable_value').join }
-    it { should cmp 'OFF' }
-  end
-
-  query_tablespaces = %(
-  SELECT
-     INNODB_TABLESPACES.NAME,
-     INNODB_TABLESPACES.ENCRYPTION 
-  FROM
-     information_schema.INNODB_TABLESPACES;
-  )
-
-  tablespaces = sql_session.query(query_tablespaces).results.rows
-
   if !input('aws_rds')
-    aws_rds_tablespaces = []
-  else
-    aws_rds_tablespaces = ['mysql/rds_configuration', 'mysql/rds_history', 'mysql/rds_replication_status', 'mysql/rds_global_status_history', 'mysql/rds_global_status_history_old', 'mysql/rds_heartbeat2', 'mysql/rds_sysinfo']
-  end
 
-  tablespaces.each do |tablespace|
-    unless aws_rds_tablespaces.include? tablespace['name']
-      describe "Tablespace #{tablespace['name']} encryption" do
-        subject { tablespace }
-        its(['encryption']) { should cmp 'Y' }
+    query_encryption_params = %(
+    SELECT
+       VARIABLE_NAME,
+       VARIABLE_VALUE 
+    FROM
+       performance_schema.global_variables 
+    WHERE
+       VARIABLE_NAME like '%encrypt%';
+    )
+
+    encryption_params = sql_session.query(query_encryption_params).results.rows.map{|x| {x['variable_name']=> x['variable_value']}}.reduce({}, :merge)
+
+    describe "Encryption Param:" do
+      subject { encryption_params }
+      its(['audit_log_encryption']) { should cmp 'AES' }
+      its(['binlog_encryption']) { should cmp 'ON' }
+      its(['innodb_redo_log_encrypt']) { should cmp 'ON' }
+      its(['innodb_undo_log_encrypt']) { should cmp 'ON' }
+      its(['table_encryption_privilege_check']) { should cmp 'ON' }
+    end
+
+    query_general_log = %(
+    SELECT
+       VARIABLE_NAME,
+       VARIABLE_VALUE 
+    FROM
+       performance_schema.global_variables 
+    WHERE
+       VARIABLE_NAME like 'general_log';
+    )
+
+    describe "general_log config" do
+      subject { sql_session.query(query_general_log).results.column('variable_value').join }
+      it { should cmp 'OFF' }
+    end
+
+    query_tablespaces = %(
+    SELECT
+       INNODB_TABLESPACES.NAME,
+       INNODB_TABLESPACES.ENCRYPTION 
+    FROM
+       information_schema.INNODB_TABLESPACES;
+    )
+
+    tablespaces = sql_session.query(query_tablespaces).results.rows
+
+    if !input('aws_rds')
+      aws_rds_tablespaces = []
+    else
+      aws_rds_tablespaces = ['mysql/rds_configuration', 'mysql/rds_history', 'mysql/rds_replication_status', 'mysql/rds_global_status_history', 'mysql/rds_global_status_history_old', 'mysql/rds_heartbeat2', 'mysql/rds_sysinfo']
+    end
+
+    tablespaces.each do |tablespace|
+      unless aws_rds_tablespaces.include? tablespace['name']
+        describe "Tablespace #{tablespace['name']} encryption" do
+          subject { tablespace }
+          its(['encryption']) { should cmp 'Y' }
+        end
       end
     end
+
+  else
+    
+    impact 0.0
+    describe 'Not applicable since these features are not available in AWS RDS' do
+      skip 'Not applicable since these features are not available in AWS RDS'
+    end  
+    
   end
+
 end
