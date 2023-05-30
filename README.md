@@ -76,7 +76,7 @@ mysql_authorized_local_users: ['root']
 #Value Type: array
 authorized_password_users: ["healthchecker"]
 
-#Description: List of documented mysql accounts with administrative privileges.
+#Description: List of documented mysql accounts with administrative privileges.# SV-235096 SV-235150 SV-235168 SV-235179
 #Value Type: array
 mysql_administrative_users: ["root"]
 
