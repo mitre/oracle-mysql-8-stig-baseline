@@ -215,9 +215,14 @@ https://dev.mysql.com/doc/refman/8.0/en/grant.html.
       skip "Manually review authentication variables are configured as per guidance\n#{sql_session.query(auth_variables).output}"
     end
   else
-    describe 'No external authentication plugins found, therefore the list of documented local accounts' do
-      subject { sql_session.query(query_accounts).results.column('user') }
-      it { should be_in mysql_authorized_local_users }
+#    describe 'No external authentication plugins found, therefore the list of documented local accounts' do
+#      subject { sql_session.query(query_accounts).results.column('user') }
+#      it { should be_in mysql_authorized_local_users }
+#    end
+    describe "No external authentication plugins found, therefore if native accounts are required, perform a manual review of native mysql users #{ sql_session.query(query_accounts).results.column('user') } documenting the need and justification; describing the measures taken to ensure the use of MySQL Server authentication is
+kept to a minimum; describing the measures taken to safeguard passwords; and listing or describing the MySQL logins used." do
+      skip "No external authentication plugins found, therefore if native accounts are required, perform a manual review of native mysql users #{ sql_session.query(query_accounts).results.column('user') } documenting the need and justification; describing the measures taken to ensure the use of MySQL Server authentication is
+kept to a minimum; describing the measures taken to safeguard passwords; and listing or describing the MySQL logins used."
     end
   end
 end
