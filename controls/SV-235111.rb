@@ -32,7 +32,7 @@ This InSpec profile is adapted to measure accordingly when using Community Serve
            WHERE PLUGIN_NAME LIKE 'SERVER%';
     The value for SERVER_AUDIT should return ACTIVE.]
 
-    The status of the audit_log plugin must be \"active\". If it is not
+    The status of the audit_log plugin should be \"active\". If it is not
 \"active\", this is a finding.
 
 [NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 

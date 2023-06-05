@@ -43,9 +43,9 @@ events are being audited by the system.
 [NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 
 Community Server (also used by AWS RDS) has reduced or different features. 
 For Community Server, the MariaDB audit plugin may be used. 
-This InSpec profile is adapted to measure accordingly when using Community Server]:    
+This InSpec profile is adapted to measure accordingly when using Community Server:    
     SELECT PLUGIN_NAME, plugin_status FROM INFORMATION_SCHEMA.PLUGINS
-          WHERE PLUGIN_NAME LIKE 'SERVER_AUDIT' ;
+          WHERE PLUGIN_NAME LIKE 'SERVER_AUDIT' ;]
 
     If nothing is returned OR if the results are not \"audit_log\" and
 \"plugin_status='ACTIVE'\" , this is a finding.

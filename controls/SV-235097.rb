@@ -45,9 +45,9 @@ events are being audited by the system.
 [NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 
 Community Server (also used by AWS RDS) has reduced or different features. 
 For Community Server, the MariaDB audit plugin may be used. 
-This InSpec profile is adapted to measure accordingly when using Community Server]:    
+This InSpec profile is adapted to measure accordingly when using Community Server:    
     SELECT PLUGIN_NAME, plugin_status FROM INFORMATION_SCHEMA.PLUGINS
-          WHERE PLUGIN_NAME LIKE 'SERVER_AUDIT' ;
+          WHERE PLUGIN_NAME LIKE 'SERVER_AUDIT' ;]
           
     If the results are not 'audit_log' and plugin_status='ACTIVE' , this is a
 finding.
@@ -133,12 +133,12 @@ select @@basedir;
 [NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 
 Community Server (also used by AWS RDS) has reduced or different features. 
 For Community Server, the MariaDB audit plugin may be used. 
-This InSpec profile is adapted to measure accordingly when using Community Server]:
+This InSpec profile is adapted to measure accordingly when using Community Server:
     Verify the plugin installation by running:
     SELECT PLUGIN_NAME, PLUGIN_STATUS
            FROM INFORMATION_SCHEMA.PLUGINS
            WHERE PLUGIN_NAME LIKE 'SERVER%';
-    The value for audit_log should return ACTIVE.
+    The value for audit_log should return ACTIVE.]
 
     To prevent the plugin from being removed at runtime, add the --audit-log
 option under the [mysqld] option group in the MySQL configuration file
