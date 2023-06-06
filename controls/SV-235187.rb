@@ -203,8 +203,6 @@ database.
       it { should be_in approved_tls_ciphersuites }
     end
 
-    if !input('aws_rds')
-
       org_approved_cert_issuer = input('org_approved_cert_issuer')
 
       full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
@@ -216,7 +214,6 @@ database.
       describe x509_certificate(full_cert_path) do
         its('issuer.CN') { should match org_approved_cert_issuer}
       end
-    end
     
   else
     
