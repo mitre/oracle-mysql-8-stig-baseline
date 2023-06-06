@@ -27,9 +27,34 @@ the variable audit_file.
           FROM INFORMATION_SCHEMA.PLUGINS
           WHERE PLUGIN_NAME LIKE 'audit%';
 
+[NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 
+Community Server (also used by AWS RDS) has reduced or different features. 
+For Community Server, the MariaDB audit plugin may be used. 
+This InSpec profile is adapted to measure accordingly when using Community Server:
+    Verify the plugin installation by running:
+    SELECT PLUGIN_NAME, PLUGIN_STATUS
+           FROM INFORMATION_SCHEMA.PLUGINS
+           WHERE PLUGIN_NAME LIKE 'SERVER%';
+    The value for SERVER_AUDIT should return ACTIVE.]
+
     The status of the audit_log plugin must be \"active\". If it is not
 \"active\", this is a finding.
 
+[NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 
+Community Server (also used by AWS RDS) has reduced or different features. 
+For Community Server, the MariaDB audit plugin may be used and configured to 
+audit all CONNECT and QUERY events.
+This InSpec profile is adapted to measure accordingly when using Community Server:
+    Verify the CONNECT and QUERY events are enabled:
+    SHOW variables LIKE 'server_audit_events';
+    +---------------------+---------------+
+    | Variable_name       | Value         |
+    +---------------------+---------------+
+    | server_audit_events | CONNECT,QUERY |
+    +---------------------+---------------+
+  	1 row in set (0.00 sec)    
+  	The value for server_audit_events should return CONNECT,QUERY.]
+  
     Review audit filters and associated users by running the following queries:
     SELECT `audit_log_filter`.`NAME`,
        `audit_log_filter`.`FILTER`
@@ -128,16 +153,28 @@ well as providing the details for the audit event.
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  audit_log_plugin = %(
-  SELECT
-     PLUGIN_NAME,
-     plugin_status
-  FROM
-     INFORMATION_SCHEMA.PLUGINS
-  WHERE
-     PLUGIN_NAME LIKE 'audit_log' ;
-  )
-
+  if !input('aws_rds')
+    audit_log_plugin = %(
+    SELECT
+       PLUGIN_NAME,
+       plugin_status 
+    FROM
+       INFORMATION_SCHEMA.PLUGINS 
+    WHERE
+       PLUGIN_NAME LIKE 'audit_log' ;
+    )
+  else
+    audit_log_plugin = %(
+    SELECT
+       PLUGIN_NAME,
+       plugin_status 
+    FROM
+       INFORMATION_SCHEMA.PLUGINS 
+    WHERE
+       PLUGIN_NAME LIKE 'SERVER_AUDIT' ;
+    )
+  end
+  
   audit_log_plugin_status = sql_session.query(audit_log_plugin)
 
   query_audit_log_filter = %(
@@ -161,72 +198,47 @@ well as providing the details for the audit event.
 
   audit_log_user_entries = sql_session.query(query_audit_log_user)
 
-  # Following code design will allow for adaptive tests in this partially automatable control
-  # If ANY of the automatable tests FAIL, the control will report automated statues
-  # If ALL automatable tests PASS, MANUAL review statuses are reported to ensure full compliance
+  query_server_audit_events = %(SHOW variables LIKE 'server_audit_events';)
 
-  if !audit_log_plugin_status.results.column('plugin_status').join.eql?('ACTIVE') or
-     audit_log_filter_entries.results.empty? or
-     audit_log_user_entries.results.empty?
+  server_audit_events_setting = sql_session.query(query_server_audit_events)
 
-    describe 'Audit Log Plugin status' do
-      subject { audit_log_plugin_status.results.column('plugin_status') }
-      it { should cmp 'ACTIVE' }
+
+  if !input('aws_rds')
+  
+    # Following code design will allow for adaptive tests in this partially automatable control
+    # If ANY of the automatable tests FAIL, the control will report automated statues
+    # If ALL automatable tests PASS, MANUAL review statuses are reported to ensure full compliance
+
+    if !audit_log_plugin_status.results.column('plugin_status').join.eql?('ACTIVE') or
+       audit_log_filter_entries.results.empty? or
+       audit_log_user_entries.results.empty?
+
+      describe 'Audit Log Plugin status' do
+        subject { audit_log_plugin_status.results.column('plugin_status') }
+        it { should cmp 'ACTIVE' }
+      end
+
+      describe 'List of entries in Table: audit_log_filter' do
+        subject { audit_log_filter_entries.results }
+        it { should_not be_empty }
+      end
+
+      describe 'List of entries in Table: audit_log_user' do
+        subject { audit_log_user_entries.results }
+        it { should_not be_empty }
+      end
     end
 
-    describe 'List of entries in Table: audit_log_filter' do
-      subject { audit_log_filter_entries.results }
-      it { should_not be_empty }
+    describe "Manually validate `audit_log` plugin is active:\n #{audit_log_plugin_status.output}" do
+      skip "Manually validate `audit_log` plugin is active:\n #{audit_log_plugin_status.output}"
     end
-
-    describe 'List of entries in Table: audit_log_user' do
-      subject { audit_log_user_entries.results }
-      it { should_not be_empty }
+    describe "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}" do
+      skip "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}"
     end
-  end
-
-  describe "Manually validate `audit_log` plugin is active:\n #{audit_log_plugin_status.output}" do
-    skip "Manually validate `audit_log` plugin is active:\n #{audit_log_plugin_status.output}"
-  end
-  describe "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}" do
-    skip "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}"
-  end
-  describe "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}" do
-    skip "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}"
-  end
-  describe "Manually validate that required audit logs are generated when the following query is executed:
-  CREATE TABLE `test_trigger`.`info_cat_test` ( `id` INT NOT NULL, `name` VARCHAR(20) NULL, `desc` VARCHAR(20) NULL, `sec_level` CHAR(1) NULL, PRIMARY KEY (`id`));
-  DELIMITER $$ 
-  INSERT INTO
-     `test_trigger`.`info_cat_test` (`id`, `name`, `desc`, `sec_level`) 
-  VALUES
-     (
-        '1', 'fred', 'engineer', 'H'
-     )
-  ;
-  INSERT INTO
-     `test_trigger`.`info_cat_test` (`id`, `name`, `desc`, `sec_level`) 
-  VALUES
-     (
-        '2', 'jill', 'program manager', 'M'
-     )
-  ;
-  INSERT INTO
-     `test_trigger`.`info_cat_test` (`id`, `name`, `desc`, `sec_level`) 
-  VALUES
-     (
-        '3', 'joe', 'maintenance', 'L'
-     )
-  ;
-  SELECT
-     `info_cat_test`.`id`,
-     `info_cat_test`.`name`,
-     `info_cat_test`.`desc`,
-     `info_cat_test`.`sec_level`,
-     IF(`info_cat_test`.`sec_level` = 'H', audit_api_message_emit_udf('sec_level_selected', 'audit_select_attempt', ' H level sec data was accessed', 'FOR ', name ), 'Not Audited') 
-  FROM
-     `test_trigger`.`info_cat_test`;" do
-    skip "Manually validate that required audit logs are generated when the following query is executed:
+    describe "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}" do
+      skip "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}"
+    end
+    describe "Manually validate that required audit logs are generated when the following query is executed:
     CREATE TABLE `test_trigger`.`info_cat_test` ( `id` INT NOT NULL, `name` VARCHAR(20) NULL, `desc` VARCHAR(20) NULL, `sec_level` CHAR(1) NULL, PRIMARY KEY (`id`));
     DELIMITER $$ 
     INSERT INTO
@@ -257,6 +269,47 @@ well as providing the details for the audit event.
        `info_cat_test`.`sec_level`,
        IF(`info_cat_test`.`sec_level` = 'H', audit_api_message_emit_udf('sec_level_selected', 'audit_select_attempt', ' H level sec data was accessed', 'FOR ', name ), 'Not Audited') 
     FROM
-       `test_trigger`.`info_cat_test`;" 
+       `test_trigger`.`info_cat_test`;" do
+      skip "Manually validate that required audit logs are generated when the following query is executed:
+      CREATE TABLE `test_trigger`.`info_cat_test` ( `id` INT NOT NULL, `name` VARCHAR(20) NULL, `desc` VARCHAR(20) NULL, `sec_level` CHAR(1) NULL, PRIMARY KEY (`id`));
+      DELIMITER $$ 
+      INSERT INTO
+         `test_trigger`.`info_cat_test` (`id`, `name`, `desc`, `sec_level`) 
+      VALUES
+         (
+            '1', 'fred', 'engineer', 'H'
+         )
+      ;
+      INSERT INTO
+         `test_trigger`.`info_cat_test` (`id`, `name`, `desc`, `sec_level`) 
+      VALUES
+         (
+            '2', 'jill', 'program manager', 'M'
+         )
+      ;
+      INSERT INTO
+         `test_trigger`.`info_cat_test` (`id`, `name`, `desc`, `sec_level`) 
+      VALUES
+         (
+            '3', 'joe', 'maintenance', 'L'
+         )
+      ;
+      SELECT
+         `info_cat_test`.`id`,
+         `info_cat_test`.`name`,
+         `info_cat_test`.`desc`,
+         `info_cat_test`.`sec_level`,
+         IF(`info_cat_test`.`sec_level` = 'H', audit_api_message_emit_udf('sec_level_selected', 'audit_select_attempt', ' H level sec data was accessed', 'FOR ', name ), 'Not Audited') 
+      FROM
+         `test_trigger`.`info_cat_test`;" 
+    end
+    
+  else
+    
+    describe '[NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. Community Server (also used by AWS RDS) has reduced or different features. For Community Server, the MariaDB audit plugin may be used and configured to audit all CONNECT and QUERY events. Provide an attestation explaining how the type of events identified in this requirement are flagged by processes reading its generated audit logs.]' do
+      skip '[NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. Community Server (also used by AWS RDS) has reduced or different features. For Community Server, the MariaDB audit plugin may be used and configured to audit all CONNECT and QUERY events. Provide an attestation explaining how the type of events identified in this requirement are flagged by processes reading its generated audit logs.]'
+    end
+  
   end
+    
 end

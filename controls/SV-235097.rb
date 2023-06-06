@@ -41,7 +41,14 @@ events are being audited by the system.
 
     SELECT PLUGIN_NAME, plugin_status FROM INFORMATION_SCHEMA.PLUGINS
           WHERE PLUGIN_NAME LIKE 'audit_log' ;
-
+          
+[NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 
+Community Server (also used by AWS RDS) has reduced or different features. 
+For Community Server, the MariaDB audit plugin may be used. 
+This InSpec profile is adapted to measure accordingly when using Community Server:    
+    SELECT PLUGIN_NAME, plugin_status FROM INFORMATION_SCHEMA.PLUGINS
+          WHERE PLUGIN_NAME LIKE 'SERVER_AUDIT' ;]
+          
     If the results are not 'audit_log' and plugin_status='ACTIVE' , this is a
 finding.
 
@@ -52,6 +59,7 @@ finding.
 
     If nothing is returned or the value for audit_log_encryption is not AES,
 this is a finding.
+[NOTE: Community Server using MariaDB audit plugin does not support the audit_log_encryption parameter]
 
     Review the audit files in the file systems.
 
@@ -122,6 +130,16 @@ select @@basedir;
            WHERE PLUGIN_NAME LIKE 'audit%';
     The value for audit_log should return ACTIVE.
 
+[NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 
+Community Server (also used by AWS RDS) has reduced or different features. 
+For Community Server, the MariaDB audit plugin may be used. 
+This InSpec profile is adapted to measure accordingly when using Community Server:
+    Verify the plugin installation by running:
+    SELECT PLUGIN_NAME, PLUGIN_STATUS
+           FROM INFORMATION_SCHEMA.PLUGINS
+           WHERE PLUGIN_NAME LIKE 'SERVER%';
+    The value for audit_log should return ACTIVE.]
+
     To prevent the plugin from being removed at runtime, add the --audit-log
 option under the [mysqld] option group in the MySQL configuration file
 (/etc/my.cnf) with a setting of FORCE_PLUS_PERMANENT.
@@ -154,16 +172,28 @@ true } }');
 
   audit_log_path = input('audit_log_path')
 
-  audit_log_plugin = %(
-  SELECT
-     PLUGIN_NAME,
-     plugin_status 
-  FROM
-     INFORMATION_SCHEMA.PLUGINS 
-  WHERE
-     PLUGIN_NAME LIKE 'audit_log' ;
-  )
-
+  if !input('aws_rds')
+    audit_log_plugin = %(
+    SELECT
+       PLUGIN_NAME,
+       plugin_status 
+    FROM
+       INFORMATION_SCHEMA.PLUGINS 
+    WHERE
+       PLUGIN_NAME LIKE 'audit_log' ;
+    )
+  else
+    audit_log_plugin = %(
+    SELECT
+       PLUGIN_NAME,
+       plugin_status 
+    FROM
+       INFORMATION_SCHEMA.PLUGINS 
+    WHERE
+       PLUGIN_NAME LIKE 'SERVER_AUDIT' ;
+    )
+  end
+  
   audit_log_encryption = %(
   SELECT
      VARIABLE_NAME,
@@ -188,13 +218,14 @@ true } }');
     subject { sql_session.query(audit_log_plugin).results.column('plugin_status') }
     it { should cmp 'ACTIVE' }
   end
+  
+  if !input('aws_rds')
 
   describe "audit_log_encryption config" do
     subject { sql_session.query(audit_log_encryption).results.column('variable_value') }
     it { should cmp 'AES' }
   end
 
-  if !input('aws_rds')
 
     audit_log_files = command("ls -d #{audit_log_path}").stdout.split
 

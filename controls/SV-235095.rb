@@ -170,6 +170,20 @@ https://dev.mysql.com/doc/refman/8.0/en/grant.html.
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
+  query_accounts = %(
+  SELECT
+     user
+  FROM
+     mysql.user 
+  WHERE
+     user not in 
+     (
+        'mysql.infoschema',
+        'mysql.session',
+        'mysql.sys'
+     );
+     )
+
   auth_plugins = %(
   SELECT
      plugin_name,
@@ -197,13 +211,10 @@ https://dev.mysql.com/doc/refman/8.0/en/grant.html.
   if auth_plugins_installed
     describe "Manually review authentication variables are configured as per guidance\n#{sql_session.query(auth_variables).output}" do
       skip "Manually review authentication variables are configured as per guidance\n#{sql_session.query(auth_variables).output}"
-      
     end
-
   else
-    describe "List of installed authentication plugins" do
-      subject { sql_session.query(auth_plugins).results.rows }
-      it { should_not be_empty }
+    describe "No external authentication plugins found, therefore if native accounts are required, perform a manual review of native mysql users #{ sql_session.query(query_accounts).results.column('user') } documenting the need and justification; describing the measures taken to ensure the use of MySQL Server authentication is kept to a minimum; describing the measures taken to safeguard passwords; and listing or describing the MySQL logins used." do
+      skip "No external authentication plugins found, therefore if native accounts are required, perform a manual review of native mysql users #{ sql_session.query(query_accounts).results.column('user') } documenting the need and justification; describing the measures taken to ensure the use of MySQL Server authentication is kept to a minimum; describing the measures taken to safeguard passwords; and listing or describing the MySQL logins used."
     end
   end
 end

@@ -4,6 +4,11 @@ InSpec profile to validate the secure configuration of Oracle MySQL 8.0 against 
 
 #### AWS-RDS-Ready: Profile updated to adapt checks when running against an AWS RDS instance of MySQL, by setting the input `aws_rds` to `true`. See [Tailoring to Your Environment](#tailoring-to-your-environment) below.
 
+[NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 
+Community Server (also used by AWS RDS) has reduced or different features. 
+For Community Server, the MariaDB audit plugin may be used. 
+This InSpec profile is adapted to measure accordingly when using Community Server]
+
 ## Getting Started
 
 ### Requirements
@@ -72,7 +77,7 @@ pki_exception_users: ["healthchecker"]
 #Value Type: array
 authorized_password_users: ["healthchecker"]
 
-#Description: List of documented mysql accounts with administrative previlleges.
+#Description: List of documented mysql accounts with administrative privileges.# SV-235096 SV-235150 SV-235168 SV-235179
 #Value Type: array
 mysql_administrative_users: ["root"]
 

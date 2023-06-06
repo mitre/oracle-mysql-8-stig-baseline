@@ -71,8 +71,20 @@ https://dev.mysql.com/doc/refman/8.0/en/fips-mode.html
 
   ssl_params = sql_session.query(query_ssl_params).results
 
-  describe '@@ssl_fips_mode' do
-    subject { ssl_params.column('@@ssl_fips_mode').join }
-    it { should match /ON|STRICT/ }
-  end
+  if !input('aws_rds')
+
+    describe '@@ssl_fips_mode' do
+      subject { ssl_params.column('@@ssl_fips_mode').join }
+      it { should match /ON|STRICT/ }
+    end
+    
+  else
+    
+    impact 0.0
+    describe 'Not applicable since ssl_fips_mode is set to 0 (OFF) and cannot be configured in AWS RDS' do
+      skip 'Not applicable since ssl_fips_mode is set to 0 (OFF) and cannot be configured in AWS RDS'
+    end
+    
+  end    
+    
 end

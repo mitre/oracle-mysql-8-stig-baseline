@@ -23,9 +23,34 @@ Database Management System (DBMS) is running."
            FROM INFORMATION_SCHEMA.PLUGINS
            WHERE PLUGIN_NAME LIKE 'audit%';
 
+[NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 
+Community Server (also used by AWS RDS) has reduced or different features. 
+For Community Server, the MariaDB audit plugin may be used. 
+This InSpec profile is adapted to measure accordingly when using Community Server:
+    Verify the plugin installation by running:
+    SELECT PLUGIN_NAME, PLUGIN_STATUS
+           FROM INFORMATION_SCHEMA.PLUGINS
+           WHERE PLUGIN_NAME LIKE 'SERVER%';
+    The value for SERVER_AUDIT should return ACTIVE.]
+
     The status of the \"audit_log plugin\" must be \"active\". If it is not
 \"active\", this is a finding.
 
+[NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 
+Community Server (also used by AWS RDS) has reduced or different features. 
+For Community Server, the MariaDB audit plugin may be used and configured to 
+audit all CONNECT and QUERY events.
+This InSpec profile is adapted to measure accordingly when using Community Server:
+    Verify the CONNECT and QUERY events are enabled:
+    SHOW variables LIKE 'server_audit_events';
+    +---------------------+---------------+
+    | Variable_name       | Value         |
+    +---------------------+---------------+
+    | server_audit_events | CONNECT,QUERY |
+    +---------------------+---------------+
+  	1 row in set (0.00 sec)    
+  	The value for server_audit_events should return CONNECT,QUERY.]
+  
     Review audit filters and associated users by running the following queries:
     SELECT `audit_log_filter`.`NAME`,
         `audit_log_filter`.`FILTER`
@@ -58,25 +83,32 @@ If no audits are returned, this is a finding.
   tag cci: ['CCI-001464']
   tag nist: ['AU-14 (1)']
 
-  mycnf = input('mycnf')
-
-  describe ini(mycnf) do
-    its ('mysqld.plugin-load-add') { should cmp 'audit_log.so' }
-    its ('mysqld.audit-log') { should cmp 'FORCE_PLUS_PERMANENT' }
-  end
-
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  audit_log_plugin = %(
-  SELECT
-     PLUGIN_NAME,
-     plugin_status
-  FROM
-     INFORMATION_SCHEMA.PLUGINS
-  WHERE
-     PLUGIN_NAME LIKE 'audit_log' ;
-  )
-
+  mycnf = input('mycnf')
+  
+  if !input('aws_rds')
+    audit_log_plugin = %(
+    SELECT
+       PLUGIN_NAME,
+       plugin_status 
+    FROM
+       INFORMATION_SCHEMA.PLUGINS 
+    WHERE
+       PLUGIN_NAME LIKE 'audit_log' ;
+    )
+  else
+    audit_log_plugin = %(
+    SELECT
+       PLUGIN_NAME,
+       plugin_status 
+    FROM
+       INFORMATION_SCHEMA.PLUGINS 
+    WHERE
+       PLUGIN_NAME LIKE 'SERVER_AUDIT' ;
+    )
+  end
+  
   audit_log_plugin_status = sql_session.query(audit_log_plugin)
 
   query_audit_log_filter = %(
@@ -100,18 +132,45 @@ If no audits are returned, this is a finding.
 
   audit_log_user_entries = sql_session.query(query_audit_log_user)
 
-  describe 'Audit Log Plugin status' do
-    subject { audit_log_plugin_status.results.column('plugin_status').join }
-    it { should cmp 'ACTIVE' }
-  end
+  query_server_audit_events = %(SHOW variables LIKE 'server_audit_events';)
 
-  describe 'List of entries in Table: audit_log_filter' do
-    subject { audit_log_filter_entries.results }
-    it { should_not be_empty }
-  end
+  server_audit_events_setting = sql_session.query(query_server_audit_events)
 
-  describe 'List of entries in Table: audit_log_user' do
-    subject { audit_log_user_entries.results }
-    it { should_not be_empty }
+
+  if !input('aws_rds')
+
+    describe ini(mycnf) do
+      its ('mysqld.plugin-load-add') { should cmp 'audit_log.so' }
+      its ('mysqld.audit-log') { should cmp 'FORCE_PLUS_PERMANENT' }
+    end
+
+    describe 'Audit Log Plugin status' do
+      subject { audit_log_plugin_status.results.column('plugin_status').join }
+      it { should cmp 'ACTIVE' }
+    end
+
+    describe 'List of entries in Table: audit_log_filter' do
+      subject { audit_log_filter_entries.results }
+      it { should_not be_empty }
+    end
+
+    describe 'List of entries in Table: audit_log_user' do
+      subject { audit_log_user_entries.results }
+      it { should_not be_empty }
+    end
+    
+  else
+    
+    describe 'Audit Log Plugin status' do
+      subject { audit_log_plugin_status.results.column('plugin_status') }
+      it { should cmp 'ACTIVE' }
+    end
+
+    describe 'Community Server server_audit_events settings' do
+      subject { Set[server_audit_events_setting.results.column('value')[0].split(',')] }
+      it { should cmp Set['CONNECT,QUERY'.split(',')] }
+    end
+    
   end
+    
 end
