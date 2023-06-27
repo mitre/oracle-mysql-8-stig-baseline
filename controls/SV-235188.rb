@@ -63,9 +63,11 @@ exact behavior of FIPS mode for ON or STRICT depends on the OpenSSL version.
 
   if !input('aws_rds')
 
+    ssl_fips_mode = ssl_params.column('@@ssl_fips_mode').join
     describe '@@ssl_fips_mode' do
-      subject { ssl_params.column('@@ssl_fips_mode').join }
-      it { should match /1|ON/ }
+      it "should be 1 or ON. Got #{ssl_fips_mode}" do
+        expect(ssl_fips_mode).to be_in(['1', 'ON'])
+      end
     end
     
   else

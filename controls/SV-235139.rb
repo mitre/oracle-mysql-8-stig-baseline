@@ -103,9 +103,11 @@ names as necessary:
 
   ssl_params = sql_session.query(query_ssl_params).results
 
+  require_secure_transport = ssl_params.column('@@require_secure_transport').join
   describe '@@require_secure_transport' do
-    subject { ssl_params.column('@@require_secure_transport').join }
-    it { should match /1|ON/ }
+    it "should be 1 or ON. Got #{require_secure_transport}" do
+      expect(require_secure_transport).to be_in(['1', 'ON'])
+    end
   end
 
   if !input('aws_rds')
