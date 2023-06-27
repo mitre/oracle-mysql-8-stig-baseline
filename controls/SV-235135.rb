@@ -162,9 +162,11 @@ STRICT at startup causes the server to produce an error message and exit.
 
   if !input('aws_rds')
 
+    ssl_fips_mode = ssl_params.column('@@ssl_fips_mode').join
     describe '@@ssl_fips_mode' do
-      subject { ssl_params.column('@@ssl_fips_mode').join }
-      it { should match /ON|STRICT/ }
+      it "shoud be ON or STRICT. Got #{ssl_fips_mode}" do
+        expect(ssl_fips_mode).to be_in(['ON', 'STRICT'])
+      end
     end
 
     if ssl_params.column('@@ssl_crlpath').join.eql?('NULL')

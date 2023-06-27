@@ -145,7 +145,7 @@ placed in PROTECTING (active blocking) or DETECTING(logging) mode.
         sql_session.query(query_firewall_users).results.rows.each do |fw_user|
           describe "USERHOST #{fw_user['userhost']}" do
             subject { fw_user }
-            its(['mode']) { should match /LEARNING|DETECTING|PROTECTING/ }
+            its(['mode']) { should be_in ['LEARNING', 'DETECTING', 'PROTECTING'] }
           end
         end
       end
