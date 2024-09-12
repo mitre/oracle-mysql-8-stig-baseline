@@ -28,9 +28,49 @@ Goto https://www.inspec.io/downloads/ and consult the documentation for your Ope
 ```sh
 inspec --version
 ```
+### MySQL client setup
 
-### How to execute this instance  
-This profile can be executed against a remote target using the ssh transport, docker transport, or winrm transport of InSpec. Profiles can also be executed directly on the host where InSpec is installed (see https://www.inspec.io/docs/reference/cli/). 
+To run the MySQL profile against an AWS RDS Instance, InSpec expects the mysql client to be readily available on the same runner system it is installed on.
+ 
+For example, to install the mysql client on a Linux runner host:
+```
+sudo yum install mysql-community-server
+```
+To confirm successful install of mysql:
+```
+which mysql
+```
+> sample output:  _/usr/bin/mysql_
+```
+mysql –-version
+```		
+> sample output:  *mysql  Ver 8.0.32 for Linux on x86_64 (MySQL Community Server - GPL)*
+
+Test mysql connectivity to your AWS RDS instance from your InSpec runner host:
+```
+mysql -u <master user> -p<password>  -h <endpoint>.amazonaws.com -P 3306
+```		
+> sample output:
+>
+>  *Welcome to the MySQL monitor.  Commands end with ; or \g.*
+>  *Your MySQL connection id is 4035*
+>  *Server version: 8.0.32 Source distribution*
+>
+>  *Copyright (c) 2000, 2023, Oracle and/or its affiliates.*
+>
+>  *Oracle is a registered trademark of Oracle Corporation and/or its*
+>  *affiliates. Other names may be trademarks of their respective*
+>  *owners.*
+>
+>  *Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.*
+>
+>  *mysql> quit*
+>
+>  *Bye*
+
+For installation of mysql client on other operating systems for your runner host, visit https://www.mysql.com/
+
+
 
 ## Tailoring to Your Environment
 
@@ -131,24 +171,56 @@ authorized_functions: []
 minimum_mysql_version: 8.0.25
 
 ```
+### How to execute this instance  
+This profile can be executed against a remote target using the ssh transport, docker transport, or winrm transport of InSpec. Profiles can also be executed directly on the host where InSpec is installed (see https://www.inspec.io/docs/reference/cli/). 
+
+## Running This Overlay Directly from Github against a hosted (non AWS RDS) instance of MySQL 8: 
+
+Against a remote target using ssh (i.e., inspec installed on a separate runner host)
+```bash
+inspec exec https://github.com/mitre/oracle-mysql-8-stig-baseline/archive/main.tar.gz -t ssh://<target_username>:<target_password>@<target_ip>:<target_port> --input-file <path_to_your_input_file/name_of_your_input_file.yml> --reporter=cli json:<path_to_your_output_file/name_of_your_output_file.json> 
+```
+
+Against a remote target using a pem key (i.e., inspec installed on a separate runner host)
+```bash
+inspec exec https://github.com/mitre/oracle-mysql-8-stig-baseline/archive/main.tar.gz -t ssh://<target_username>@<target_ip>:<target_port> -i <PEM_KEY> --input-file <path_to_your_input_file/name_of_your_input_file.yml> --reporter=cli json:<path_to_your_output_file/name_of_your_output_file.json>  
+```
+
+Against a _**locally-hosted**_ instance (i.e., inspec installed on the target hosting the database)
+
+```bash
+inspec exec https://github.com/mitre/oracle-mysql-8-stig-baseline/archive/main.tar.gz --input-file=<path_to_your_inputs_file/name_of_your_inputs_file.yml> --reporter=cli json:<path_to_your_output_file/name_of_your_output_file.json>
+```
+
+Against a _**docker-containerized**_ instance (i.e., inspec installed on the node hosting the container):
+```
+inspec exec https://github.com/mitre/oracle-mysql-8-stig-baseline/archive/main.tar.gz -t docker://<instance_id> --input-file=<path_to_your_inputs_file/name_of_your_inputs_file.yml> --reporter=cli json:<path_to_your_output_file/name_of_your_output_file.json>
+```
+## Running This Overlay Directly from Github against an AWS RDS instance of MySQL 8: 
+
+```bash
+inspec exec https://github.com/mitre/oracle-mysql-8-stig-baseline/archive/main.tar.gz --input-file <path_to_your_input_file/name_of_your_input_file.yml> --reporter=cli json:<path_to_your_output_file/name_of_your_output_file.json> 
+```
+
+## Generalized cases:
 
 #### Execute a single control in the profile 
 ```bash
-inspec exec <path to profile on runner> --input-file=<name of your inputs file>.yml --controls=SV-235096 -t <target>
+inspec exec <path to profile> --input-file=<name of your inputs file>.yml --controls=SV-235096 -t <target>
 ```
 #### Execute a single control in the profile and save results as JSON
 ```bash
-inspec exec <path to profile on runner> --input-file=<name of your inputs file>.yml --controls=<control id> -t <target> --reporter cli json:results.json
+inspec exec <path to profile> --input-file=<name of your inputs file>.yml --controls=<control id> -t <target> --reporter cli json:results.json
 ```
 #### Execute all controls in the profile 
 ```bash
-inspec exec <path to profile on runner> --input-file=<name of your inputs file>.yml -t <target>
+inspec exec <path to profile> --input-file=<name of your inputs file>.yml -t <target>
 ```
 #### Execute all controls in the profile and save results as JSON
 ```bash
-inspec exec <path to profile on runner> --input-file=<name of your inputs file>.yml -t <target> --reporter cli json:results.json
+inspec exec <path to profile> --input-file=<name of your inputs file>.yml -t <target> --reporter cli json:results.json
 ```
 #### Execute the profile directly on the MySQL database host
 ```bash
-inspec exec <path to profile on the host> --input-file=<name of your inputs file>.yml --reporter cli json:results.json
+inspec exec <path to profile> --input-file=<name of your inputs file>.yml --reporter cli json:results.json
 ```
