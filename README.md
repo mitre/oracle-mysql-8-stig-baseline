@@ -201,8 +201,52 @@ inspec exec https://github.com/mitre/oracle-mysql-8-stig-baseline/archive/main.t
 ```bash
 inspec exec https://github.com/mitre/oracle-mysql-8-stig-baseline/archive/main.tar.gz --input-file <path_to_your_input_file/name_of_your_input_file.yml> --reporter=cli json:<path_to_your_output_file/name_of_your_output_file.json> 
 ```
+## Running This Overlay from a local Archive copy 
 
-## Generalized cases:
+If your runner is not always expected to have direct access to GitHub, use the following steps to create an archive bundle of this overlay and all of its dependent tests:
+
+(Git is required to clone the InSpec profile using the instructions below. Git can be downloaded from the [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) site.)
+
+When the __"runner"__ host uses this profile overlay for the first time, follow these steps: 
+
+```
+mkdir profiles
+cd profiles
+git clone https://github.com/mitre/oracle-mysql-8-stig-baseline.git
+inspec archive oracle-mysql-8-stig-baseline
+inspec exec <name of generated archive> --input-file=<path_to_your_inputs_file/name_of_your_inputs_file.yml> --reporter=cli json:<path_to_your_output_file/name_of_your_output_file.json>
+```
+
+For every successive run, follow these steps to always have the latest version of this overlay and dependent profiles:
+
+```
+cd oracle-mysql-8-stig-baseline
+git pull
+cd ..
+inspec archive oracle-mysql-8-stig-baseline --overwrite
+inspec exec <name of generated archive> --input-file=<path_to_your_inputs_file/name_of_your_inputs_file.yml> --reporter=cli json:<path_to_your_output_file/name_of_your_output_file.json>
+```
+
+## Using Heimdall for Viewing the JSON Results
+
+The JSON results output file can be loaded into __[heimdall-lite](https://heimdall-lite.mitre.org/)__ for a user-interactive, graphical view of the InSpec results. 
+
+The JSON InSpec results file may also be loaded into a __[full heimdall server](https://github.com/mitre/heimdall2)__, allowing for additional functionality such as to store and compare multiple profile runs.
+
+## Authors
+* Eugene Aronne - [ejaronne](https://github.com/ejaronne)
+
+## Special Thanks
+* Aaron Lippold - [aaronlippold](https://github.com/aaronlippold)
+* Shivani Karikar - [karikarshivani](https://github.com/karikarshivani)
+
+## Contributing and Getting Help
+To report a bug or feature request, please open an [issue](https://github.com/mitre/oracle-mysql-8-stig-baseline/issues/new).
+
+
+
+
+## Generalized execution cases:
 
 #### Execute a single control in the profile 
 ```bash
