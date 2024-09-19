@@ -1,8 +1,8 @@
 control 'SV-235096' do
-  title "MySQL Database Server 8.0  must limit the number of concurrent
+  title 'MySQL Database Server 8.0  must limit the number of concurrent
 sessions to an organization-defined number per user for all accounts and/or
-account types."
-  desc  "Database management includes the ability to control the number of
+account types.'
+  desc 'Database management includes the ability to control the number of
 users and user sessions utilizing a Database Management System (DBMS).
 Unlimited concurrent connections to the DBMS could allow a successful Denial of
 Service (DoS) attack by exhausting connection resources; and a system can also
@@ -29,11 +29,8 @@ few for a database administrator using a database management GUI tool, where
 each query tab and navigation pane may count as a separate session.
 
     (Sessions may also be referred to as connections or logons, which for the
-purposes of this requirement, are synonyms.)
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Determine whether the system documentation specifies limits on the number
+purposes of this requirement, are synonyms.)'
+  desc 'check', "Determine whether the system documentation specifies limits on the number
 of concurrent MySQL database server 8.0 sessions.
 
     Review the concurrent-sessions settings in the MySQL database server and/or
@@ -61,27 +58,25 @@ session MAX_USER_CONNECTIONS value is set to that limit. Otherwise, the session
 max_user_connections value is set to the global value.
 
     If the DBMS settings for concurrent sessions for each user is greater than
-the site-specific maximum number of sessions and nonzero, this is a finding.
-  "
-  desc  'fix', "
-    The MySQL Database Server 8.0 is capable of enforcing this restriction. If
+the site-specific maximum number of sessions and nonzero, this is a finding."
+  desc 'fix', "The MySQL Database Server 8.0 is capable of enforcing this restriction. If
 not configured to do so, configure it to do so.
 
     Connect to the MySQL Database as an administrator.
-    To set the global default to #{input('max_user_connections')}:
-    SET PERSIST max_user_connections=#{input('max_user_connections')};
+    To set the global default to 50:
+    SET PERSIST max_user_connections=50;
 
     Additionally, max user connections can be set per user as well as for a
 given period of time.
     GRANT ALL ON customer.* TO 'francis'@'localhost'
     WITH MAX_CONNECTIONS_PER_HOUR 5;
-    MAX_USER_CONNECTIONS 2;
-  "
+    MAX_USER_CONNECTIONS 2;"
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000001-DB-000031'
   tag gid: 'V-235096'
-  tag rid: 'SV-235096r638812_rule'
+  tag rid: 'SV-235096r960735_rule'
   tag stig_id: 'MYS8-00-000200'
   tag fix_id: 'F-38278r623409_fix'
   tag cci: ['CCI-000054']

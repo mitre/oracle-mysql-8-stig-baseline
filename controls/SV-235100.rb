@@ -1,7 +1,7 @@
 control 'SV-235100' do
-  title "The audit information produced by the MySQL Database Server 8.0 must
-be protected from unauthorized modification."
-  desc  "If audit data were to become compromised, then competent forensic
+  title 'The audit information produced by the MySQL Database Server 8.0 must
+be protected from unauthorized modification.'
+  desc 'If audit data were to become compromised, then competent forensic
 analysis and discovery of the true source of potentially malicious system
 activity is impossible to achieve.
 
@@ -23,11 +23,8 @@ settings, and audit reports) needed to successfully audit information system
 activity.
 
     Modification of database audit data could mask the theft of, or the
-unauthorized modification of, sensitive data stored in the database.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Review locations of audit logs, both internal to the database and database
+unauthorized modification of, sensitive data stored in the database.'
+  desc 'check', %q(Review locations of audit logs, both internal to the database and database
 audit logs located at the operating system level.
 
     Verify there are appropriate controls and permissions to protect the audit
@@ -48,8 +45,8 @@ the datadir. Run the this script to find the data directory:
     ls -l <directory where audit log files are located>
     ls -l <directory where audit log files are located> | grep -i
 <audit_file_name>
-    For example if the values returned by - \"select @@datadir,
-@@audit_log_file; \" are  /usr/local/mysql/data/,  audit.log
+    For example if the values returned by - "select @@datadir,
+@@audit_log_file; " are  /usr/local/mysql/data/,  audit.log
     ls -l  /usr/local/mysql/data/audit
 
     See below for an example:
@@ -67,14 +64,12 @@ audit.20190424T190008.log
     -rw-r-----    1 _mysql  _mysql     30208 Apr 24 14:10
 audit.20190424T191044.log.enc
 
-    If the owner and group are not \"mysql\" or\" _mysql\", this is a finding.
+    If the owner and group are not "mysql" or" _mysql", this is a finding.
 
     If the directory or file permissions are more permissive than owner having
 Read/Write (RW) and group having Read (R) access to the audit files, aka
-\"750\", this is a finding.
-  "
-  desc 'fix', "
-    Apply controls and modify permissions to protect database audit log data
+"750", this is a finding.)
+  desc 'fix', 'Apply controls and modify permissions to protect database audit log data
 from unauthorized access, whether stored in the database itself or at the OS
 level.
 
@@ -93,17 +88,17 @@ level.
     sudo chown mysql <audit directory path>
     sudo chgrp mysql <audit directory path>
     Change permissions
-    chmod 750 <directory path>
-  "
+    chmod 750 <directory path>'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000119-DB-000060'
   tag gid: 'V-235100'
-  tag rid: 'SV-235100r638812_rule'
+  tag rid: 'SV-235100r960933_rule'
   tag stig_id: 'MYS8-00-001300'
   tag fix_id: 'F-38282r623421_fix'
   tag cci: ['CCI-000163']
-  tag nist: ['AU-9']
+  tag nist: ['AU-9', 'AU-9 a']
 
   if !input('aws_rds')
 

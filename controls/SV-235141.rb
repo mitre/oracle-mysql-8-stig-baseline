@@ -1,11 +1,11 @@
 control 'SV-235141' do
-  title "The MySQL Database Server 8.0 must enforce approved authorizations for
+  title 'The MySQL Database Server 8.0 must enforce approved authorizations for
 logical access to information and system resources in accordance with
-applicable access control policies."
-  desc  "Authentication with a #{input('org_name')}-approved PKI certificate does not
+applicable access control policies.'
+  desc 'Authentication with a DoD-approved PKI certificate does not
 necessarily imply authorization to access the Database Management System
 (DBMS). To mitigate the risk of unauthorized access to sensitive information by
-entities that have been issued certificates by #{input('org_name')}-approved PKIs, all #{input('org_name')}
+entities that have been issued certificates by DoD-approved PKIs, all DoD
 systems, including databases, must be properly configured to implement access
 control policies.
 
@@ -29,11 +29,8 @@ a category that includes database management systems. If the DBMS does not
 follow applicable policy when approving access, it may be in conflict with
 networks or other applications in the information system. This may result in
 users either gaining or being denied access inappropriately and in conflict
-with applicable policy.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Check MySQL settings to determine whether users are restricted from
+with applicable policy.'
+  desc 'check', "Check MySQL settings to determine whether users are restricted from
 accessing objects and data they are not authorized to access.
     Review the system documentation to determine the required levels of
 protection for DBMS server securables, by type of login.
@@ -96,22 +93,20 @@ by user, host, PRIV_SOURCE, _db, _obj, _col;
 
     If appropriate access controls are not implemented to restrict access to
 authorized users and to restrict the access of those users to objects and data
-they are authorized to see, this is a finding.
-  "
-  desc 'fix', "
-    Configure the MySQL Database Server 8.0 settings and access controls to
+they are authorized to see, this is a finding."
+  desc 'fix', 'Configure the MySQL Database Server 8.0 settings and access controls to
 permit user access only to objects and data that the user is authorized to view
 or interact with, and to prevent access to all other objects and data.
 
     Use GRANT, REVOKE, ALTER statements to add and remove permissions on
 server-level securables, bringing them into line with the documented
-requirements.
-  "
+requirements.'
   impact 0.7
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'high'
   tag gtitle: 'SRG-APP-000033-DB-000084'
   tag gid: 'V-235141'
-  tag rid: 'SV-235141r638812_rule'
+  tag rid: 'SV-235141r960792_rule'
   tag stig_id: 'MYS8-00-005400'
   tag fix_id: 'F-38323r623544_fix'
   tag cci: ['CCI-000213']

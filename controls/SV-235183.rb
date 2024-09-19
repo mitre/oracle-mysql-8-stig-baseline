@@ -1,8 +1,8 @@
 control 'SV-235183' do
-  title "The MySQL Database Server 8.0 must associate organization-defined
+  title 'The MySQL Database Server 8.0 must associate organization-defined
 types of security labels having organization-defined security label values with
-information in process."
-  desc  "Without the association of security labels to information, there is no
+information in process.'
+  desc 'Without the association of security labels to information, there is no
 basis for the Database Management System (DBMS) to make security-related
 access-control decisions.
 
@@ -29,11 +29,8 @@ DBMS product, a third-party product, or custom application code.
 columns of the base table. A view can provide value-based security for the
 information in a table. To use a view requires appropriate privileges only for
 the view itself. The user need not be given privileges on base objects
-underlying the view.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    If security labeling is not required, this is not a finding.
+underlying the view.'
+  desc 'check', 'If security labeling is not required, this is not a finding.
 
     If security labeling requirements have been specified, check for a MySQL
 solution using views and Stored Procedures to implement a row-level security
@@ -46,16 +43,16 @@ user should only be able to view the data that have a specific tag or tags
 classified).
 
     If a MySQL solution through the use of views and stored procedures or a
-third party solution does not exist, this is a finding.
-  "
-  desc 'fix', "Deploy MySQL Views and Stored Procedures or a third-party
+third party solution does not exist, this is a finding.'
+  desc 'fix', 'Deploy MySQL Views and Stored Procedures or a third-party
 software, or add custom data structures, data elements and application code, to
-provide reliable security labeling of information in storage."
+provide reliable security labeling of information in storage.'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000313-DB-000309'
   tag gid: 'V-235183'
-  tag rid: 'SV-235183r638812_rule'
+  tag rid: 'SV-235183r961272_rule'
   tag stig_id: 'MYS8-00-010900'
   tag fix_id: 'F-38365r623670_fix'
   tag cci: ['CCI-002263']

@@ -1,7 +1,7 @@
 control 'SV-235153' do
-  title "Access to database files must be limited to relevant processes and to
-authorized, administrative users."
-  desc  "Applications, including DBMSs, must prevent unauthorized and
+  title 'Access to database files must be limited to relevant processes and to
+authorized, administrative users.'
+  desc 'Applications, including DBMSs, must prevent unauthorized and
 unintended information transfer via shared system resources. Permitting only
 DBMS processes and authorized, administrative users to have access to the files
 where the database resides helps ensure that those files are not shared
@@ -10,11 +10,8 @@ inappropriately and are not open to backdoor access and manipulation.
     As a general rule, distributed files and resources should follow the
 principal of least privilege, which requires that users, processes, programs,
 and other system components only have access to information and resources
-required for their legitimate purpose.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Review the permissions granted to users via the operating system/file
+required for their legitimate purpose.'
+  desc 'check', "Review the permissions granted to users via the operating system/file
 system on the instance files, database files, database redo, undo, archive, bin
 and audit log files, and database backup files.
 
@@ -98,19 +95,19 @@ srwxrwxrwx
     Miscellaneous support files directory
     /usr/local/mysql/support-files   root                   drwxr-xr-x
     Miscellaneous files directory
-    /usr/local/mysql/share                root                   drwxr-xr-x
-  "
-  desc 'fix', "Configure the permissions granted by the operating system/file
+    /usr/local/mysql/share                root                   drwxr-xr-x"
+  desc 'fix', 'Configure the permissions granted by the operating system/file
 system on the database files, database log files, and database backup files so
 that only relevant system accounts and authorized system administrators and
 database administrators with a need to know are permitted to read/view these
 files. Remove any unauthorized permission grants from MySQL data, audit,
-certificate, key, or other directories."
+certificate, key, or other directories.'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000243-DB-000374'
   tag gid: 'V-235153'
-  tag rid: 'SV-235153r638812_rule'
+  tag rid: 'SV-235153r961149_rule'
   tag stig_id: 'MYS8-00-006800'
   tag fix_id: 'F-38335r623580_fix'
   tag cci: ['CCI-001090']

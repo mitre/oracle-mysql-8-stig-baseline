@@ -1,13 +1,11 @@
 control 'SV-235136' do
-  title "The MySQL Database Server 8.0 must map the PKI-authenticated identity
-to an associated user account."
-  desc  "The #{input('org_name')} standard for authentication is #{input('org_name')}-approved PKI certificates.
+  title 'The MySQL Database Server 8.0 must map the PKI-authenticated identity
+to an associated user account.'
+  desc 'The DoD standard for authentication is DoD-approved PKI certificates.
 Once a PKI certificate has been validated, it must be mapped to a Database
 Management System (DBMS) user account for the authenticated identity to be
-meaningful to the DBMS and useful for authorization decisions."
-  desc  'rationale', ''
-  desc  'check', "
-    Review MySQL Database Server 8.0 configuration to verify DBMS user accounts
+meaningful to the DBMS and useful for authorization decisions.'
+  desc 'check', 'Review MySQL Database Server 8.0 configuration to verify DBMS user accounts
 are being mapped directly to unique identifying information within the
 validated PKI certificate.
 
@@ -20,10 +18,8 @@ validated PKI certificate.
     FROM `mysql`.`user`;
 
     If user accounts are not being mapped to authenticated identities, this is
-a finding.
-  "
-  desc 'fix', "
-    Configure the MySQL Database Server 8.0 to map the authenticated identity
+a finding.'
+  desc 'fix', "Configure the MySQL Database Server 8.0 to map the authenticated identity
 directly to the MySQL Database Server 8.0 user account.
 
     Alter users to require X509 certificates.
@@ -39,17 +35,17 @@ directly to the MySQL Database Server 8.0 user account.
     ALTER USER 'johansmith'@'%'
     REQUIRE X509
       AND SUBJECT '/C=US/ST=Texas/L=Houston/O=SomeCompany/CN=Johan Smith'
-      AND ISSUER '/C=US/ST=Texas/L=Houston/O=SomeCompany/CN=Some CA';
-  "
+      AND ISSUER '/C=US/ST=Texas/L=Houston/O=SomeCompany/CN=Some CA';"
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000177-DB-000069'
   tag gid: 'V-235136'
-  tag rid: 'SV-235136r638812_rule'
+  tag rid: 'SV-235136r961044_rule'
   tag stig_id: 'MYS8-00-004900'
   tag fix_id: 'F-38318r623529_fix'
   tag cci: ['CCI-000187']
-  tag nist: ['IA-5 (2) (c)']
+  tag nist: ['IA-5 (2) (c)', 'IA-5 (2) (a) (2)']
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 

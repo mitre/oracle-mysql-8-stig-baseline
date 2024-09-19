@@ -1,7 +1,7 @@
 control 'SV-235143' do
-  title "Default demonstration and sample databases, database objects, and
-applications must be removed."
-  desc  "Information systems are capable of providing a wide variety of
+  title 'Default demonstration and sample databases, database objects, and
+applications must be removed.'
+  desc 'Information systems are capable of providing a wide variety of
 functions and services. Some of the functions and services, provided by
 default, may not be necessary to support essential organizational operations
 (e.g., key missions, functions).
@@ -19,11 +19,8 @@ functionality by providing only essential capabilities.
 known attack points for malicious users. These demonstration and sample objects
 are meant to provide simple examples of coding specific functions and are not
 developed to prevent vulnerabilities from being introduced to the DBMS and host
-system.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Review vendor documentation and vendor websites to identify vendor-provided
+system.'
+  desc 'check', "Review vendor documentation and vendor websites to identify vendor-provided
 demonstration or sample databases, database applications, objects, and files.
 Note: MySQL does not include any in MySQL Database Server 8.0.
 
@@ -45,19 +42,17 @@ database names:
     world_x
     menagerie
 
-    If any of these databases exist, this is a finding.
-  "
-  desc 'fix', "
-    MySQL 8.0 contains no demo databases by default. If demo schemas (aka
+    If any of these databases exist, this is a finding."
+  desc 'fix', %q(MySQL 8.0 contains no demo databases by default. If demo schemas (aka
 databases) were added, remove them by executing:
 
-    mysql -u root -p --execute=\"DROP DATABASE 'schema_name'\"
-  "
+    mysql -u root -p --execute="DROP DATABASE 'schema_name'")
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000141-DB-000090'
   tag gid: 'V-235143'
-  tag rid: 'SV-235143r638812_rule'
+  tag rid: 'SV-235143r960963_rule'
   tag stig_id: 'MYS8-00-005600'
   tag fix_id: 'F-38325r623550_fix'
   tag cci: ['CCI-000381']

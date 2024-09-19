@@ -1,8 +1,8 @@
 control 'SV-235169' do
-  title "The MySQL Database Server 8.0 must enforce access restrictions
+  title 'The MySQL Database Server 8.0 must enforce access restrictions
 associated with changes to the configuration of the MySQL Database Server 8.0
-or database(s)."
-  desc  "Failure to provide logical access restrictions associated with changes
+or database(s).'
+  desc 'Failure to provide logical access restrictions associated with changes
 to configuration may have significant effects on the overall security of the
 system.
 
@@ -13,11 +13,8 @@ on the overall security of the system.
 
     Accordingly, only qualified and authorized individuals should be allowed to
 obtain access to system components for the purposes of initiating changes,
-including upgrades and modifications.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Review the security configuration of the MySQL Database Server 8.0 and
+including upgrades and modifications.'
+  desc 'check', 'Review the security configuration of the MySQL Database Server 8.0 and
 database(s). If it does not enforce access restrictions associated with changes
 to the configuration of the MySQL Database Server 8.0 or database(s), this is a
 finding.
@@ -26,7 +23,7 @@ finding.
     1) The mysql configuration file. This file must be owned and permissions to
 read or write to it limited to the mysql OS user only.
     2) Via a SET command within the server itself. These commands may be
-limited by limiting \"server administration\" privileges. User privileges can
+limited by limiting "server administration" privileges. User privileges can
 be shown using the SHOW GRANTS [FOR user]. This data is written to
 mysqld-auto.cnf file.
 
@@ -54,10 +51,8 @@ persist system variable settings that save to a file named mysqld-auto.cnf
 /usr/local/mysql-commercial-8.0.16-macos10.14-x86_64/data/mysqld-auto.cnf
 
     If the permissions of the mysqld-auto.cnf are more permissive, this is a
-finding.
-  "
-  desc 'fix', "
-    Configure the MySQL Database Server 8.0 to enforce access restrictions
+finding.'
+  desc 'fix', 'Configure the MySQL Database Server 8.0 to enforce access restrictions
 associated with changes to the configuration of the MySQL Database Server 8.0
 or database(s).
 
@@ -73,18 +68,18 @@ Permissions   File Permissions
     -rw-r--r--
 
     The mysqld-auto.cnf is created and managed by the mysql instance, as such
-permissions should be correct. If not correct, change \"owner\" to \"mysql\"
-and \"rw r\" to \"640\".
-  "
+permissions should be correct. If not correct, change "owner" to "mysql"
+and "rw r" to "640".'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000380-DB-000360'
   tag gid: 'V-235169'
-  tag rid: 'SV-235169r638812_rule'
+  tag rid: 'SV-235169r961461_rule'
   tag stig_id: 'MYS8-00-009200'
   tag fix_id: 'F-38351r623628_fix'
   tag cci: ['CCI-001813']
-  tag nist: ['CM-5 (1)']
+  tag nist: ['CM-5 (1)', 'CM-5 (1) (a)']
 
   if !input('aws_rds')
 

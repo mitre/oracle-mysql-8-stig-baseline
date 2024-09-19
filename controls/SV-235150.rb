@@ -1,7 +1,7 @@
 control 'SV-235150' do
-  title "The MySQL Database Server 8.0 must separate user functionality
-(including user interface services) from database management functionality."
-  desc  "Information system management functionality includes functions
+  title 'The MySQL Database Server 8.0 must separate user functionality
+(including user interface services) from database management functionality.'
+  desc 'Information system management functionality includes functions
 necessary to administer databases, network components, workstations, or
 servers, and typically requires privileged user access.
 
@@ -20,14 +20,11 @@ domain and with additional access controls.
 
     If administrative functionality or information regarding DBMS management is
 presented on an interface available for users, information on DBMS settings may
-be inadvertently made available to the user.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Check MySQL settings and documentation to verify that administrative
+be inadvertently made available to the user.'
+  desc 'check', %q(Check MySQL settings and documentation to verify that administrative
 functionality is separate from user functionality.
 
-    As Database Administrator (DBA) (“root\"), list all roles and permissions
+    As Database Administrator (DBA) (“root"), list all roles and permissions
 for the database:
 
     > mysql -u root -p
@@ -56,22 +53,20 @@ Delete_priv, Create_priv,
 and mysql.session, this is a finding.
 
     If administrator and general user functionality are not separated, this is
-a finding.
-  "
-  desc 'fix', "
-    Configure MySQL Database Server 8.0 to separate database administration and
+a finding.)
+  desc 'fix', 'Configure MySQL Database Server 8.0 to separate database administration and
 general user functionality.
 
     Revoke or remove users with admin and user mixed permissions.
 
     Review MySQL documentation related to access controls for users and admins:
-https://dev.mysql.com/doc/refman/8.0/en/access-control.html.
-  "
+https://dev.mysql.com/doc/refman/8.0/en/access-control.html.'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000211-DB-000122'
   tag gid: 'V-235150'
-  tag rid: 'SV-235150r638812_rule'
+  tag rid: 'SV-235150r961095_rule'
   tag stig_id: 'MYS8-00-006400'
   tag fix_id: 'F-38332r623571_fix'
   tag cci: ['CCI-001082']

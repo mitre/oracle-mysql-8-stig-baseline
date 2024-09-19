@@ -1,7 +1,7 @@
 control 'SV-235102' do
-  title "The MySQL Database Server 8.0 must protect against a user falsely
-repudiating having performed organization-defined actions."
-  desc  "Non-repudiation of actions taken is required to maintain data
+  title 'The MySQL Database Server 8.0 must protect against a user falsely
+repudiating having performed organization-defined actions.'
+  desc 'Non-repudiation of actions taken is required to maintain data
 integrity. Examples of particular actions taken by individuals include creating
 information, sending a message, approving information (e.g., indicating
 concurrence or signing a contract), and receiving a message.
@@ -16,11 +16,8 @@ must then include building audit features into the application data tables, and
 configuring DBMS audit tools to capture the necessary audit trail. Design and
 implementation also must ensure that applications pass individual user
 identification to the DBMS, even where the application connects to the DBMS
-with a standard, group account.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Obtain the list of authorized MySQL Server accounts in the system
+with a standard, group account.'
+  desc 'check', 'Obtain the list of authorized MySQL Server accounts in the system
 documentation.
 
     Determine if any accounts are shared. A shared account is defined as a
@@ -50,10 +47,8 @@ identifiers, this is a finding.
     Note: Privileged installation accounts like root@localhost may be required
 to be accessed by the DBA or other administrators for system maintenance. In
 these cases, each use of the account must be logged in some manner to assign
-accountability for any actions taken during the use of the account.
-  "
-  desc 'fix', "
-    Remove user-accessible shared accounts and use individual user IDs.
+accountability for any actions taken during the use of the account.'
+  desc 'fix', "Remove user-accessible shared accounts and use individual user IDs.
 
     Build/configure applications to ensure successful individual authentication
 prior to shared account access.
@@ -63,13 +58,13 @@ relevant circumstances.
 
     Design, develop, and implement a method to log use of any account to which
 more than one person has access. Restrict interactive access to shared accounts
-to the fewest persons possible.
-  "
+to the fewest persons possible."
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000080-DB-000063'
   tag gid: 'V-235102'
-  tag rid: 'SV-235102r638812_rule'
+  tag rid: 'SV-235102r960864_rule'
   tag stig_id: 'MYS8-00-001500'
   tag fix_id: 'F-38284r623427_fix'
   tag cci: ['CCI-000166']

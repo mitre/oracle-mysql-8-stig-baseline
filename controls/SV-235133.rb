@@ -1,89 +1,54 @@
 control 'SV-235133' do
-  title "The MySQL Database Server 8.0 must generate audit records for all
-direct access to the database(s)."
-  desc  "In this context, direct access is any query, command, or call to the
+  title 'The MySQL Database Server 8.0 must generate audit records for all
+direct access to the database(s).'
+  desc 'In this context, direct access is any query, command, or call to the
 Database Management System (DBMS) that comes from any source other than the
 application(s) that it supports. Examples would be the command line or a
 database management utility program. The intent is to capture all activity from
-administrative and non-standard sources."
-  desc  'rationale', ''
-  desc  'check', "
-    Review the system documentation to determine if MySQL Server is required to
-generate audit records for all direct access to the database(s).
+administrative and non-standard sources.'
+  desc 'check', %q(Review the system documentation to determine if MySQL Server is required to generate audit records for all direct access to the database(s).
 
-    Check if MySQL audit is configured and enabled. The my.cnf file will set
-the variable audit_file.
+Check if MySQL audit is configured and enabled. The my.cnf file will set the variable audit_file.
 
-    To further check, execute the following query:
-    SELECT PLUGIN_NAME, PLUGIN_STATUS
-          FROM INFORMATION_SCHEMA.PLUGINS
-          WHERE PLUGIN_NAME LIKE 'audit%';
+To further check, execute the following query: 
+SELECT PLUGIN_NAME, PLUGIN_STATUS
+      FROM INFORMATION_SCHEMA.PLUGINS
+      WHERE PLUGIN_NAME LIKE 'audit%';
 
-[NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 
-Community Server (also used by AWS RDS) has reduced or different features. 
-For Community Server, the MariaDB audit plugin may be used. 
-This InSpec profile is adapted to measure accordingly when using Community Server:
-    Verify the plugin installation by running:
-    SELECT PLUGIN_NAME, PLUGIN_STATUS
-           FROM INFORMATION_SCHEMA.PLUGINS
-           WHERE PLUGIN_NAME LIKE 'SERVER%';
-    The value for SERVER_AUDIT should return ACTIVE.]
+The status of the audit_log plugin must be "active". If it is not "active", this is a finding.
 
-    The status of the audit_log plugin must be \"active\". If it is not
-\"active\", this is a finding.
+Review audit filters and associated users by running the following queries:
+SELECT `audit_log_filter`.`NAME`,
+   `audit_log_filter`.`FILTER`
+FROM `mysql`.`audit_log_filter`;
 
-[NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 
-Community Server (also used by AWS RDS) has reduced or different features. 
-For Community Server, the MariaDB audit plugin may be used and configured to 
-audit all CONNECT and QUERY events.
-This InSpec profile is adapted to measure accordingly when using Community Server:
-    Verify the CONNECT and QUERY events are enabled:
-    SHOW variables LIKE 'server_audit_events';
-    +---------------------+---------------+
-    | Variable_name       | Value         |
-    +---------------------+---------------+
-    | server_audit_events | CONNECT,QUERY |
-    +---------------------+---------------+
-  	1 row in set (0.00 sec)    
-  	The value for server_audit_events should return CONNECT,QUERY.]
-  
-    Review audit filters and associated users by running the following queries:
-    SELECT `audit_log_filter`.`NAME`,
-       `audit_log_filter`.`FILTER`
-    FROM `mysql`.`audit_log_filter`;
+SELECT `audit_log_user`.`USER`,
+   `audit_log_user`.`HOST`,
+   `audit_log_user`.`FILTERNAME`
+FROM `mysql`.`audit_log_user`;
 
-    SELECT `audit_log_user`.`USER`,
-       `audit_log_user`.`HOST`,
-       `audit_log_user`.`FILTERNAME`
-    FROM `mysql`.`audit_log_user`;
+All currently defined audits for the MySQL server instance will be listed. If no audits are returned, this is a finding.
 
-    All currently defined audits for the MySQL server instance will be listed.
-If no audits are returned, this is a finding.
+To check if the audit filters in place are generating records to audit all direct access to the database(s):
 
-    To check if the audit filters in place are generating records to audit all
-direct access to the database(s):
+Run any access to the database.
 
-    Run any access to the database.
+Review the audit log by running the Linux command:
+sudo cat  <directory where audit log files are located>/audit.log
+For example if the values returned by - "select @@datadir, @@audit_log_file; " are  /usr/local/mysql/data/,  audit.log 
+sudo cat  /usr/local/mysql/data/audit.log
 
-    Review the audit log by running the Linux command:
-    sudo cat  <directory where audit log files are located>/audit.log
-    For example if the values returned by - \"select @@datadir,
-@@audit_log_file; \" are  /usr/local/mysql/data/,  audit.log
-    sudo cat  /usr/local/mysql/data/audit.log
-
-    If the audit events are not present, this is a finding.
-  "
-  desc 'fix', "
-    If currently required, configure the MySQL Database Server to produce audit
+If the audit events are not present, this is a finding.)
+  desc 'fix', 'If currently required, configure the MySQL Database Server to produce audit
 records for all direct access to the database(s).
 
-    See the supplemental file \"MySQL80Audit.sql\".
-  "
+    See the supplemental file "MySQL80Audit.sql".'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000508-DB-000358'
   tag gid: 'V-235133'
-  tag rid: 'SV-235133r638812_rule'
+  tag rid: 'SV-235133r961839_rule'
   tag stig_id: 'MYS8-00-004600'
   tag fix_id: 'F-38315r623520_fix'
   tag cci: ['CCI-000172']

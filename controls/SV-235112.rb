@@ -1,7 +1,7 @@
 control 'SV-235112' do
-  title "The MySQL Database Server 8.0 must generate audit records when
-unsuccessful attempts to add privileges/permissions occur."
-  desc  "Failed attempts to change the permissions, privileges, and roles
+  title 'The MySQL Database Server 8.0 must generate audit records when
+unsuccessful attempts to add privileges/permissions occur.'
+  desc 'Failed attempts to change the permissions, privileges, and roles
 granted to users and roles must be tracked. Without an audit trail,
 unauthorized attempts to elevate or restrict individuals and groups privileges
 could go undetected.
@@ -10,94 +10,58 @@ could go undetected.
 command, or, in the negative, the DENY command.
 
     To aid in diagnosis, it is necessary to keep track of failed attempts in
-addition to the successful ones.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Check that MySQL Server Audit is being used for the STIG compliant audit.
+addition to the successful ones.'
+  desc 'check', %q(Check that MySQL Server Audit is being used for the STIG compliant audit.
 
-    Check if MySQL audit is configured and enabled. The my.cnf file will set
-the variable audit_file.
+Check if MySQL audit is configured and enabled. The my.cnf file will set the variable audit_file.
 
-    To further check, execute the following query:
-    SELECT PLUGIN_NAME, PLUGIN_STATUS
-          FROM INFORMATION_SCHEMA.PLUGINS
-          WHERE PLUGIN_NAME LIKE 'audit%';
+To further check, execute the following query: 
+SELECT PLUGIN_NAME, PLUGIN_STATUS
+      FROM INFORMATION_SCHEMA.PLUGINS
+      WHERE PLUGIN_NAME LIKE 'audit%';
 
-[NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 
-Community Server (also used by AWS RDS) has reduced or different features. 
-For Community Server, the MariaDB audit plugin may be used. 
-This InSpec profile is adapted to measure accordingly when using Community Server:
-    Verify the plugin installation by running:
-    SELECT PLUGIN_NAME, PLUGIN_STATUS
-           FROM INFORMATION_SCHEMA.PLUGINS
-           WHERE PLUGIN_NAME LIKE 'SERVER%';
-    The value for SERVER_AUDIT should return ACTIVE.]
+The status of the audit_log plugin must be "active". If it is not "active", this is a finding.
 
-    The status of the audit_log plugin must be \"active\". If it is not
-\"active\", this is a finding.
+Review audit filters and associated users by running the following queries:
+SELECT `audit_log_filter`.`NAME`,
+   `audit_log_filter`.`FILTER`
+FROM `mysql`.`audit_log_filter`;
 
-[NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 
-Community Server (also used by AWS RDS) has reduced or different features. 
-For Community Server, the MariaDB audit plugin may be used and configured to 
-audit all CONNECT and QUERY events.
-This InSpec profile is adapted to measure accordingly when using Community Server:
-    Verify the CONNECT and QUERY events are enabled:
-    SHOW variables LIKE 'server_audit_events';
-    +---------------------+---------------+
-    | Variable_name       | Value         |
-    +---------------------+---------------+
-    | server_audit_events | CONNECT,QUERY |
-    +---------------------+---------------+
-  	1 row in set (0.00 sec)    
-  	The value for server_audit_events should return CONNECT,QUERY.]
-  
+SELECT `audit_log_user`.`USER`,
+   `audit_log_user`.`HOST`,
+   `audit_log_user`.`FILTERNAME`
+FROM `mysql`.`audit_log_user`;
 
-    Review audit filters and associated users by running the following queries:
-    SELECT `audit_log_filter`.`NAME`,
-       `audit_log_filter`.`FILTER`
-    FROM `mysql`.`audit_log_filter`;
+All currently defined audits for the MySQL server instance will be listed. If no audits are returned, this is a finding.
 
-    SELECT `audit_log_user`.`USER`,
-       `audit_log_user`.`HOST`,
-       `audit_log_user`.`FILTERNAME`
-    FROM `mysql`.`audit_log_user`;
+Determine if rules are in place to capture the following types of commands related to permissions by running the command:
+select * from mysql.audit_log_filter;
 
-    All currently defined audits for the MySQL server instance will be listed.
-If no audits are returned, this is a finding.
+If the template SQL filter was used, it will have the name log_stig.
 
-    Determine if rules are in place to capture the following types of commands
-related to permissions by running the command:
-    select * from mysql.audit_log_filter;
-
-    If the template SQL filter was used, it will have the name log_stig.
-
-    Review the filter values. It will show filters for events of the type of
-field general_sql_command.str for the following SQL statement types:
-    grant
-    grant_roles
-    revoke
-    revoke_all
-    revoke_roles
-    drop_role
-    alter_user_default_role
-    create_role
-    drop_role
-    grant_roles
-    revoke_roles
-    set_role
-    create_user
-    alter_user
-    drop_user
-    alter_user
-    alter_user_default_role
-    create_user
-    drop_user
-    rename_user
-    show_create_user
-  "
-  desc 'fix', "
-    Configure the MySQL Database Server to audit when privileges/permissions
+Review the filter values. It will show filters for events of the type of field general_sql_command.str for the following SQL statement types:
+grant
+grant_roles
+revoke
+revoke_all
+revoke_roles
+drop_role
+alter_user_default_role
+create_role
+drop_role
+grant_roles
+revoke_roles
+set_role
+create_user
+alter_user
+drop_user
+alter_user
+alter_user_default_role
+create_user
+drop_user
+rename_user
+show_create_user)
+  desc 'fix', 'Configure the MySQL Database Server to audit when privileges/permissions
 are added.
 
     Add the following events to the MySQL Server Audit that is being used for
@@ -124,13 +88,13 @@ the STIG compliance audit:
     rename_user
     show_create_user
 
-    See the supplemental file \"MySQL80Audit.sql\".
-  "
+    See the supplemental file "MySQL80Audit.sql".'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000495-DB-000327'
   tag gid: 'V-235112'
-  tag rid: 'SV-235112r638812_rule'
+  tag rid: 'SV-235112r961800_rule'
   tag stig_id: 'MYS8-00-002500'
   tag fix_id: 'F-38294r623457_fix'
   tag cci: ['CCI-000172']

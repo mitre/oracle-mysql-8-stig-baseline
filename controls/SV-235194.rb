@@ -1,8 +1,8 @@
 control 'SV-235194' do
-  title "Security-relevant software updates to the MySQL Database Server 8.0
+  title 'Security-relevant software updates to the MySQL Database Server 8.0
 must be installed within the time period directed by an authoritative source	
-(e.g., IAVM, CTOs, DTMs, and STIGs)."
-  desc  "Security flaws with software applications, including database
+(e.g., IAVM, CTOs, DTMs, and STIGs).'
+  desc 'Security flaws with software applications, including database
 management systems, are discovered daily. Vendors are constantly updating and
 patching their products to address newly discovered security vulnerabilities.
 Organizations (including any contractor to the organization) are required to
@@ -29,11 +29,8 @@ Information Assurance Vulnerability Management (IAVM) process.
     The application will be configured to check for and install	
 security-relevant software updates within an identified time period from the	
 availability of the update. The specific time period will be defined by an	
-authoritative source (e.g., IAVM, CTOs, DTMs, and STIGs).
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    To check the version of the installed MySQL, run the following SQL
+authoritative source (e.g., IAVM, CTOs, DTMs, and STIGs).'
+  desc 'check', 'To check the version of the installed MySQL, run the following SQL
 statement:
 
     select @@version;
@@ -53,15 +50,15 @@ to known vulnerability.
     https://dev.mysql.com/doc/relnotes/mysql/8.0/en/
 
     If MySQL Enterprise Edition 8.0 is not at the latest version, this is a
-finding.
-  "
-  desc  'fix', "Institute and adhere to policies and procedures to ensure that
-patches are consistently applied to MySQL within the time allowed."
+finding.'
+  desc 'fix', 'Institute and adhere to policies and procedures to ensure that
+patches are consistently applied to MySQL within the time allowed.'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000456-DB-000390'
   tag gid: 'V-235194'
-  tag rid: 'SV-235194r638812_rule'
+  tag rid: 'SV-235194r961683_rule'
   tag stig_id: 'MYS8-00-012300'
   tag fix_id: 'F-38376r623703_fix'
   tag cci: ['CCI-002605']

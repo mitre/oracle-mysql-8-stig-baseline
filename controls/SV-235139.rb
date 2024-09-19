@@ -1,7 +1,7 @@
 control 'SV-235139' do
-  title "If passwords are used for authentication, the MySQL Database Server
-8.0 must transmit only encrypted representations of passwords."
-  desc  "The #{input('org_name')} standard for authentication is #{input('org_name')}-approved PKI certificates.
+  title 'If passwords are used for authentication, the MySQL Database Server
+8.0 must transmit only encrypted representations of passwords.'
+  desc 'The DoD standard for authentication is DoD-approved PKI certificates.
 
     Authentication based on User ID and Password may be used only when it is
 not possible to employ a PKI certificate, and requires Authorizing Official
@@ -12,11 +12,8 @@ is the standard method for protecting passwords during transmission.
 
     Database Management System (DBMS) passwords sent in clear text format
 across the network are vulnerable to discovery by unauthorized users.
-Disclosure of passwords may easily lead to unauthorized access to the database.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Review configuration settings for encrypting passwords in transit across
+Disclosure of passwords may easily lead to unauthorized access to the database.'
+  desc 'check', "Review configuration settings for encrypting passwords in transit across
 the network. If passwords are not encrypted, this is a finding.
 
     If it is determined that passwords are passed unencrypted at any point
@@ -38,11 +35,9 @@ other details:
     select @@ssl_ca, @@ssl_capath, @@ssl_cert, @@ssl_cipher, @@ssl_crl,
 @@ssl_crlpath, @@ssl_fips_mode, @@ssl_key;
 
-    If the certificate is not a #{input('org_name')} certificate, or if no certificate is
-listed, this is a finding.
-  "
-  desc 'fix', "
-    Configure encryption for transmission of passwords across the network. If
+    If the certificate is not a DoD certificate, or if no certificate is
+listed, this is a finding."
+  desc 'fix', 'Configure encryption for transmission of passwords across the network. If
 the database does not provide encryption for logon events natively, employ
 encryption at the OS or network level.
 
@@ -51,7 +46,7 @@ encryption at the OS or network level.
     connect to MySQL as admin (root)
     mysql> set persist require_secure_transport=ON;
 
-    Set system variables on the server side specify  #{input('org_name')} approved certificate
+    Set system variables on the server side specify  DoD approved certificate
 and key files the server uses when permitting clients to establish encrypted
 connections:
 
@@ -72,13 +67,13 @@ names as necessary:
     [mysqld]
     ssl_ca=ca.pem
     ssl_cert=server-cert.pem
-    ssl_key=server-key.pem
-  "
+    ssl_key=server-key.pem'
   impact 0.7
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'high'
   tag gtitle: 'SRG-APP-000172-DB-000075'
   tag gid: 'V-235139'
-  tag rid: 'SV-235139r638812_rule'
+  tag rid: 'SV-235139r961029_rule'
   tag stig_id: 'MYS8-00-005200'
   tag fix_id: 'F-38321r623538_fix'
   tag cci: ['CCI-000197']

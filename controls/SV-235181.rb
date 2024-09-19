@@ -1,8 +1,8 @@
 control 'SV-235181' do
-  title "The MySQL Database Server 8.0 must prevent non-privileged users from
+  title 'The MySQL Database Server 8.0 must prevent non-privileged users from
 executing privileged functions, to include disabling, circumventing, or
-altering implemented security safeguards/countermeasures."
-  desc  "Preventing non-privileged users from executing privileged functions
+altering implemented security safeguards/countermeasures.'
+  desc 'Preventing non-privileged users from executing privileged functions
 mitigates the risk that unauthorized individuals or processes may gain
 unnecessary access to information or privileges.
 
@@ -47,11 +47,8 @@ table executed by other than a security principal.
     Depending on the capabilities of the DBMS and the design of the database
 and associated applications, the prevention of unauthorized use of privileged
 functions may be achieved by means of DBMS security features, database
-triggers, other mechanisms, or a combination of these.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Review the server documentation to obtain a listing of accounts used for
+triggers, other mechanisms, or a combination of these.'
+  desc 'check', "Review the server documentation to obtain a listing of accounts used for
 executing external processes. Execute the following query to obtain a listing
 of accounts currently configured for use by external processes.
 
@@ -64,20 +61,18 @@ this is a finding.
 implemented as described in the documentation, this is a finding.
     If the privilege-elevation logic can be invoked in ways other than
 intended, or in contexts other than intended, or by subjects/principals other
-than intended, this is a finding.
-  "
-  desc 'fix', "
-    Remove any procedures that are not authorized.
+than intended, this is a finding."
+  desc 'fix', 'Remove any procedures that are not authorized.
 
-    Drop the procedure or function using
-    DROP PROCEDURE <proc_name>;
-    DROP FUNCTION <function_name>;
-  "
+Drop the procedure or function using
+DROP PROCEDURE <proc_name>;
+DROP FUNCTION <function_name>;'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000340-DB-000304'
   tag gid: 'V-235181'
-  tag rid: 'SV-235181r638812_rule'
+  tag rid: 'SV-235181r961353_rule'
   tag stig_id: 'MYS8-00-010700'
   tag fix_id: 'F-38363r623664_fix'
   tag cci: ['CCI-002235']

@@ -1,8 +1,8 @@
 control 'SV-235158' do
-  title "The MySQL Database Server 8.0 and associated applications, when making
+  title 'The MySQL Database Server 8.0 and associated applications, when making
 use of dynamic code execution, must scan input data for invalid values that may
-indicate a code injection attack."
-  desc  "With respect to database management systems, one class of threat is
+indicate a code injection attack.'
+  desc %q(With respect to database management systems, one class of threat is
 known as SQL Injection, or more generally, code injection. It takes advantage
 of the dynamic execution capabilities of various programming languages,
 including dialects of SQL. In such cases, the attacker deduces the manner in
@@ -35,7 +35,7 @@ these are -- or /*  */
     -- If HTML and XML tags, entities, comments, etc., will never be valid,
 reject them.
     -- If wildcards are present, reject them unless truly necessary. In SQL
-these are the underscore and the percentage sign, and the word \"ESCAPE\" is
+these are the underscore and the percentage sign, and the word "ESCAPE" is
 also a clue that wildcards are in use.
     -- If SQL key words, such as SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER,
 DROP, ESCAPE, UNION, GRANT, REVOKE, DENY, MODIFY will never be valid, reject
@@ -59,11 +59,8 @@ the attacker.
 administrators to permit or deny SQL statement execution based on matching
 against whitelists of accepted statement patterns. This hardens MySQL Server
 against attacks such as SQL injection or attempts to exploit applications by
-using them outside of their legitimate query workload characteristics.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Review MySQL Database Server 8.0 source code (stored procedures, functions,
+using them outside of their legitimate query workload characteristics.)
+  desc 'check', "Review MySQL Database Server 8.0 source code (stored procedures, functions,
 and triggers) and application source code to identify cases of dynamic code
 execution.
 
@@ -87,10 +84,8 @@ list for the userhost user to execute.
 not on the allow list for the userhost user to execute.
 
     If dynamic code execution is employed without protective measures against
-code injection, this is a finding.
-  "
-  desc 'fix', "
-    Where dynamic code execution is used, modify the code to implement
+code injection, this is a finding."
+  desc 'fix', "Where dynamic code execution is used, modify the code to implement
 protections against code injection.
 
     Enable the MySQL Enterprise Firewall by running this script, which is
@@ -105,13 +100,13 @@ examples applications that allow user input.
     Once the allowlist for the user/host has been captured, the firewall can be
 placed in PROTECTING (active blocking) or DETECTING(logging) mode.
     CALL mysql.sp_set_firewall_mode('fwuser@localhost', 'PROTECTING');
-    CALL mysql.sp_set_firewall_mode('fwuser@localhost', 'DETECTING');
-  "
+    CALL mysql.sp_set_firewall_mode('fwuser@localhost', 'DETECTING');"
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000251-DB-000392'
   tag gid: 'V-235158'
-  tag rid: 'SV-235158r638812_rule'
+  tag rid: 'SV-235158r961158_rule'
   tag stig_id: 'MYS8-00-007500'
   tag fix_id: 'F-38340r623595_fix'
   tag cci: ['CCI-001310']

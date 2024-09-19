@@ -1,8 +1,8 @@
 control 'SV-235184' do
-  title "The MySQL Database Server 8.0 must associate organization-defined
+  title 'The MySQL Database Server 8.0 must associate organization-defined
 types of security labels having organization-defined security label values with
-information in transmission."
-  desc  "Without the association of security labels to information, there is no
+information in transmission.'
+  desc 'Without the association of security labels to information, there is no
 basis for the DBMS to make security-related access-control decisions.
 
     Security labels are abstractions representing the basic properties or
@@ -28,11 +28,8 @@ DBMS product, a third-party product, or custom application code.
 columns of the base table. A view can provide value-based security for the
 information in a table. To use a view requires appropriate privileges only for
 the view itself. The user need not be given privileges on base objects
-underlying the view.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    If security labeling is not required, this is not a finding.
+underlying the view.'
+  desc 'check', 'If security labeling is not required, this is not a finding.
 
     If security labeling requirements have been specified, check for a MySQL
 solution using views and Stored Procedures to implement a row-level security
@@ -44,16 +41,16 @@ user can only view the data that have a specific tag or tags (e.g., user [x]
 can only view records that are labeled with the tag of classified).
 
     If a MySQL solution through the use of views and stored procedures or a
-third party solution does not exist, this is a finding.
-  "
-  desc 'fix', "Deploy MySQL Views and Stored Procedures or a third-party
+third party solution does not exist, this is a finding.'
+  desc 'fix', 'Deploy MySQL Views and Stored Procedures or a third-party
 software, or add custom data structures, data elements and application code, to
-provide reliable security labeling of information in storage."
+provide reliable security labeling of information in storage.'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000314-DB-000310'
   tag gid: 'V-235184'
-  tag rid: 'SV-235184r638812_rule'
+  tag rid: 'SV-235184r961275_rule'
   tag stig_id: 'MYS8-00-011000'
   tag fix_id: 'F-38366r623673_fix'
   tag cci: ['CCI-002264']

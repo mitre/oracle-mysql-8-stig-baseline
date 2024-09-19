@@ -1,7 +1,7 @@
 control 'SV-235161' do
-  title "The MySQL Database Server 8.0 must protect its audit configuration
-from unauthorized modification."
-  desc  "Protecting audit data also includes identifying and protecting the
+  title 'The MySQL Database Server 8.0 must protect its audit configuration
+from unauthorized modification.'
+  desc 'Protecting audit data also includes identifying and protecting the
 tools used to view and manipulate log data. Therefore, protecting audit tools
 is necessary to prevent unauthorized operation on audit data.
 
@@ -13,11 +13,8 @@ the modification of audit tools.
     Audit tools include, but are not limited to, vendor-provided and open
 source audit tools needed to successfully view and manipulate audit information
 system activity and records. Audit tools include custom queries and report
-generators.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Check users with permissions to administer MySQL Auditing.
+generators.'
+  desc 'check', %q(Check users with permissions to administer MySQL Auditing.
 
     select * from information_schema.user_privileges where privilege_type =
 'AUDIT_ADMIN';
@@ -36,10 +33,8 @@ generators.
     FROM performance_schema.global_variables where variable_name =
 'audit_log_encryption';
 
-    If \"audit_log_encryption\" is not set to \"AES\", this is a finding.
-  "
-  desc 'fix', "
-    Remove audit-related permissions from individuals and roles not authorized
+    If "audit_log_encryption" is not set to "AES", this is a finding.)
+  desc 'fix', %q(Remove audit-related permissions from individuals and roles not authorized
 to have them.
 
     REVOKE AUDIT_ADMIN on *.* FROM <user>;
@@ -54,10 +49,10 @@ to have them.
 
     Note: First instantiate the keyring plugin which is needed to store the
 audit encryption key.
-    The example above has an \"early-plugin-load=keyring_file.so\" entry in the
+    The example above has an "early-plugin-load=keyring_file.so" entry in the
 my.cnf file.
     A keyring plugin must be present before adding the
-\"audit-log-encryption=AES\" entry or the database will not start.
+"audit-log-encryption=AES" entry or the database will not start.
 
     Below are valid key ring plugins:
 
@@ -95,13 +90,13 @@ keyring_oci_management_endpoint=shortAlphaNumericString-management.kms.us-ashbur
     early-plugin-load=keyring_hashicorp.so
     keyring_hashicorp_role_id='ee3b495c-d0c9-11e9-8881-8444c71c32aa'
     keyring_hashicorp_secret_id='0512af29-d0ca-11e9-95ee-0010e00dd718'
-    keyring_hashicorp_store_path='/v1/kv/mysql'
-  "
+    keyring_hashicorp_store_path='/v1/kv/mysql')
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000122-DB-000203'
   tag gid: 'V-235161'
-  tag rid: 'SV-235161r638812_rule'
+  tag rid: 'SV-235161r960942_rule'
   tag stig_id: 'MYS8-00-008100'
   tag fix_id: 'F-38343r623604_fix'
   tag cci: ['CCI-001494']

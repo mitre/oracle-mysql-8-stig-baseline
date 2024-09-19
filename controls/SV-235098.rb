@@ -1,8 +1,8 @@
 control 'SV-235098' do
-  title "The MySQL Database Server 8.0 must include additional, more detailed,
+  title 'The MySQL Database Server 8.0 must include additional, more detailed,
 organizationally defined information in the audit records for audit events
-identified by type, location, or subject."
-  desc  "Information system auditing capability is critical for accurate
+identified by type, location, or subject.'
+  desc 'Information system auditing capability is critical for accurate
 forensic analysis. Reconstruction of harmful events or forensic analysis is not
 possible if audit records do not contain enough information. To support
 analysis, some types of events will need information to be logged that exceeds
@@ -22,11 +22,8 @@ compromise.
 
     Examples of detailed information the organization may require in audit
 records are full-text recording of privileged commands or the individual
-identities of group account users.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    If a MySQL Server Audit is not in use for audit purposes, this is a finding
+identities of group account users.'
+  desc 'check', 'If a MySQL Server Audit is not in use for audit purposes, this is a finding
 unless a third-party product is being used that can perform detailed auditing
 for MySQL Server.
 
@@ -39,14 +36,12 @@ to audit any events and any fields, in addition to those in the standard audit.
 the documented requirements.
 
     If any such requirement is not satisfied by the audit specification(s) (or
-by supplemental, locally-deployed mechanisms), this is a finding.
-  "
-  desc 'fix', "
-    Design and deploy an audit configuration that captures all auditable events
+by supplemental, locally-deployed mechanisms), this is a finding.'
+  desc 'fix', %q(Design and deploy an audit configuration that captures all auditable events
 and data items.
 
     Create rule
-    SELECT audit_log_filter_set_filter('log_all', '{ \"filter\": { \"log\":
+    SELECT audit_log_filter_set_filter('log_all', '{ "filter": { "log":
 true } }');
     SELECT audit_log_filter_set_user('%', 'log_all');
 
@@ -55,13 +50,13 @@ required information including, but not limited to, events, type, location,
 subject, date and time and by whom the change occurred.
 
     Implement additional custom audits to capture the additional
-organizationally required information.
-  "
+organizationally required information.)
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000101-DB-000044'
   tag gid: 'V-235098'
-  tag rid: 'SV-235098r638812_rule'
+  tag rid: 'SV-235098r960909_rule'
   tag stig_id: 'MYS8-00-000800'
   tag fix_id: 'F-38280r623415_fix'
   tag cci: ['CCI-000135']

@@ -1,7 +1,7 @@
 control 'SV-235127' do
-  title "The MySQL Database Server 8.0 must generate audit records for all
-privileged activities or other system-level access."
-  desc  "Without tracking privileged activity, it would be difficult to
+  title 'The MySQL Database Server 8.0 must generate audit records for all
+privileged activities or other system-level access.'
+  desc 'Without tracking privileged activity, it would be difficult to
 establish, correlate, and investigate the events relating to an incident or
 identify those responsible for one.
 
@@ -42,94 +42,58 @@ mechanisms, or a combination of these.
 
     Note that it is particularly important to audit, and tightly control, any
 action that weakens the implementation of this requirement itself, since the
-objective is to have a complete audit trail of all administrative activity.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Review the system documentation to determine if MySQL Server is required to
-audit for all privileged activities or other system-level access.
+objective is to have a complete audit trail of all administrative activity.'
+  desc 'check', %q(Review the system documentation to determine if MySQL Server is required to audit for all privileged activities or other system-level access.
 
-    Check if MySQL audit is configured and enabled. The my.cnf file will set
-the variable audit_file.
+Check if MySQL audit is configured and enabled. The my.cnf file will set the variable audit_file.
 
-    To further check, execute the following query:
-    SELECT PLUGIN_NAME, PLUGIN_STATUS
-          FROM INFORMATION_SCHEMA.PLUGINS
-          WHERE PLUGIN_NAME LIKE 'audit%';
+To further check, execute the following query: 
+SELECT PLUGIN_NAME, PLUGIN_STATUS
+      FROM INFORMATION_SCHEMA.PLUGINS
+      WHERE PLUGIN_NAME LIKE 'audit%';
 
-[NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 
-Community Server (also used by AWS RDS) has reduced or different features. 
-For Community Server, the MariaDB audit plugin may be used. 
-This InSpec profile is adapted to measure accordingly when using Community Server:
-    Verify the plugin installation by running:
-    SELECT PLUGIN_NAME, PLUGIN_STATUS
-           FROM INFORMATION_SCHEMA.PLUGINS
-           WHERE PLUGIN_NAME LIKE 'SERVER%';
-    The value for SERVER_AUDIT should return ACTIVE.]
+The status of the audit_log plugin must be "active". If it is not "active", this is a finding.
 
-    The status of the audit_log plugin must be \"active\". If it is not
-\"active\", this is a finding.
+Review audit filters and associated users by running the following queries:
+SELECT `audit_log_filter`.`NAME`,
+   `audit_log_filter`.`FILTER`
+FROM `mysql`.`audit_log_filter`;
 
-[NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 
-Community Server (also used by AWS RDS) has reduced or different features. 
-For Community Server, the MariaDB audit plugin may be used and configured to 
-audit all CONNECT and QUERY events.
-This InSpec profile is adapted to measure accordingly when using Community Server:
-    Verify the CONNECT and QUERY events are enabled:
-    SHOW variables LIKE 'server_audit_events';
-    +---------------------+---------------+
-    | Variable_name       | Value         |
-    +---------------------+---------------+
-    | server_audit_events | CONNECT,QUERY |
-    +---------------------+---------------+
-  	1 row in set (0.00 sec)    
-  	The value for server_audit_events should return CONNECT,QUERY.]
-  
-    Review audit filters and associated users by running the following queries:
-    SELECT `audit_log_filter`.`NAME`,
-       `audit_log_filter`.`FILTER`
-    FROM `mysql`.`audit_log_filter`;
+SELECT `audit_log_user`.`USER`,
+   `audit_log_user`.`HOST`,
+   `audit_log_user`.`FILTERNAME`
+FROM `mysql`.`audit_log_user`;
 
-    SELECT `audit_log_user`.`USER`,
-       `audit_log_user`.`HOST`,
-       `audit_log_user`.`FILTERNAME`
-    FROM `mysql`.`audit_log_user`;
+All currently defined audits for the MySQL server instance will be listed. If no audits are returned, this is a finding.
 
-    All currently defined audits for the MySQL server instance will be listed.
-If no audits are returned, this is a finding.
+Determine if rules are in place to capture the following types of commands related to permissions by running:
+select * from mysql.audit_log_filter;
 
-    Determine if rules are in place to capture the following types of commands
-related to permissions by running:
-    select * from mysql.audit_log_filter;
+If the template SQL filter was used, it will have the name "log_stig".
 
-    If the template SQL filter was used, it will have the name \"log_stig\".
-
-    Review the filter values. It will show filters for events of the type of
-the field general_sql_command.str for the following SQL statement types:
-    grant
-    grant_roles
-    revoke
-    revoke_all
-    revoke_roles
-    drop_role
-    alter_user_default_role
-    create_role
-    drop_role
-    grant_roles
-    revoke_roles
-    set_role
-    create_user
-    alter_user
-    drop_user
-    alter_user
-    alter_user_default_role
-    create_user
-    drop_user
-    rename_user
-    show_create_user
-  "
-  desc 'fix', "
-    Configure the MySQL Database Server to audit for all privileged activities
+Review the filter values. It will show filters for events of the type of the field general_sql_command.str for the following SQL statement types:
+grant
+grant_roles
+revoke
+revoke_all
+revoke_roles
+drop_role
+alter_user_default_role
+create_role
+drop_role
+grant_roles
+revoke_roles
+set_role
+create_user
+alter_user
+drop_user
+alter_user
+alter_user_default_role
+create_user
+drop_user
+rename_user
+show_create_user)
+  desc 'fix', 'Configure the MySQL Database Server to audit for all privileged activities
 or other system-level access.
 
     Add the following events to the MySQL Server Audit:
@@ -155,13 +119,13 @@ or other system-level access.
     rename_user
     show_create_user
 
-    See the supplemental file \"MySQL80Audit.sql\".
-  "
+    See the supplemental file "MySQL80Audit.sql".'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000504-DB-000354'
   tag gid: 'V-235127'
-  tag rid: 'SV-235127r638812_rule'
+  tag rid: 'SV-235127r961827_rule'
   tag stig_id: 'MYS8-00-004000'
   tag fix_id: 'F-38309r623502_fix'
   tag cci: ['CCI-000172']
