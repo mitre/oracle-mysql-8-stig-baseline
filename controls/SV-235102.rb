@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235102' do
   title 'The MySQL Database Server 8.0 must protect against a user falsely
 repudiating having performed organization-defined actions.'
@@ -75,16 +77,16 @@ to the fewest persons possible."
   query_accounts = %(
     SELECT
        User,
-       Host 
+       Host
     FROM
        mysql.user;
   )
 
   accounts = sql_session.query(query_accounts).output
 
-  describe "Manually review MySQL accounts and determine if any are shared accounts and 
+  describe "Manually review MySQL accounts and determine if any are shared accounts and
   that they are compliant with the specified requirements.\n#{accounts}" do
-    skip "Manually review MySQL accounts and determine if any are shared accounts and 
-    that they are compliant with the specified requirements.\n#{accounts}" 
+    skip "Manually review MySQL accounts and determine if any are shared accounts and
+    that they are compliant with the specified requirements.\n#{accounts}"
   end
 end

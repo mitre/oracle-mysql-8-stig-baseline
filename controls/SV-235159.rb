@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235159' do
   title 'The MySQL Database Server 8.0 must initiate session auditing upon
 startup.'
@@ -5,7 +7,7 @@ startup.'
 investigation. To be sure of capturing all activity during those periods when
 session auditing is in use, it needs to be in operation for the whole time the
 Database Management System (DBMS) is running."
-  desc 'check', %q(Determine if an audit is configured and enabled. 
+  desc 'check', %q(Determine if an audit is configured and enabled.
 
 The my.cnf file will set the variable audit_file.
 
@@ -16,7 +18,7 @@ audit-log=FORCE_PLUS_PERMANENT
 
 If these entries are not present. This is a finding.
 
-Execute the following query: 
+Execute the following query:
 SELECT PLUGIN_NAME, PLUGIN_STATUS
        FROM INFORMATION_SCHEMA.PLUGINS
        WHERE PLUGIN_NAME LIKE 'audit%';
@@ -55,29 +57,29 @@ audit-log-format=JSON'
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
   mycnf = input('mycnf')
-  
-  if !input('aws_rds')
-    audit_log_plugin = %(
+
+  audit_log_plugin = if !input('aws_rds')
+                       %(
     SELECT
        PLUGIN_NAME,
-       plugin_status 
+       plugin_status
     FROM
-       INFORMATION_SCHEMA.PLUGINS 
+       INFORMATION_SCHEMA.PLUGINS
     WHERE
        PLUGIN_NAME LIKE 'audit_log' ;
     )
-  else
-    audit_log_plugin = %(
+                     else
+                       %(
     SELECT
        PLUGIN_NAME,
-       plugin_status 
+       plugin_status
     FROM
-       INFORMATION_SCHEMA.PLUGINS 
+       INFORMATION_SCHEMA.PLUGINS
     WHERE
        PLUGIN_NAME LIKE 'SERVER_AUDIT' ;
     )
-  end
-  
+                     end
+
   audit_log_plugin_status = sql_session.query(audit_log_plugin)
 
   query_audit_log_filter = %(
@@ -105,12 +107,11 @@ audit-log-format=JSON'
 
   server_audit_events_setting = sql_session.query(query_server_audit_events)
 
-
   if !input('aws_rds')
 
     describe ini(mycnf) do
-      its ('mysqld.plugin-load-add') { should cmp 'audit_log.so' }
-      its ('mysqld.audit-log') { should cmp 'FORCE_PLUS_PERMANENT' }
+      its('mysqld.plugin-load-add') { should cmp 'audit_log.so' }
+      its('mysqld.audit-log') { should cmp 'FORCE_PLUS_PERMANENT' }
     end
 
     describe 'Audit Log Plugin status' do
@@ -127,9 +128,9 @@ audit-log-format=JSON'
       subject { audit_log_user_entries.results }
       it { should_not be_empty }
     end
-    
+
   else
-    
+
     describe 'Audit Log Plugin status' do
       subject { audit_log_plugin_status.results.column('plugin_status') }
       it { should cmp 'ACTIVE' }
@@ -139,7 +140,6 @@ audit-log-format=JSON'
       subject { Set[server_audit_events_setting.results.column('value')[0].split(',')] }
       it { should cmp Set['CONNECT,QUERY'.split(',')] }
     end
-    
+
   end
-    
 end

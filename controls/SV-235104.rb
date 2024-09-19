@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235104' do
   title 'The MySQL Database Server 8.0 must allow only the Information System
 Security Manager (ISSM) (or individuals or roles appointed by the ISSM) to
@@ -52,26 +54,26 @@ personnel to select which auditable events are audited.
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  if !input('aws_rds')
-    audit_admins = input('audit_admins')
-  else
-    audit_admins = input('audit_admins') + ["'rdsadmin'@'localhost'"]
-  end
+  audit_admins = if !input('aws_rds')
+                   input('audit_admins')
+                 else
+                   input('audit_admins') + ["'rdsadmin'@'localhost'"]
+                 end
 
   query_audit_admins = %(
     SELECT
-     * 
+     *
   FROM
-     INFORMATION_SCHEMA.USER_PRIVILEGES 
+     INFORMATION_SCHEMA.USER_PRIVILEGES
   where
-     PRIVILEGE_TYPE in 
+     PRIVILEGE_TYPE in
      (
         'AUDIT_ADMIN',
         'SUPER'
      );
   )
 
-  describe "List of configured audit admins" do
+  describe 'List of configured audit admins' do
     subject { sql_session.query(query_audit_admins).results.column('grantee') }
     it { should be_in audit_admins }
   end

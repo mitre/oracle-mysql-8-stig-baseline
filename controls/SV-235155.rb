@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235155' do
   title 'The MySQL Database Server 8.0 must protect the confidentiality and
 integrity of all information at rest.'
@@ -106,16 +108,16 @@ using ALTER TABLE.
     query_encryption_params = %(
     SELECT
        VARIABLE_NAME,
-       VARIABLE_VALUE 
+       VARIABLE_VALUE
     FROM
-       performance_schema.global_variables 
+       performance_schema.global_variables
     WHERE
        VARIABLE_NAME like '%encrypt%';
     )
 
-    encryption_params = sql_session.query(query_encryption_params).results.rows.map{|x| {x['variable_name']=> x['variable_value']}}.reduce({}, :merge)
+    encryption_params = sql_session.query(query_encryption_params).results.rows.map { |x| { x['variable_name'] => x['variable_value'] } }.reduce({}, :merge)
 
-    describe "Encryption Param:" do
+    describe 'Encryption Param:' do
       subject { encryption_params }
       its(['audit_log_encryption']) { should cmp 'AES' }
       its(['binlog_encryption']) { should cmp 'ON' }
@@ -127,14 +129,14 @@ using ALTER TABLE.
     query_general_log = %(
     SELECT
        VARIABLE_NAME,
-       VARIABLE_VALUE 
+       VARIABLE_VALUE
     FROM
-       performance_schema.global_variables 
+       performance_schema.global_variables
     WHERE
        VARIABLE_NAME like 'general_log';
     )
 
-    describe "general_log config" do
+    describe 'general_log config' do
       subject { sql_session.query(query_general_log).results.column('variable_value').join }
       it { should cmp 'OFF' }
     end
@@ -142,7 +144,7 @@ using ALTER TABLE.
     query_tablespaces = %(
     SELECT
        INNODB_TABLESPACES.NAME,
-       INNODB_TABLESPACES.ENCRYPTION 
+       INNODB_TABLESPACES.ENCRYPTION
     FROM
        information_schema.INNODB_TABLESPACES;
     )
@@ -150,19 +152,18 @@ using ALTER TABLE.
     tablespaces = sql_session.query(query_tablespaces).results.rows
 
     tablespaces.each do |tablespace|
-        describe "Tablespace #{tablespace['name']} encryption" do
-          subject { tablespace }
-          its(['encryption']) { should cmp 'Y' }
-        end
+      describe "Tablespace #{tablespace['name']} encryption" do
+        subject { tablespace }
+        its(['encryption']) { should cmp 'Y' }
+      end
     end
-    
+
   else
-    
+
     impact 0.0
     describe 'Not applicable since these requirements are handled within AWS RDS' do
       skip 'Not applicable since these requirements are handled within AWS RDS'
     end
-    
-  end    
-  
+
+  end
 end

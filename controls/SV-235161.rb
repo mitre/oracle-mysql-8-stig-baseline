@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235161' do
   title 'The MySQL Database Server 8.0 must protect its audit configuration
 from unauthorized modification.'
@@ -104,26 +106,26 @@ keyring_oci_management_endpoint=shortAlphaNumericString-management.kms.us-ashbur
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  if !input('aws_rds')
-    audit_admins = input('audit_admins')
-  else
-    audit_admins = input('audit_admins') + ["'rdsadmin'@'localhost'"]
-  end
+  audit_admins = if !input('aws_rds')
+                   input('audit_admins')
+                 else
+                   input('audit_admins') + ["'rdsadmin'@'localhost'"]
+                 end
 
   query_audit_admins = %(
   SELECT
-     * 
+     *
   FROM
-     information_schema.user_privileges 
+     information_schema.user_privileges
   WHERE
      privilege_type = 'AUDIT_ADMIN';
   )
 
   query_keyring_plugins = %(
   SELECT
-     * 
+     *
   FROM
-     information_schema.PLUGINS 
+     information_schema.PLUGINS
   where
      plugin_name like 'keyring%';
   )
@@ -131,9 +133,9 @@ keyring_oci_management_endpoint=shortAlphaNumericString-management.kms.us-ashbur
   audit_log_encryption = %(
   SELECT
      VARIABLE_NAME,
-     VARIABLE_VALUE 
+     VARIABLE_VALUE
   FROM
-     performance_schema.global_variables 
+     performance_schema.global_variables
   WHERE
      VARIABLE_NAME LIKE 'audit_log_encryption' ;
   )
@@ -143,18 +145,17 @@ keyring_oci_management_endpoint=shortAlphaNumericString-management.kms.us-ashbur
     it { should be_in audit_admins }
   end
 
-  if !input('aws_rds')
+  unless input('aws_rds')
 
-    describe "List of installed keyring plugins" do
+    describe 'List of installed keyring plugins' do
       subject { sql_session.query(query_keyring_plugins).results.column('variable_value') }
       it { should_not be_empty }
     end
 
-    describe "audit_log_encryption config" do
+    describe 'audit_log_encryption config' do
       subject { sql_session.query(audit_log_encryption).results.column('variable_value') }
       it { should cmp 'AES' }
     end
-    
+
   end
-  
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235186' do
   title 'The MySQL Database Server 8.0 must maintain the confidentiality and
 integrity of information during preparation for transmission.'

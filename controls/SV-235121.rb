@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235121' do
   title 'The MySQL Database Server 8.0 must generate audit records when
 security objects are deleted.'
@@ -8,7 +10,7 @@ If such an event occurs, it must be logged."
 
 Check if MySQL audit is configured and enabled. The my.cnf file will set the variable audit_file.
 
-To further check, execute the following query: 
+To further check, execute the following query:
 SELECT PLUGIN_NAME, PLUGIN_STATUS
       FROM INFORMATION_SCHEMA.PLUGINS
       WHERE PLUGIN_NAME LIKE 'audit%';
@@ -28,14 +30,14 @@ FROM `mysql`.`audit_log_user`;
 All currently defined audits for the MySQL server instance will be listed. If no audits are returned, this is a finding.
 
 To check if the audit filters in place are generating records when security objects are deleted, run the following, which will test auditing. Note: This is destructive. Back up the database table prior to testing so it can be restored.
-drop mysql.procs_priv; 
+drop mysql.procs_priv;
 
 Review the audit log by running the Linux command:
 sudo cat  <directory where audit log files are located>/audit.log|egrep DROP
 For example if the values returned by - "select @@datadir, @@audit_log_file; " are  /usr/local/mysql/data/,  audit.log
 sudo cat  /usr/local/mysql/data/audit.log |egrep DROP
 
-The audit data will look similar to the example below: 
+The audit data will look similar to the example below:
 { "timestamp": "2020-08-21 17:06:02", "id": 1, "class": "general", "event": "status", "connection_id": 9, "account": { "user": "root", "host": "localhost" }, "login": { "user": "root", "os": "", "ip": "::1", "proxy": "" }, "general_data": { "command": "Query", "sql_command": "drop_table", "query": "DROP TABLE `mysql`.`proxies_priv`", "status": 0 } },
 
 If the audit event is not present, this is a finding.)
@@ -56,28 +58,28 @@ deleted.
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  if !input('aws_rds')
-    audit_log_plugin = %(
+  audit_log_plugin = if !input('aws_rds')
+                       %(
     SELECT
        PLUGIN_NAME,
-       plugin_status 
+       plugin_status
     FROM
-       INFORMATION_SCHEMA.PLUGINS 
+       INFORMATION_SCHEMA.PLUGINS
     WHERE
        PLUGIN_NAME LIKE 'audit_log' ;
     )
-  else
-    audit_log_plugin = %(
+                     else
+                       %(
     SELECT
        PLUGIN_NAME,
-       plugin_status 
+       plugin_status
     FROM
-       INFORMATION_SCHEMA.PLUGINS 
+       INFORMATION_SCHEMA.PLUGINS
     WHERE
        PLUGIN_NAME LIKE 'SERVER_AUDIT' ;
     )
-  end
-  
+                     end
+
   audit_log_plugin_status = sql_session.query(audit_log_plugin)
 
   query_audit_log_filter = %(
@@ -105,15 +107,14 @@ deleted.
 
   server_audit_events_setting = sql_session.query(query_server_audit_events)
 
-
   if !input('aws_rds')
-  
+
     # Following code design will allow for adaptive tests in this partially automatable control
     # If ANY of the automatable tests FAIL, the control will report automated statues
     # If ALL automatable tests PASS, MANUAL review statuses are reported to ensure full compliance
 
-    if !audit_log_plugin_status.results.column('plugin_status').join.eql?('ACTIVE') or
-       audit_log_filter_entries.results.empty? or
+    if !audit_log_plugin_status.results.column('plugin_status').join.eql?('ACTIVE') ||
+       audit_log_filter_entries.results.empty? ||
        audit_log_user_entries.results.empty?
 
       describe 'Audit Log Plugin status' do
@@ -133,7 +134,7 @@ deleted.
     end
 
     describe "Manually validate `audit_log` plugin is active:\n #{audit_log_plugin_status.output}" do
-      skip "Manually validate `audit_log` plugin is active:\n #{audit_log_plugin_status.output}" 
+      skip "Manually validate `audit_log` plugin is active:\n #{audit_log_plugin_status.output}"
     end
     describe "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}" do
       skip "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}"
@@ -144,9 +145,9 @@ deleted.
     describe 'Manually validate that required audit logs are generated when the specified query is executed.' do
       skip 'Manually validate that required audit logs are generated when the specified query is executed.'
     end
-    
+
   else
-    
+
     describe 'Audit Log Plugin status' do
       subject { audit_log_plugin_status.results.column('plugin_status') }
       it { should cmp 'ACTIVE' }
@@ -156,7 +157,6 @@ deleted.
       subject { Set[server_audit_events_setting.results.column('value')[0].split(',')] }
       it { should cmp Set['CONNECT,QUERY'.split(',')] }
     end
-    
+
   end
-    
 end

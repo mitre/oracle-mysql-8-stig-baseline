@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235156' do
   title 'The MySQL Database Server 8.0 must check the validity of all data
 inputs except those specifically identified by the organization.'

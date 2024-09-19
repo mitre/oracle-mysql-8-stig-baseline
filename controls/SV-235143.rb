@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235143' do
   title 'Default demonstration and sample databases, database objects, and
 applications must be removed.'
@@ -62,11 +64,11 @@ databases) were added, remove them by executing:
 
   query_schemas = %(
   SELECT
-     * 
+     *
   FROM
-     information_schema.SCHEMATA 
+     information_schema.SCHEMATA
   where
-     SCHEMA_NAME not in 
+     SCHEMA_NAME not in
      (
         'mysql',
         'information_schema',
@@ -77,6 +79,6 @@ databases) were added, remove them by executing:
 
   describe 'Defined schemas' do
     subject { sql_session.query(query_schemas).results.column('schema_name') }
-    it { should_not be_in ['sakila','world','world_x','menagerie'] }
+    it { should_not be_in ['sakila', 'world', 'world_x', 'menagerie'] }
   end
 end

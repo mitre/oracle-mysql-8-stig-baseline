@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235145' do
   title 'Unused database components which are integrated in the MySQL Database
 Server 8.0 and cannot be uninstalled must be disabled.'
@@ -77,17 +79,17 @@ component is not needed.
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  if !input('aws_rds')
-   approved_plugins = input('approved_plugins')
-  else
-   approved_plugins = input('approved_plugins') + ['validate_password','RDS_PROCESSLIST','RDS_EVENTS_THREADS_WAITS_CURRENT']
-  end
+  approved_plugins = if !input('aws_rds')
+                       input('approved_plugins')
+                     else
+                       input('approved_plugins') + ['validate_password', 'RDS_PROCESSLIST', 'RDS_EVENTS_THREADS_WAITS_CURRENT']
+                     end
 
   query_plugins = %(
   SELECT
-     * 
+     *
   FROM
-     information_schema.PLUGINS 
+     information_schema.PLUGINS
   where
      plugin_library is NOT NULL;
   )
@@ -97,10 +99,10 @@ component is not needed.
     it { should be_in approved_plugins }
   end
 
-	if !input('aws_rds')
+  unless input('aws_rds')
     query_components = %(
     SELECT
-      * 
+      *
     FROM
       mysql.component;
     )

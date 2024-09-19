@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235175' do
   title 'The MySQL Database Server 8.0 must provide a warning to appropriate
 support staff when allocated audit record storage volume reaches 75 percent of

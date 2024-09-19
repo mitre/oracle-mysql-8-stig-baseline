@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235097' do
   title 'MySQL Database Server 8.0  must produce audit records containing
 sufficient information to establish what type of events occurred.'
@@ -37,7 +39,7 @@ SELECT PLUGIN_NAME, plugin_status FROM INFORMATION_SCHEMA.PLUGINS
 
 If the results are not 'audit_log' and plugin_status='ACTIVE' , this is a finding.
 
-Next, determine if the audit log is encrypted: 
+Next, determine if the audit log is encrypted:
 SELECT VARIABLE_NAME, VARIABLE_VALUE
 FROM performance_schema.global_variables
 WHERE VARIABLE_NAME LIKE 'audit_log_encryption' ;
@@ -78,7 +80,7 @@ If there are no audit log files, then organizational auditable events are not be
 To confirm that MySQL audit is capturing sufficient information to establish the identity of the user/subject or process, perform a successful auditable action and an auditable action that results in an SQL error, and then view the results in the audit file, whichever is in use.
 
 If no audit event is returned for the auditable actions just performed, this is a finding.)
-  desc 'fix', %q(Configure DBMS auditing to audit standard and organization-defined auditable events, with the audit record to include what type of event occurred. 
+  desc 'fix', %q(Configure DBMS auditing to audit standard and organization-defined auditable events, with the audit record to include what type of event occurred.
 
 Use this process to ensure auditable events are captured:
 
@@ -86,7 +88,7 @@ Configure MySQL database server 8.0 for auditing and configure audit settings to
 
 To install MySQL Enterprise Audit:
 Run the audit_log_filter_linux_install.sql script located in the sharedirectory of your MySQL installation. This can be determined by running – select @@basedir;
-For example if the basedir is /usr/local/mysql 
+For example if the basedir is /usr/local/mysql
 shell> bin/mysql -u root -p < /usr/local/mysql/share/audit_log_filter_linux_install.sql
 
 Verify the plugin installation by running:
@@ -122,34 +124,34 @@ SELECT audit_log_filter_set_user('%', 'log_all');)
 
   audit_log_path = input('audit_log_path')
 
-  if !input('aws_rds')
-    audit_log_plugin = %(
+  audit_log_plugin = if !input('aws_rds')
+                       %(
     SELECT
        PLUGIN_NAME,
-       plugin_status 
+       plugin_status
     FROM
-       INFORMATION_SCHEMA.PLUGINS 
+       INFORMATION_SCHEMA.PLUGINS
     WHERE
        PLUGIN_NAME LIKE 'audit_log' ;
     )
-  else
-    audit_log_plugin = %(
+                     else
+                       %(
     SELECT
        PLUGIN_NAME,
-       plugin_status 
+       plugin_status
     FROM
-       INFORMATION_SCHEMA.PLUGINS 
+       INFORMATION_SCHEMA.PLUGINS
     WHERE
        PLUGIN_NAME LIKE 'SERVER_AUDIT' ;
     )
-  end
-  
+                     end
+
   audit_log_encryption = %(
   SELECT
      VARIABLE_NAME,
-     VARIABLE_VALUE 
+     VARIABLE_VALUE
   FROM
-     performance_schema.global_variables 
+     performance_schema.global_variables
   WHERE
      VARIABLE_NAME LIKE 'audit_log_encryption' ;
   )
@@ -157,38 +159,37 @@ SELECT audit_log_filter_set_user('%', 'log_all');)
   datadir = %(
     SELECT
        VARIABLE_NAME,
-       VARIABLE_VALUE 
+       VARIABLE_VALUE
     FROM
-       performance_schema.global_variables 
+       performance_schema.global_variables
     WHERE
        VARIABLE_NAME LIKE 'datadir';
   )
 
-  describe "Audit Log Plugin status" do
+  describe 'Audit Log Plugin status' do
     subject { sql_session.query(audit_log_plugin).results.column('plugin_status') }
     it { should cmp 'ACTIVE' }
   end
-  
-  if !input('aws_rds')
 
-  describe "audit_log_encryption config" do
-    subject { sql_session.query(audit_log_encryption).results.column('variable_value') }
-    it { should cmp 'AES' }
-  end
+  unless input('aws_rds')
 
+    describe 'audit_log_encryption config' do
+      subject { sql_session.query(audit_log_encryption).results.column('variable_value') }
+      it { should cmp 'AES' }
+    end
 
     audit_log_files = command("ls -d #{audit_log_path}").stdout.split
 
-    describe "List of audit_log files" do
+    describe 'List of audit_log files' do
       subject { audit_log_files }
       it { should_not be_empty }
     end
 
     audit_log_files.each do |log_file|
       describe file(log_file) do
-        its('path') { should match /.*[.]enc$/ }
-        its('owner') { should match /^[_]?mysql$/ }
-        its('group') { should match /^[_]?mysql$/ }
+        its('path') { should match(/.*[.]enc$/) }
+        its('owner') { should match(/^_?mysql$/) }
+        its('group') { should match(/^_?mysql$/) }
         it { should_not be_more_permissive_than('0750') }
       end
     end
@@ -197,8 +198,8 @@ SELECT audit_log_filter_set_user('%', 'log_all');)
 
     describe "Data Directory: #{datadir_path}" do
       subject { directory(datadir_path) }
-      its('owner') { should match /^[_]?mysql$/ }
-      its('group') { should match /^[_]?mysql$/ }
+      its('owner') { should match(/^_?mysql$/) }
+      its('group') { should match(/^_?mysql$/) }
       it { should_not be_more_permissive_than('0750') }
     end
 

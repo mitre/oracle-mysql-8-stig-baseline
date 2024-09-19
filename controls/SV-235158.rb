@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235158' do
   title 'The MySQL Database Server 8.0 and associated applications, when making
 use of dynamic code execution, must scan input data for invalid values that may
@@ -120,7 +122,7 @@ placed in PROTECTING (active blocking) or DETECTING(logging) mode.
 
     query_firewall_users = %(
     SELECT
-       * 
+       *
     FROM
        INFORMATION_SCHEMA.MYSQL_FIREWALL_USERS;
     )
@@ -130,28 +132,27 @@ placed in PROTECTING (active blocking) or DETECTING(logging) mode.
       it { should cmp 'ON' }
     end
 
-      # Enable the MySQL Enterprise Firewall by running this script, which is located in the mysql home share sub directory. Sub directory accessible?
-      if sql_session.query(query_firewall_mode).results.column('value').join.eql?('ON')
-        describe 'List of MYSQL_FIREWALL_USERS' do
-          subject { sql_session.query(query_firewall_users).results }
-          it { should_not be_empty }
-        end
-
-        sql_session.query(query_firewall_users).results.rows.each do |fw_user|
-          describe "USERHOST #{fw_user['userhost']}" do
-            subject { fw_user }
-            its(['mode']) { should be_in ['LEARNING', 'DETECTING', 'PROTECTING'] }
-          end
-        end
+    # Enable the MySQL Enterprise Firewall by running this script, which is located in the mysql home share sub directory. Sub directory accessible?
+    if sql_session.query(query_firewall_mode).results.column('value').join.eql?('ON')
+      describe 'List of MYSQL_FIREWALL_USERS' do
+        subject { sql_session.query(query_firewall_users).results }
+        it { should_not be_empty }
       end
 
+      sql_session.query(query_firewall_users).results.rows.each do |fw_user|
+        describe "USERHOST #{fw_user['userhost']}" do
+          subject { fw_user }
+          its(['mode']) { should be_in ['LEARNING', 'DETECTING', 'PROTECTING'] }
+        end
+      end
+    end
+
   else
-    
+
     impact 0.0
     describe 'Not applicable since the feature is not available in AWS RDS' do
       skip 'Not applicable since the feature is not available in AWS RDS'
-    end  
-    
+    end
+
   end
-  
 end

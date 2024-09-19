@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235167' do
   title 'The MySQL Database Server 8.0 must disable network functions, ports,
 protocols, and services deemed by the organization to be nonsecure, in accord
@@ -98,11 +100,11 @@ setting mysqlx=0 in the MySQL configuration file, or by passing in either
   query_ports = %(
   SELECT
      VARIABLE_NAME,
-     VARIABLE_VALUE 
+     VARIABLE_VALUE
   FROM
-     performance_schema.global_variables 
+     performance_schema.global_variables
   WHERE
-     VARIABLE_NAME in 
+     VARIABLE_NAME in
      (
         'port',
         'mysqlx_port',
@@ -113,12 +115,12 @@ setting mysqlx=0 in the MySQL configuration file, or by passing in either
   query_sockets = %(
   SELECT
      VARIABLE_NAME,
-     VARIABLE_VALUE 
+     VARIABLE_VALUE
   FROM
-     performance_schema.global_variables 
+     performance_schema.global_variables
   where
-     VARIABLE_NAME like '%pipe%' 
-     or VARIABLE_NAME = 'socket' 
+     VARIABLE_NAME like '%pipe%'
+     or VARIABLE_NAME = 'socket'
      or VARIABLE_NAME = 'mysqlx_socket';
   )
 

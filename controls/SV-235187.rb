@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235187' do
   title "The MySQL Database Server 8.0 must use NSA-approved cryptography to
 protect classified information in accordance with the data owner's
@@ -35,7 +37,7 @@ View the versions of TLS, then review the cipher suites in use for the versions 
 SELECT VARIABLE_NAME, VARIABLE_VALUE
 FROM performance_schema.global_variables WHERE VARIABLE_NAME = 'tls_version';
 
-If the results include less than version TLS 1.2, for example TLS 1.0 or 1.1, this is a finding. 
+If the results include less than version TLS 1.2, for example TLS 1.0 or 1.1, this is a finding.
 
 If the results include TLS 1.2 view the supported ciphers on the MySQL Server, run
 select * from performance_schema.global_status where variable_name= 'Ssl_cipher_list';
@@ -46,7 +48,7 @@ FROM performance_schema.global_variables WHERE VARIABLE_NAME = 'tls_ciphersuites
 
 If any results list show an uncertified NIST FIPS 140-2 algorithm type, this is a finding.
 
-Check MySQL certificate PEM file(s) for compliance with DoD requirements by running this command: 
+Check MySQL certificate PEM file(s) for compliance with DoD requirements by running this command:
 openssl x509 -in server-cert.pem -text -noout
 
 If any PEM file is not in compliance, this is a finding.)
@@ -121,9 +123,9 @@ Create and use DOD-approved certificates for asymmetric keys used by the databas
 
     query_ssl_cipher_list = %(
     SELECT
-       * 
+       *
     FROM
-       performance_schema.global_status 
+       performance_schema.global_status
     WHERE
        variable_name = 'Ssl_cipher_list';
     )
@@ -152,9 +154,9 @@ Create and use DOD-approved certificates for asymmetric keys used by the databas
     query_tls_ciphersuites = %(
     SELECT
        VARIABLE_NAME,
-       VARIABLE_VALUE 
+       VARIABLE_VALUE
     FROM
-       performance_schema.global_variables 
+       performance_schema.global_variables
     WHERE
        VARIABLE_NAME = 'tls_ciphersuites';
     )
@@ -175,25 +177,24 @@ Create and use DOD-approved certificates for asymmetric keys used by the databas
       it { should be_in approved_tls_ciphersuites }
     end
 
-      org_approved_cert_issuer = input('org_approved_cert_issuer')
+    org_approved_cert_issuer = input('org_approved_cert_issuer')
 
-      full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
-      describe "SSL Certificate file: #{full_cert_path}" do
-        subject { file(full_cert_path) }
-        it { should exist }
-      end
+    full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
+    describe "SSL Certificate file: #{full_cert_path}" do
+      subject { file(full_cert_path) }
+      it { should exist }
+    end
 
-      describe x509_certificate(full_cert_path) do
-        its('issuer.CN') { should match org_approved_cert_issuer}
-      end
-    
+    describe x509_certificate(full_cert_path) do
+      its('issuer.CN') { should match org_approved_cert_issuer }
+    end
+
   else
-    
+
     impact 0.0
     describe 'Not applicable since ssl_fips_mode is set to 0 (OFF) and cannot be configured in AWS RDS' do
       skip 'Not applicable since ssl_fips_mode is set to 0 (OFF) and cannot be configured in AWS RDS'
     end
-    
-  end    
-    
+
+  end
 end

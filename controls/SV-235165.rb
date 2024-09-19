@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235165' do
   title 'Database software, including MySQL Database Server 8.0 configuration
 files, must be stored in dedicated directories, or DASD pools (remove),
@@ -74,7 +76,7 @@ configuration file.'
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
   query_directory_variables = %(
-  show variables 
+  show variables
   where
      variable_name like '%dir%';
   )
@@ -82,16 +84,15 @@ configuration file.'
   query_configuration_variables = %(
   SELECT
      t1.*,
-     VARIABLE_VALUE 
+     VARIABLE_VALUE
   FROM
-     performance_schema.variables_info t1 
+     performance_schema.variables_info t1
      JOIN
-        performance_schema.global_variables t2 
-        ON t2.VARIABLE_NAME = t1.VARIABLE_NAME 
+        performance_schema.global_variables t2
+        ON t2.VARIABLE_NAME = t1.VARIABLE_NAME
   where
      length(t1.variable_path) > 0;
    )
-
 
   describe "Review the MySQL Database Server 8.0  software library directory and note
 other root directories located on the same disk directory or any subdirectories.
@@ -101,7 +102,7 @@ datadir, basedir, or other non tmpdir directories, examine or investigate their
 use.\n#{sql_session.query(query_directory_variables).output}" do
     skip "Review the MySQL Database Server 8.0  software library directory and note
     other root directories located on the same disk directory or any subdirectories.
-    
+
         If any non-MySQL Database Server 8.0 software directories exist on the
     datadir, basedir, or other non tmpdir directories, examine or investigate their
     use.\n#{sql_session.query(query_directory_variables).output}"

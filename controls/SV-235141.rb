@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235141' do
   title 'The MySQL Database Server 8.0 must enforce approved authorizations for
 logical access to information and system resources in accordance with

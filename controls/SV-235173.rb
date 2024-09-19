@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235173' do
   title 'The MySQL Database Server 8.0 must allocate audit record storage
 capacity in accordance with organization-defined audit record storage
@@ -81,12 +83,12 @@ example:
   query_audit_configurations = %(
   SELECT
      VARIABLE_NAME,
-     VARIABLE_VALUE 
+     VARIABLE_VALUE
   FROM
-     performance_schema.global_variables 
+     performance_schema.global_variables
   WHERE
-     VARIABLE_NAME = 'audit_log_file' 
-     OR VARIABLE_NAME = 'datadir' 
+     VARIABLE_NAME = 'audit_log_file'
+     OR VARIABLE_NAME = 'datadir'
      OR VARIABLE_NAME = 'audit_log_rotate_on_size';
   )
 

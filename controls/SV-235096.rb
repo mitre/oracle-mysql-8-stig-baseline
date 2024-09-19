@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235096' do
   title 'MySQL Database Server 8.0  must limit the number of concurrent
 sessions to an organization-defined number per user for all accounts and/or
@@ -89,9 +91,9 @@ given period of time.
   global_concurrent_sessions = %(
   SELECT
      VARIABLE_NAME,
-     VARIABLE_VALUE 
+     VARIABLE_VALUE
   FROM
-     performance_schema.global_variables 
+     performance_schema.global_variables
   WHERE
      VARIABLE_NAME LIKE 'max_user_connections' ;
   )
@@ -100,33 +102,33 @@ given period of time.
   SELECT
      user,
      host,
-     max_user_connections 
+     max_user_connections
   FROM
-     mysql.user 
+     mysql.user
   WHERE
-     user not like 'mysql.%' 
+     user not like 'mysql.%'
      and user not like 'root';
   )
 
-  describe "Global value of max_user_connections" do
+  describe 'Global value of max_user_connections' do
     subject { sql_session.query(global_concurrent_sessions).results.column('variable_value') }
     it { should_not cmp 0 }
     it { should cmp <= max_user_connections }
   end
 
-  if !input('aws_rds')
-    mysql_administrative_users = input('mysql_administrative_users')
-  else
-    mysql_administrative_users = input('mysql_administrative_users') + ['rdsadmin']
-  end
+  mysql_administrative_users = if !input('aws_rds')
+                                 input('mysql_administrative_users')
+                               else
+                                 input('mysql_administrative_users') + ['rdsadmin']
+                               end
 
   sql_session.query(user_concurrent_sessions).results.rows.each do |row|
-    unless mysql_administrative_users.include? row['user']
-      describe "User value of max_user_connections for user:#{row['user']} host:#{row['host']}" do
-        subject { row['max_user_connections'] }
-        it { should_not cmp 0 }
-        it { should cmp <= max_user_connections }
-      end
+    next if mysql_administrative_users.include? row['user']
+
+    describe "User value of max_user_connections for user:#{row['user']} host:#{row['host']}" do
+      subject { row['max_user_connections'] }
+      it { should_not cmp 0 }
+      it { should cmp <= max_user_connections }
     end
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235169' do
   title 'The MySQL Database Server 8.0 must enforce access restrictions
 associated with changes to the configuration of the MySQL Database Server 8.0
@@ -94,7 +96,7 @@ and "rw r" to "640".'
       its('owner') { should eq 'mysql' }
       it { should_not be_more_permissive_than('0640') }
     end
-    
+
   else
     impact 0.0
     describe 'Not applicable since these requirements are handled within AWS RDS' do

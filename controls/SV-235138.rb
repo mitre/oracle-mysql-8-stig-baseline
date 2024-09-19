@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235138' do
   title 'If passwords are used for authentication, the MySQL Database Server
 8.0 must store only hashed, salted representations of passwords.'
@@ -31,9 +33,9 @@ If a password store is used and any password is not encrypted, this is a finding
 Run this query to determine which MySQL Server authentication methods are enabled:
 SELECT PLUGIN_NAME, PLUGIN_STATUS
        FROM INFORMATION_SCHEMA.PLUGINS
-       WHERE PLUGIN_NAME LIKE '%ldap%' OR 
-       PLUGIN_NAME LIKE '%ldap%' OR 
-       PLUGIN_NAME LIKE '%pam%' OR 
+       WHERE PLUGIN_NAME LIKE '%ldap%' OR
+       PLUGIN_NAME LIKE '%ldap%' OR
+       PLUGIN_NAME LIKE '%pam%' OR
        PLUGIN_NAME like '%password';
 
 If the results return any of the following values:
@@ -44,8 +46,8 @@ If the results return any of the following values:
 Next, determine if any accounts have been created that use passwords.
 SELECT user, host,
     `user`.`plugin`
-FROM `mysql`.`user` where 
-(user.plugin like '%password') 
+FROM `mysql`.`user` where
+(user.plugin like '%password')
 AND NOT
 (user like 'mysql.%' or user ='root');
 
@@ -103,7 +105,7 @@ If password authentication is necessary, then for mysql and mysqlsh command line
      OR PLUGIN_NAME like '%password';
   )
 
-  authentication_methods = sql_session.query(query_authentication_methods).results
+  sql_session.query(query_authentication_methods).results
 
   describe 'Authentication methods' do
     subject { sql_session.query(query_authentication_methods).results.column('plugin_name') }
@@ -132,11 +134,11 @@ If password authentication is necessary, then for mysql and mysqlsh command line
      or user = 'root');
   )
 
-  if !input('aws_rds')
-    authorized_password_users = input('authorized_password_users')
-  else
-    authorized_password_users = input('authorized_password_users') + ['rdsadmin']
-  end
+  authorized_password_users = if !input('aws_rds')
+                                input('authorized_password_users')
+                              else
+                                input('authorized_password_users') + ['rdsadmin']
+                              end
 
   describe 'List of password users' do
     subject { sql_session.query(query_password_users).results.column('user') }

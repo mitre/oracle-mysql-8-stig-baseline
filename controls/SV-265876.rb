@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-265876' do
   title 'MySQL database products must be a version supported by the vendor.'
   desc 'Unsupported commercial and database systems should not be used because fixes to newly identified bugs will not be implemented by the vendor. The lack of support can result in potential vulnerabilities.
@@ -15,7 +17,7 @@ The result will show the version. For example:
 8.0.22-commercial
 
 Access the vendor website or use other means to verify the version is still supported.
-Oracle lifetime support: 
+Oracle lifetime support:
 https://www.oracle.com/us/assets/lifetime-support-technology-069183.pdf
 Scroll down to Oracle MySQL Releases (approximately page 28).
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235123' do
   title 'The MySQL Database Server 8.0 must generate audit records when
 categories of information (e.g., classification levels/security levels) are
@@ -43,6 +45,6 @@ categories of information are deleted.' do
   describe 'Manually review the DBMS/database security and audit configurations to verify that
 audit records are produced when categories of information are deleted.' do
     skip 'Manually review the DBMS/database security and audit configurations to verify that
-    audit records are produced when categories of information are deleted.' 
+    audit records are produced when categories of information are deleted.'
   end
 end

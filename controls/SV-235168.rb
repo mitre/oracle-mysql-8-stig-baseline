@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235168' do
   title 'The MySQL Database Server 8.0 must prohibit user installation of logic
 modules (stored procedures, functions, triggers, views, etc.) without explicit
@@ -35,7 +37,7 @@ FROM `mysql`.`user`
  where     `Create_routine_priv`='Y' OR
     `Alter_routine_priv` = 'Y';
 
-If any users or role permissions returned are not authorized to modify the specified object or type, this is a finding. 
+If any users or role permissions returned are not authorized to modify the specified object or type, this is a finding.
 
 If any user or role membership is not authorized, this is a finding.
 
@@ -46,7 +48,7 @@ SELECT `db`.`Host`,
 FROM `mysql`.`db` where     `db`.`Create_routine_priv`='Y' OR
     `db`.`Alter_routine_priv` = 'Y';
 
-If any users or role permissions returned are not authorized to modify the specified object or type, this is a finding. 
+If any users or role permissions returned are not authorized to modify the specified object or type, this is a finding.
 
 If any user or role membership is not authorized, this is a finding."
   desc 'fix', "MySQL requires users (other than root) to be explicitly granted the CREATE
@@ -69,20 +71,20 @@ of CREATE ROUTINE.
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  if !input('aws_rds')
-    mysql_administrative_users = input('mysql_administrative_users')
-  else
-    mysql_administrative_users = input('mysql_administrative_users') + ['rdsadmin']
-  end
+  mysql_administrative_users = if !input('aws_rds')
+                                 input('mysql_administrative_users')
+                               else
+                                 input('mysql_administrative_users') + ['rdsadmin']
+                               end
 
   query_users = %(
   SELECT
      user.Host,
-     user.User 
+     user.User
   FROM
-     mysql.user 
+     mysql.user
   where
-     Create_routine_priv = 'Y' 
+     Create_routine_priv = 'Y'
      OR Alter_routine_priv = 'Y';
   )
 
@@ -90,11 +92,11 @@ of CREATE ROUTINE.
   SELECT
      db.Host,
      db.User,
-     db.Db 
+     db.Db
   FROM
-     mysql.db 
+     mysql.db
   where
-     db.Create_routine_priv = 'Y' 
+     db.Create_routine_priv = 'Y'
      OR db.Alter_routine_priv = 'Y';
   )
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235176' do
   title 'The MySQL Database Server 8.0 must provide an immediate real-time
 alert to appropriate support staff of all audit log failures.'

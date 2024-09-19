@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235098' do
   title 'The MySQL Database Server 8.0 must include additional, more detailed,
 organizationally defined information in the audit records for audit events
@@ -64,6 +66,5 @@ organizationally required information.)
 
   describe 'Manually validate that documented audit requirements are satisfied.' do
     skip 'Manually validate that documented audit requirements are satisfied.'
-  
   end
 end

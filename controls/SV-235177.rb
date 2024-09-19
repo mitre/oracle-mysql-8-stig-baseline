@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235177' do
   title 'The MySQL Database Server 8.0 must prohibit the use of cached
 authenticators after an organization-defined time period.'

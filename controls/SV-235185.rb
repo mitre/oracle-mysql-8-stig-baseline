@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235185' do
   title 'The MySQL Database Server 8.0 must automatically terminate a user
 session after organization-defined conditions or trigger events requiring

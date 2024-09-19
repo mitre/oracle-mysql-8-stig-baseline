@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235195' do
   title 'When invalid inputs are received, the MySQL Database Server 8.0 must
 behave in a predictable and documented manner that reflects organizational and
@@ -59,7 +61,7 @@ CHECK (i BETWEEN 7 AND 12 ) );
 
   query_constraints = %(
   SELECT
-     * 
+     *
   FROM
      INFORMATION_SCHEMA.TABLE_CONSTRAINTS;
   )

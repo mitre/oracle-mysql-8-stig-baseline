@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235146' do
   title 'The MySQL Database Server 8.0 must be configured to prohibit or
 restrict the use of organization-defined functions, ports, protocols, and/or
@@ -94,11 +96,11 @@ mysqlx=0 in the MySQL configuration file, or by passing in either --mysqlx=0 or
   query_ports = %(
   SELECT
      VARIABLE_NAME,
-     VARIABLE_VALUE 
+     VARIABLE_VALUE
   FROM
-     performance_schema.global_variables 
+     performance_schema.global_variables
   WHERE
-     VARIABLE_NAME in 
+     VARIABLE_NAME in
      (
         'port',
         'mysqlx_port',
@@ -109,12 +111,12 @@ mysqlx=0 in the MySQL configuration file, or by passing in either --mysqlx=0 or
   query_sockets = %(
   SELECT
      VARIABLE_NAME,
-     VARIABLE_VALUE 
+     VARIABLE_VALUE
   FROM
-     performance_schema.global_variables 
+     performance_schema.global_variables
   where
-     VARIABLE_NAME like '%pipe%' 
-     or VARIABLE_NAME = 'socket' 
+     VARIABLE_NAME like '%pipe%'
+     or VARIABLE_NAME = 'socket'
      or VARIABLE_NAME = 'mysqlx_socket';
   )
 

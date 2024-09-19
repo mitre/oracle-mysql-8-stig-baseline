@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235134' do
   title 'The MySQL Database Server 8.0, when utilizing PKI-based
 authentication, must validate certificates by performing RFC 5280-compliant
@@ -105,11 +107,11 @@ names as necessary:
 
   org_approved_cert_issuer = input('org_approved_cert_issuer')
 
-  if !input('aws_rds')
-   pki_exception_users = input('pki_exception_users')
-  else
-   pki_exception_users = input('pki_exception_users') + ['rdsadmin']
-  end
+  pki_exception_users = if !input('aws_rds')
+                          input('pki_exception_users')
+                        else
+                          input('pki_exception_users') + ['rdsadmin']
+                        end
 
   query_ssl_params = %(
   SELECT @@ssl_ca,
@@ -132,14 +134,14 @@ names as necessary:
       subject { ssl_params.column('@@ssl_crl').join }
       it { should_not cmp 'NULL' }
     end
-  
+
   else
-    
-    if ssl_params.column('@@ssl_crlpath').join.eql?('NULL')
-      crl_path = ssl_params.column('@@datadir').join
-    else
-      crl_path = ssl_params.column('@@ssl_crlpath').join
-    end
+
+    crl_path = if ssl_params.column('@@ssl_crlpath').join.eql?('NULL')
+                 ssl_params.column('@@datadir').join
+               else
+                 ssl_params.column('@@ssl_crlpath').join
+               end
 
     require_secure_transport = ssl_params.column('@@require_secure_transport').join
     describe '@@require_secure_transport' do
@@ -153,7 +155,7 @@ names as necessary:
       it { should_not cmp 'NULL' }
     end
 
-    if !input('aws_rds')
+    unless input('aws_rds')
       full_crl_path = "#{crl_path}#{ssl_params.column('@@ssl_crl').join}"
       describe "SSL CRL file: #{full_crl_path}" do
         subject { file(full_crl_path) }
@@ -193,7 +195,6 @@ names as necessary:
       subject { user_params.results.column('subject') }
       it { should_not include nil }
     end
-    
+
   end
-  
 end

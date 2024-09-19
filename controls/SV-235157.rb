@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235157' do
   title 'The MySQL Database Server 8.0 and associated applications must reserve
 the use of dynamic code execution for situations that require it.'

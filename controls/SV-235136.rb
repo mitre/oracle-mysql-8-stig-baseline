@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235136' do
   title 'The MySQL Database Server 8.0 must map the PKI-authenticated identity
 to an associated user account.'
@@ -49,11 +51,11 @@ directly to the MySQL Database Server 8.0 user account.
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  if !input('aws_rds')
-   pki_exception_users = input('pki_exception_users')
-  else
-   pki_exception_users = input('pki_exception_users') + ['rdsadmin']
-  end
+  pki_exception_users = if !input('aws_rds')
+                          input('pki_exception_users')
+                        else
+                          input('pki_exception_users') + ['rdsadmin']
+                        end
 
   query_user_params = "
       SELECT user.Host,

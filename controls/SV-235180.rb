@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235180' do
   title 'Execution of software modules (to include stored procedures,
 functions, and triggers) with elevated privileges must be restricted to
@@ -52,18 +54,18 @@ DROP FUNCTION <function_name>;'
 
   authorized_functions = input('authorized_functions')
 
-  if !input('aws_rds')
-    authorized_procedures = input('authorized_procedures')
-  else
-    authorized_procedures = input('authorized_procedures') + ['rds_collect_global_status_history', 'rds_disable_gsh_collector', 'rds_disable_gsh_rotation', 'rds_enable_gsh_collector', 'rds_enable_gsh_rotation', 'rds_external_master', 'rds_innodb_buffer_pool_dump_now', 'rds_innodb_buffer_pool_load_abort', 'rds_innodb_buffer_pool_load_now', 'rds_kill', 'rds_kill_query', 'rds_next_master_log', 'rds_reset_external_master', 'rds_rotate_general_log', 'rds_rotate_global_status_history', 'rds_rotate_slow_log', 'rds_set_configuration', 'rds_set_external_master', 'rds_set_external_master_with_auto_position', 'rds_set_external_master_with_delay', 'rds_set_fk_checks_off', 'rds_set_fk_checks_on', 'rds_set_gsh_collector', 'rds_set_gsh_rotation', 'rds_set_master_auto_position', 'rds_set_source_delay', 'rds_show_configuration', 'rds_skip_repl_error', 'rds_skip_transaction_with_gtid', 'rds_start_replication', 'rds_start_replication_until', 'rds_start_replication_until_gtid', 'rds_stop_replication']
-  end
+  authorized_procedures = if !input('aws_rds')
+                            input('authorized_procedures')
+                          else
+                            input('authorized_procedures') + ['rds_collect_global_status_history', 'rds_disable_gsh_collector', 'rds_disable_gsh_rotation', 'rds_enable_gsh_collector', 'rds_enable_gsh_rotation', 'rds_external_master', 'rds_innodb_buffer_pool_dump_now', 'rds_innodb_buffer_pool_load_abort', 'rds_innodb_buffer_pool_load_now', 'rds_kill', 'rds_kill_query', 'rds_next_master_log', 'rds_reset_external_master', 'rds_rotate_general_log', 'rds_rotate_global_status_history', 'rds_rotate_slow_log', 'rds_set_configuration', 'rds_set_external_master', 'rds_set_external_master_with_auto_position', 'rds_set_external_master_with_delay', 'rds_set_fk_checks_off', 'rds_set_fk_checks_on', 'rds_set_gsh_collector', 'rds_set_gsh_rotation', 'rds_set_master_auto_position', 'rds_set_source_delay', 'rds_show_configuration', 'rds_skip_repl_error', 'rds_skip_transaction_with_gtid', 'rds_start_replication', 'rds_start_replication_until', 'rds_start_replication_until_gtid', 'rds_stop_replication']
+                          end
 
-  describe "List of PROCEDUREs defined" do
+  describe 'List of PROCEDUREs defined' do
     subject { sql_session.query(query_procedures).results.column('name') }
     it { should be_in authorized_procedures }
   end
 
-  describe "List of FUNCTIONs defined" do
+  describe 'List of FUNCTIONs defined' do
     subject { sql_session.query(query_functions).results.column('name') }
     it { should be_in authorized_functions }
   end

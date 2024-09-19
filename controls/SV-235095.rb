@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235095' do
   title 'MySQL Database Server 8.0 must integrate with an organization-level
 authentication/access mechanism providing account management and automation for
@@ -33,7 +35,7 @@ together contain an overall mechanism supporting an organization's automated
 account management requirements."
   desc 'check', %q(Determine if an organization-level authentication/access mechanism providing account management and automation for all users, groups, roles, and any other principals has been configured.
 
-To determine if a MySQL Server has any external authentication plugins, connect as a mysql administrator (root) and run the following query: 
+To determine if a MySQL Server has any external authentication plugins, connect as a mysql administrator (root) and run the following query:
 SELECT PLUGIN_NAME, PLUGIN_STATUS
        FROM INFORMATION_SCHEMA.PLUGINS
        WHERE PLUGIN_NAME LIKE '%ldap%' OR PLUGIN_NAME LIKE '%pam%' OR PLUGIN_NAME LIKE '%authentication_windows %';
@@ -46,14 +48,14 @@ authentication_windows
 
 If at least one of the above plugins is not installed, then no organization-level authentication/access is in place, and this is a finding.
 
-Depending on the plugin in use, review its configuration.  
+Depending on the plugin in use, review its configuration.
 
 For a list of global variables, run the following query:
 SELECT VARIABLE_NAME, VARIABLE_VALUE
 FROM performance_schema.global_variables
-WHERE VARIABLE_NAME LIKE 'auth%' ;  
+WHERE VARIABLE_NAME LIKE 'auth%' ;
 
-If the LDAP plugin is installed, check the ldap_host and mapping. 
+If the LDAP plugin is installed, check the ldap_host and mapping.
 
 For the LDAP plugin, global variables showing the configuration for authentication to ldap hosts and binding to organizational users should look similar to the following:
 authentication_ldap_simple_server_host=127.0.0.1
@@ -63,20 +65,20 @@ authentication_ldap_sasl_bind_base_dn="dc=example,dc=com"
 
 If the ldap_host is not a valid authentication host or the mapping to the base_dn maps is not correct, this is a finding.
 
-Determine the accounts (SQL Logins) managed by PAM. Run the statement: 
+Determine the accounts (SQL Logins) managed by PAM. Run the statement:
 SELECT `user`.`Host`,
     `user`.`user`,
     `user`.`plugin`,
     `user`.`authentication_string`
     from mysql.user where plugin like 'authentication_pam';
 
-For PAM, the string consists of a PAM service name, optionally followed by a PAM group mapping list consisting of one or more keyword/value pairs each specifying a PAM group name and a MySQL user name. 
+For PAM, the string consists of a PAM service name, optionally followed by a PAM group mapping list consisting of one or more keyword/value pairs each specifying a PAM group name and a MySQL user name.
 
 If not defined, this is a finding.
 
-If the windows plugin is installed, the organization mapping details will be defined within the user "authentication string". 
+If the windows plugin is installed, the organization mapping details will be defined within the user "authentication string".
 
-Determine the accounts (SQL logins) managed by Windows. Run the statement: 
+Determine the accounts (SQL logins) managed by Windows. Run the statement:
 Review the accounts
 SELECT `user`.`Host`,
     `user`.`user`,
@@ -86,7 +88,7 @@ SELECT `user`.`Host`,
 
 Verify that the Windows user, group, and windows role in the authentication_string map to proper organizational users. If not, this is a finding.
 
-To determine the accounts (MySQL accounts) actually managed by MySQL Server. Run the statement: 
+To determine the accounts (MySQL accounts) actually managed by MySQL Server. Run the statement:
 SELECT `user`.`Host`,
     `user`.`User`,
     `user`.`plugin`,
@@ -152,9 +154,9 @@ https://dev.mysql.com/doc/refman/8.0/en/grant.html.
   SELECT
      user
   FROM
-     mysql.user 
+     mysql.user
   WHERE
-     user not in 
+     user not in
      (
         'mysql.infoschema',
         'mysql.session',
@@ -165,21 +167,21 @@ https://dev.mysql.com/doc/refman/8.0/en/grant.html.
   auth_plugins = %(
   SELECT
      plugin_name,
-     plugin_status 
+     plugin_status
   FROM
-     information_schema.plugins 
+     information_schema.plugins
   WHERE
-     plugin_name LIKE '%ldap%' 
-     OR plugin_name LIKE '%pam%' 
+     plugin_name LIKE '%ldap%'
+     OR plugin_name LIKE '%pam%'
      OR plugin_name LIKE '%authentication_windows %';
   )
 
   auth_variables = %(
   SELECT
      VARIABLE_NAME,
-     VARIABLE_VALUE 
+     VARIABLE_VALUE
   FROM
-     performance_schema.global_variables 
+     performance_schema.global_variables
   WHERE
      VARIABLE_NAME LIKE 'auth%' ;
   )
@@ -191,8 +193,8 @@ https://dev.mysql.com/doc/refman/8.0/en/grant.html.
       skip "Manually review authentication variables are configured as per guidance\n#{sql_session.query(auth_variables).output}"
     end
   else
-    describe "No external authentication plugins found, therefore if native accounts are required, perform a manual review of native mysql users #{ sql_session.query(query_accounts).results.column('user') } documenting the need and justification; describing the measures taken to ensure the use of MySQL Server authentication is kept to a minimum; describing the measures taken to safeguard passwords; and listing or describing the MySQL logins used." do
-      skip "No external authentication plugins found, therefore if native accounts are required, perform a manual review of native mysql users #{ sql_session.query(query_accounts).results.column('user') } documenting the need and justification; describing the measures taken to ensure the use of MySQL Server authentication is kept to a minimum; describing the measures taken to safeguard passwords; and listing or describing the MySQL logins used."
+    describe "No external authentication plugins found, therefore if native accounts are required, perform a manual review of native mysql users #{sql_session.query(query_accounts).results.column('user')} documenting the need and justification; describing the measures taken to ensure the use of MySQL Server authentication is kept to a minimum; describing the measures taken to safeguard passwords; and listing or describing the MySQL logins used." do
+      skip "No external authentication plugins found, therefore if native accounts are required, perform a manual review of native mysql users #{sql_session.query(query_accounts).results.column('user')} documenting the need and justification; describing the measures taken to ensure the use of MySQL Server authentication is kept to a minimum; describing the measures taken to safeguard passwords; and listing or describing the MySQL logins used."
     end
   end
 end

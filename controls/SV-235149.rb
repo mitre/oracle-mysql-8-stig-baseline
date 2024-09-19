@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235149' do
   title 'The MySQL Database Server 8.0 must uniquely identify and authenticate
 non-organizational users (or processes acting on behalf of non-organizational
@@ -58,11 +60,11 @@ documentation to ensure accounts are documented and unique.'
   query_accounts = %(
     SELECT
        host,
-       user 
+       user
     FROM
-       mysql.user 
+       mysql.user
     WHERE
-       user not in 
+       user not in
        (
           'mysql.infoschema',
           'mysql.session',
@@ -72,9 +74,9 @@ documentation to ensure accounts are documented and unique.'
 
   accounts = sql_session.query(query_accounts).output
 
-  describe "Manually review MySQL accounts and determine if any are shared accounts and 
+  describe "Manually review MySQL accounts and determine if any are shared accounts and
   that they are compliant with the specified requirements.\n#{accounts}" do
-    skip "Manually review MySQL accounts and determine if any are shared accounts and 
+    skip "Manually review MySQL accounts and determine if any are shared accounts and
     that they are compliant with the specified requirements.\n#{accounts}"
   end
 end

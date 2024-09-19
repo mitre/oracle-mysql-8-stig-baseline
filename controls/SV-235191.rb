@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235191' do
   title 'The MySQL Database Server 8.0 must only accept end entity certificates
 issued by DoD PKI or DoD-approved PKI Certification Authorities (CAs) for the

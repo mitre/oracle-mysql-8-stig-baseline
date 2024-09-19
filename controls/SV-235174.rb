@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235174' do
   title 'The MySQL Database Server 8.0 must off-load audit data to a separate
 log management facility; this must be continuous and in near real time for

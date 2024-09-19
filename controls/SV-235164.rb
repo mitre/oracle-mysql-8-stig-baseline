@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235164' do
   title 'The MySQL Database Server 8.0 software installation account must be
 restricted to authorized users.'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235162' do
   title 'The MySQL Database Server 8.0 must protect its audit features from
 unauthorized removal.'
@@ -37,17 +39,17 @@ cannot be considered fixed.'
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  if !input('aws_rds')
-    audit_admins = input('audit_admins')
-  else
-    audit_admins = input('audit_admins') + ["'rdsadmin'@'localhost'"]
-  end
+  audit_admins = if !input('aws_rds')
+                   input('audit_admins')
+                 else
+                   input('audit_admins') + ["'rdsadmin'@'localhost'"]
+                 end
 
   query_audit_admins = %(
   SELECT
-     * 
+     *
   FROM
-     information_schema.user_privileges 
+     information_schema.user_privileges
   WHERE
      privilege_type = 'AUDIT_ADMIN';
   )

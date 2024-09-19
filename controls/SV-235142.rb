@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235142' do
   title 'The MySQL Database Server 8.0 must be configured in accordance with
 the security configuration settings based on DoD security configuration and

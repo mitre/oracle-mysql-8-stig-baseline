@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235106' do
   title 'The MySQL Database Server 8.0 must be able to generate audit records
 when unsuccessful attempts to retrieve privileges/permissions occur.'
@@ -67,28 +69,28 @@ records when unsuccessful attempts to retrieve privileges/permissions occur.
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  if !input('aws_rds')
-    audit_log_plugin = %(
+  audit_log_plugin = if !input('aws_rds')
+                       %(
     SELECT
        PLUGIN_NAME,
-       plugin_status 
+       plugin_status
     FROM
-       INFORMATION_SCHEMA.PLUGINS 
+       INFORMATION_SCHEMA.PLUGINS
     WHERE
        PLUGIN_NAME LIKE 'audit_log' ;
     )
-  else
-    audit_log_plugin = %(
+                     else
+                       %(
     SELECT
        PLUGIN_NAME,
-       plugin_status 
+       plugin_status
     FROM
-       INFORMATION_SCHEMA.PLUGINS 
+       INFORMATION_SCHEMA.PLUGINS
     WHERE
        PLUGIN_NAME LIKE 'SERVER_AUDIT' ;
     )
-  end
-  
+                     end
+
   audit_log_plugin_status = sql_session.query(audit_log_plugin)
 
   query_audit_log_filter = %(
@@ -117,13 +119,13 @@ records when unsuccessful attempts to retrieve privileges/permissions occur.
   server_audit_events_setting = sql_session.query(query_server_audit_events)
 
   if !input('aws_rds')
-  
+
     # Following code design will allow for adaptive tests in this partially automatable control
     # If ANY of the automatable tests FAIL, the control will report automated statues
     # If ALL automatable tests PASS, MANUAL review statuses are reported to ensure full compliance
 
-    if !audit_log_plugin_status.results.column('plugin_status').join.eql?('ACTIVE') or
-       audit_log_filter_entries.results.empty? or
+    if !audit_log_plugin_status.results.column('plugin_status').join.eql?('ACTIVE') ||
+       audit_log_filter_entries.results.empty? ||
        audit_log_user_entries.results.empty?
 
       describe 'Audit Log Plugin status' do
@@ -154,7 +156,7 @@ records when unsuccessful attempts to retrieve privileges/permissions occur.
     describe "Manually validate that required audit logs are generated when the following query is executed:\nselect * from mysql.proxies_priv;" do
       skip "Manually validate that required audit logs are generated when the following query is executed:\nselect * from mysql.proxies_priv;"
     end
-  
+
   else
 
     describe 'Audit Log Plugin status' do
@@ -166,8 +168,6 @@ records when unsuccessful attempts to retrieve privileges/permissions occur.
       subject { Set[server_audit_events_setting.results.column('value')[0].split(',')] }
       it { should cmp Set['CONNECT,QUERY'.split(',')] }
     end
-    
+
   end
-    
-    
 end

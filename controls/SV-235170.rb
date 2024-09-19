@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235170' do
   title 'The MySQL Database Server 8.0 must produce audit records of its
 enforcement of access restrictions associated with changes to the configuration
@@ -16,7 +18,7 @@ blocked by access restrictions or changes identified after the fact.'
 
 Check if MySQL audit is configured and enabled. The my.cnf file will set the variable audit_file.
 
-To further check, execute the following query: 
+To further check, execute the following query:
 
 SELECT PLUGIN_NAME, PLUGIN_STATUS
       FROM INFORMATION_SCHEMA.PLUGINS
@@ -37,14 +39,14 @@ FROM `mysql`.`audit_log_user`;
 All currently defined audits for the MySQL server instance will be listed. If no audits are returned, this is a finding.
 
 Connect and run commands as a low-privilege user. For example attempt to change system variables, user name, or another user's password, all of which should fail:
-set persist wait_timeout=28000; 
+set persist wait_timeout=28000;
 rename user passme to cantchange;
 SET PASSWORD FOR passme = 'sfsdfsdf';
 
 Review the audit log and inspect event data containing identity and user subject details by running the Linux command:
 sudo cat  <directory where audit log files are located>/audit.log
 
-For example, if the values returned by "select @@datadir, @@audit_log_file; " are  /usr/local/mysql/data/,  audit.log 
+For example, if the values returned by "select @@datadir, @@audit_log_file; " are  /usr/local/mysql/data/,  audit.log
 sudo cat  /usr/local/mysql/data/audit.log
 
 { "timestamp": "2020-08-31 20:10:21", "id": 1, "class": "general", "event": "status", "connection_id": 38, "account": { "user": "fewconnects", "host": "localhost" }, "login": { "user": "fewconnects", "os": "", "ip": "127.0.0.1", "proxy": "" }, "general_data": { "command": "Query", "sql_command": "set_option", "query": "set persist wait_timeout=28000", "status": 1227 } },
@@ -70,28 +72,28 @@ Refer to the supplemental file "MySQL80Audit.sql".'
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  if !input('aws_rds')
-    audit_log_plugin = %(
+  audit_log_plugin = if !input('aws_rds')
+                       %(
     SELECT
        PLUGIN_NAME,
-       plugin_status 
+       plugin_status
     FROM
-       INFORMATION_SCHEMA.PLUGINS 
+       INFORMATION_SCHEMA.PLUGINS
     WHERE
        PLUGIN_NAME LIKE 'audit_log' ;
     )
-  else
-    audit_log_plugin = %(
+                     else
+                       %(
     SELECT
        PLUGIN_NAME,
-       plugin_status 
+       plugin_status
     FROM
-       INFORMATION_SCHEMA.PLUGINS 
+       INFORMATION_SCHEMA.PLUGINS
     WHERE
        PLUGIN_NAME LIKE 'SERVER_AUDIT' ;
     )
-  end
-  
+                     end
+
   audit_log_plugin_status = sql_session.query(audit_log_plugin)
 
   query_audit_log_filter = %(
@@ -119,15 +121,14 @@ Refer to the supplemental file "MySQL80Audit.sql".'
 
   server_audit_events_setting = sql_session.query(query_server_audit_events)
 
-
   if !input('aws_rds')
-  
+
     # Following code design will allow for adaptive tests in this partially automatable control
     # If ANY of the automatable tests FAIL, the control will report automated statues
     # If ALL automatable tests PASS, MANUAL review statuses are reported to ensure full compliance
 
-    if !audit_log_plugin_status.results.column('plugin_status').join.eql?('ACTIVE') or
-       audit_log_filter_entries.results.empty? or
+    if !audit_log_plugin_status.results.column('plugin_status').join.eql?('ACTIVE') ||
+       audit_log_filter_entries.results.empty? ||
        audit_log_user_entries.results.empty?
 
       describe 'Audit Log Plugin status' do
@@ -154,10 +155,10 @@ Refer to the supplemental file "MySQL80Audit.sql".'
     end
     describe "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}" do
       skip "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}"
-    end 
-    
+    end
+
   else
-    
+
     describe 'Audit Log Plugin status' do
       subject { audit_log_plugin_status.results.column('plugin_status') }
       it { should cmp 'ACTIVE' }
@@ -167,7 +168,6 @@ Refer to the supplemental file "MySQL80Audit.sql".'
       subject { Set[server_audit_events_setting.results.column('value')[0].split(',')] }
       it { should cmp Set['CONNECT,QUERY'.split(',')] }
     end
-    
+
   end
-    
 end

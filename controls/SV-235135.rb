@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235135' do
   title 'The MySQL Database Server 8.0 must enforce authorized access to all
 PKI private keys stored/utilized by the MySQL Database Server 8.0.'
@@ -5,10 +7,10 @@ PKI private keys stored/utilized by the MySQL Database Server 8.0.'
 
 If the private key is stolen, an attacker can use it to impersonate the certificate holder. In cases where the Database Management System (DBMS)-stored private keys are used to authenticate the DBMS to the system’s clients, loss of the corresponding private keys would allow an attacker to successfully perform undetected man-in-the-middle attacks against the DBMS system and its clients.
 
-Both the holder of a digital certificate, and the issuing authority, must take careful measures to protect the corresponding private key. Private keys must always be generated and protected in FIPS 140-2 or 140-3 validated cryptographic modules.  
+Both the holder of a digital certificate, and the issuing authority, must take careful measures to protect the corresponding private key. Private keys must always be generated and protected in FIPS 140-2 or 140-3 validated cryptographic modules.
 
 All access to the private key(s) of the DBMS must be restricted to authorized and authenticated users. If unauthorized users have access to one or more of the DBMS's private keys, an attacker could gain access to the key(s) and use them to impersonate the database on the network or otherwise perform unauthorized actions."
-  desc 'check', %q(Review DBMS configuration to determine whether appropriate access controls exist to protect the DBMS’s private key. 
+  desc 'check', %q(Review DBMS configuration to determine whether appropriate access controls exist to protect the DBMS’s private key.
 
 If strong access controls do not exist to enforce authorized access to the private key, this is a finding.
 
@@ -17,8 +19,8 @@ MySQL stores certificates in PEM formatted files.
 Verify User ownership, Group ownership, and permissions on the ssl_files.
 
 select @@ssl_ca, @@ssl_capath, @@ssl_cert, @@ssl_cipher, @@ssl_crl, @@ssl_crlpath, @@ssl_fips_mode, @@ssl_key;
-If ssl_path or ssl_crlpath are not defined the locations default to the datadir.  
-To determine the datadir 
+If ssl_path or ssl_crlpath are not defined the locations default to the datadir.
+To determine the datadir
 select @@datadir;
 
 Example if path is  <directory where audit log files are located>/
@@ -37,7 +39,7 @@ Password:
 -rw-r--r--  1 _mysql  _mysql  1112 Feb 25 11:09  <directory where audit log files are located>/server-cert.pem
 -rw-------  1 _mysql  _mysql  1680 Feb 25 11:09  <directory where audit log files are located>/server-key.pem
 
-If the User owner is not "mysql", this is a finding. 
+If the User owner is not "mysql", this is a finding.
 
 If the Group owner is not "mysql", this is a finding.
 
@@ -45,7 +47,7 @@ For public certs and keys, permissions should be "rw" for mysql and "readonly" f
 
 For private certs and keys, permissions should be "rw" for mysql and "no rights" for mysql group or world. These files by default are named "ca-key.pem", "client-key.pem", "private_key.pem", and "server-key.pem". If not, this is a finding.
 
-Review system configuration to determine whether FIPS mode has been enabled. 
+Review system configuration to determine whether FIPS mode has been enabled.
 
 select @@ssl_fips_mode;
 
@@ -130,11 +132,11 @@ STRICT at startup causes the server to produce an error message and exit.'
       end
     end
 
-    if ssl_params.column('@@ssl_crlpath').join.eql?('NULL')
-      crl_path = ssl_params.column('@@datadir').join
-    else
-      crl_path = ssl_params.column('@@ssl_crlpath').join
-    end
+    crl_path = if ssl_params.column('@@ssl_crlpath').join.eql?('NULL')
+                 ssl_params.column('@@datadir').join
+               else
+                 ssl_params.column('@@ssl_crlpath').join
+               end
 
     full_crl_path = "#{crl_path}#{ssl_params.column('@@ssl_crl').join}"
     describe "SSL CRL file: #{full_crl_path}" do
@@ -145,11 +147,11 @@ STRICT at startup causes the server to produce an error message and exit.'
       it { should_not be_more_permissive_than('0600') }
     end
 
-    if ssl_params.column('@@ssl_capath').join.eql?('NULL')
-      ca_path = ssl_params.column('@@datadir').join
-    else
-      ca_path = ssl_params.column('@@ssl_capath').join
-    end
+    ca_path = if ssl_params.column('@@ssl_capath').join.eql?('NULL')
+                ssl_params.column('@@datadir').join
+              else
+                ssl_params.column('@@ssl_capath').join
+              end
 
     full_ca_path = "#{ca_path}#{ssl_params.column('@@ssl_ca').join}"
     describe "SSL CA file: #{full_ca_path}" do

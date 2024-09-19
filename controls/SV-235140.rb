@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235140' do
   title 'The MySQL Database Server 8.0 must obscure feedback of authentication
 information during the authentication process to protect the information from

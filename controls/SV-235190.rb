@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235190' do
   title "The MySQL Database Server 8.0 must implement NIST FIPS 140-2 or 140-3 validated cryptographic modules to protect unclassified information requiring confidentiality and cryptographic protection, in accordance with the data owner's requirements."
   desc "Use of weak or untested encryption algorithms undermines the purposes of utilizing encryption to protect data. The application must implement cryptographic modules adhering to the higher standards approved by the federal government since this provides assurance they have been tested and validated.
@@ -50,7 +52,7 @@ In general, STRICT imposes more restrictions than ON, but MySQL itself has no FI
   ssl_params = sql_session.query(query_ssl_params).results
 
   if !input('aws_rds')
-    
+
     ssl_fips_mode = ssl_params.column('@@ssl_fips_mode').join
     describe '@@ssl_fips_mode' do
       it "should be 1 or ON. Got #{ssl_fips_mode}" do
@@ -59,12 +61,11 @@ In general, STRICT imposes more restrictions than ON, but MySQL itself has no FI
     end
 
   else
-    
+
     impact 0.0
     describe 'Not applicable since ssl_fips_mode is set to 0 (OFF) and cannot be configured in AWS RDS' do
       skip 'Not applicable since ssl_fips_mode is set to 0 (OFF) and cannot be configured in AWS RDS'
     end
-    
-  end    
-    
+
+  end
 end

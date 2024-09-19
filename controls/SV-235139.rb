@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235139' do
   title 'If passwords are used for authentication, the MySQL Database Server
 8.0 must transmit only encrypted representations of passwords.'
@@ -105,15 +107,15 @@ names as necessary:
     end
   end
 
-  if !input('aws_rds')
+  unless input('aws_rds')
     full_cert_path = "#{ssl_params.column('@@datadir').join}#{ssl_params.column('@@ssl_cert').join}"
     describe "SSL Certificate file: #{full_cert_path}" do
-        subject { file(full_cert_path) }
-        it { should exist }
+      subject { file(full_cert_path) }
+      it { should exist }
     end
 
     describe x509_certificate(full_cert_path) do
-        its('issuer.CN') { should match org_approved_cert_issuer}
+      its('issuer.CN') { should match org_approved_cert_issuer }
     end
-	end
+  end
 end

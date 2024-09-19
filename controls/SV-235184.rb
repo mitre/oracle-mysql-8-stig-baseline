@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235184' do
   title 'The MySQL Database Server 8.0 must associate organization-defined
 types of security labels having organization-defined security label values with

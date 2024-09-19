@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 control 'SV-235148' do
   title 'The MySQL Database Server 8.0 must use NIST FIPS 140-2 or 140-3 validated cryptographic modules for cryptographic operations.'
   desc 'Use of weak or not validated cryptographic algorithms undermines the purposes of utilizing encryption and digital signatures to protect data. Weak algorithms can be easily broken and not validated cryptographic modules may not implement algorithms correctly. Unapproved cryptographic modules or algorithms should not be relied on for authentication, confidentiality, or integrity. Weak cryptography could allow an attacker to gain access to and modify data stored in the database as well as the administration settings of the Database Management System (DBMS).
 
-Applications, including DBMSs, utilizing cryptography are required to use approved NIST FIPS 140-2 or 140-3 validated cryptographic modules that meet the requirements of applicable federal laws, Executive Orders, directives, policies, regulations, standards, and guidance.  
+Applications, including DBMSs, utilizing cryptography are required to use approved NIST FIPS 140-2 or 140-3 validated cryptographic modules that meet the requirements of applicable federal laws, Executive Orders, directives, policies, regulations, standards, and guidance.
 
 NSA Type-X (where X=1, 2, 3, 4) products are NSA-certified, hardware-based encryption modules.
 
@@ -11,11 +13,11 @@ The standard for validating cryptographic modules will transition to the NIST FI
 FIPS 140-2 modules can remain active for up to five years after validation or until September 21, 2026, when the FIPS 140-2 validations will be moved to the historical list. Even on the historical list, CMVP supports the purchase and use of these modules for existing systems. While Federal Agencies decide when they move to FIPS 140-3 only modules, purchasers are reminded that for several years there may be a limited selection of FIPS 140-3 modules from which to choose. CMVP recommends purchasers consider all modules that appear on the Validated Modules Search Page:
 https://csrc.nist.gov/projects/cryptographic-module-validation-program/validated-modules
 
-More information on the FIPS 140-3 transition can be found here: 
+More information on the FIPS 140-3 transition can be found here:
 https://csrc.nist.gov/Projects/fips-140-3-transition-effort/'
   desc 'check', %q(Review DBMS configuration to verify it is using NIST FIPS validated cryptographic modules for cryptographic operations.
 
-To check for FIPS validated cryptographic modules for all operations, run this script in the database: 
+To check for FIPS validated cryptographic modules for all operations, run this script in the database:
 SELECT VARIABLE_NAME, VARIABLE_VALUE
 FROM performance_schema.global_variables where variable_name = 'ssl_fips_mode';
 
@@ -54,7 +56,7 @@ STRICT: Enable “strict” FIPS mode.'
   ssl_params = sql_session.query(query_ssl_params).results
 
   if !input('aws_rds')
-    
+
     ssl_fips_mode = ssl_params.column('@@ssl_fips_mode').join
     describe '@@ssl_fips_mode' do
       it "should be ON or STRICT. Got #{ssl_fips_mode}" do
@@ -63,12 +65,11 @@ STRICT: Enable “strict” FIPS mode.'
     end
 
   else
-    
+
     impact 0.0
     describe 'Not applicable since ssl_fips_mode is set to 0 (OFF) and cannot be configured in AWS RDS' do
       skip 'Not applicable since ssl_fips_mode is set to 0 (OFF) and cannot be configured in AWS RDS'
     end
-    
-  end    
-    
+
+  end
 end

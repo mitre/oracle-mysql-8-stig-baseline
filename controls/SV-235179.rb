@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235179' do
   title 'The MySQL Database Server 8.0 must enforce discretionary access
 control policies, as defined by the data owner, over defined subjects and
@@ -118,81 +120,80 @@ REVOKE role [, role ] ...
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  if !input('aws_rds')
-   mysql_administrative_users = input('mysql_administrative_users')
-  else
-   mysql_administrative_users = input('mysql_administrative_users') + ['rdsadmin']
-  end
+  mysql_administrative_users = if !input('aws_rds')
+                                 input('mysql_administrative_users')
+                               else
+                                 input('mysql_administrative_users') + ['rdsadmin']
+                               end
 
-  if !input('aws_rds')
-   mysql_administrative_grantees = input('mysql_administrative_grantees')
-  else
-   mysql_administrative_grantees = input('mysql_administrative_grantees') + ["'rdsadmin'@'localhost'"]
-  end
+  mysql_administrative_grantees = if !input('aws_rds')
+                                    input('mysql_administrative_grantees')
+                                  else
+                                    input('mysql_administrative_grantees') + ["'rdsadmin'@'localhost'"]
+                                  end
 
   query_admins = %(
   SELECT
-     * 
+     *
   FROM
-     mysql.user 
+     mysql.user
   WHERE
      (
         mysql.user.user not like 'mysql.%'
      )
-     AND 
+     AND
      (
-        user.Create_priv = 'Y' 
-        OR user.Drop_priv = 'Y' 
-        OR user.Grant_priv = 'Y' 
-        OR user.References_priv = 'Y' 
-        OR user.Index_priv = 'Y' 
-        OR user.Alter_priv = 'Y' 
-        OR user.Super_priv = 'Y' 
-        OR user.Execute_priv = 'Y' 
-        OR user.Create_view_priv = 'Y' 
-        OR user.Create_routine_priv = 'Y' 
-        OR user.Alter_routine_priv = 'Y' 
-        OR user.Create_user_priv = 'Y' 
-        OR user.Event_priv = 'Y' 
-        OR user.Trigger_priv = 'Y' 
-        OR user.Create_role_priv = 'Y' 
+        user.Create_priv = 'Y'
+        OR user.Drop_priv = 'Y'
+        OR user.Grant_priv = 'Y'
+        OR user.References_priv = 'Y'
+        OR user.Index_priv = 'Y'
+        OR user.Alter_priv = 'Y'
+        OR user.Super_priv = 'Y'
+        OR user.Execute_priv = 'Y'
+        OR user.Create_view_priv = 'Y'
+        OR user.Create_routine_priv = 'Y'
+        OR user.Alter_routine_priv = 'Y'
+        OR user.Create_user_priv = 'Y'
+        OR user.Event_priv = 'Y'
+        OR user.Trigger_priv = 'Y'
+        OR user.Create_role_priv = 'Y'
         OR user.Drop_role_priv = 'Y'
      );
   )
 
   query_users_db_admins = %(
   SELECT
-     * 
+     *
   FROM
-     mysql.db 
+     mysql.db
   where
      (
-        db.Grant_priv = 'Y' 
-        OR db.References_priv = 'Y' 
-        OR db.Index_priv = 'Y' 
-        OR db.Alter_priv = 'Y' 
-        OR db.Create_tmp_table_priv = 'Y' 
-        OR db.Lock_tables_priv = 'Y' 
-        OR db.Create_view_priv = 'Y' 
-        OR db.Show_view_priv = 'Y' 
-        OR db.Create_routine_priv = 'Y' 
-        OR db.Alter_routine_priv = 'Y' 
-        OR db.Execute_priv = 'Y' 
-        OR db.Event_priv = 'Y' 
+        db.Grant_priv = 'Y'
+        OR db.References_priv = 'Y'
+        OR db.Index_priv = 'Y'
+        OR db.Alter_priv = 'Y'
+        OR db.Create_tmp_table_priv = 'Y'
+        OR db.Lock_tables_priv = 'Y'
+        OR db.Create_view_priv = 'Y'
+        OR db.Show_view_priv = 'Y'
+        OR db.Create_routine_priv = 'Y'
+        OR db.Alter_routine_priv = 'Y'
+        OR db.Execute_priv = 'Y'
+        OR db.Event_priv = 'Y'
         OR db.Trigger_priv
      )
      and user not like 'mysql.%';
   )
-
 
   query_admin_grantees = %(
   SELECT
      USER_PRIVILEGES.GRANTEE,
      USER_PRIVILEGES.TABLE_CATALOG,
      USER_PRIVILEGES.PRIVILEGE_TYPE,
-     USER_PRIVILEGES.IS_GRANTABLE 
+     USER_PRIVILEGES.IS_GRANTABLE
   FROM
-     information_schema.USER_PRIVILEGES 
+     information_schema.USER_PRIVILEGES
   where
      USER_PRIVILEGES.IS_GRANTABLE = 'YES';
   )

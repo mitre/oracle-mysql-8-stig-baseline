@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235151' do
   title 'The MySQL Database Server 8.0 must isolate security functions from
 non-security functions.'
@@ -97,11 +99,11 @@ security-related objects to provide effective isolation.'
 
   query_schemas = %(
   SELECT
-     SCHEMATA.SCHEMA_NAME 
+     SCHEMATA.SCHEMA_NAME
   FROM
-     information_schema.SCHEMATA 
+     information_schema.SCHEMATA
   where
-     SCHEMA_NAME not in 
+     SCHEMA_NAME not in
      (
         'mysql',
         'information_schema',
@@ -119,7 +121,7 @@ functionality is stored.
 a finding.\n#{schemas}" do
     skip "Manually review the database structure to determine where security-related
     functionality is stored.
-    
+
         If security-related database objects or code are not kept separate, this is
     a finding.\n#{schemas}"
   end

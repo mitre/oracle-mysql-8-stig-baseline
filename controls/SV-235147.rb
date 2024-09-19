@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235147' do
   title 'The MySQL Database Server 8.0 must uniquely identify and authenticate
 organizational users (or processes acting on behalf of organizational users).'
@@ -103,21 +105,21 @@ relevant circumstances.
   query_auth_plugins = %(
   SELECT
      plugin_name,
-     plugin_status 
+     plugin_status
   FROM
-     information_schema.plugins 
+     information_schema.plugins
   WHERE
-     plugin_name LIKE '%ldap%' 
-     OR plugin_name LIKE '%pam%' 
+     plugin_name LIKE '%ldap%'
+     OR plugin_name LIKE '%pam%'
      OR plugin_name LIKE '%authentication_windows %';
   )
 
   query_auth_variables = %(
   SELECT
      VARIABLE_NAME,
-     VARIABLE_VALUE 
+     VARIABLE_VALUE
   FROM
-     performance_schema.global_variables 
+     performance_schema.global_variables
   WHERE
      VARIABLE_NAME LIKE 'auth%' ;
   )
@@ -127,9 +129,9 @@ relevant circumstances.
      user.Host,
      user.user,
      user.plugin,
-     user.authentication_string 
+     user.authentication_string
   from
-     mysql.user 
+     mysql.user
   where
      plugin like 'auth%';
   )

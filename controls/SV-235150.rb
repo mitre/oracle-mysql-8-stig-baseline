@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235150' do
   title 'The MySQL Database Server 8.0 must separate user functionality
 (including user interface services) from database management functionality.'
@@ -74,11 +76,11 @@ https://dev.mysql.com/doc/refman/8.0/en/access-control.html.'
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  if !input('aws_rds')
-    mysql_administrative_users = input('mysql_administrative_users')
-  else
-    mysql_administrative_users = input('mysql_administrative_users') + ['rdsadmin']
-  end
+  mysql_administrative_users = if !input('aws_rds')
+                                 input('mysql_administrative_users')
+                               else
+                                 input('mysql_administrative_users') + ['rdsadmin']
+                               end
 
   query_accounts = %(
   SELECT
@@ -115,11 +117,11 @@ https://dev.mysql.com/doc/refman/8.0/en/access-control.html.'
      Trigger_priv,
      Create_tablespace_priv,
      Create_role_priv,
-     Drop_role_priv 
+     Drop_role_priv
   FROM
-     mysql.user 
+     mysql.user
   WHERE
-     'Y' IN 
+     'Y' IN
      (
         Select_priv,
         Insert_priv,
@@ -153,7 +155,7 @@ https://dev.mysql.com/doc/refman/8.0/en/access-control.html.'
         Create_role_priv,
         Drop_role_priv
      )
-     AND user not in 
+     AND user not in
      (
         'mysql.infoschema',
         'mysql.session'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235193' do
   title 'The MySQL Database Server 8.0 must implement cryptographic mechanisms
 preventing the unauthorized disclosure of organization-defined information at
@@ -116,16 +118,16 @@ or other supported protocols.
     query_encryption_params = %(
     SELECT
        VARIABLE_NAME,
-       VARIABLE_VALUE 
+       VARIABLE_VALUE
     FROM
-       performance_schema.global_variables 
+       performance_schema.global_variables
     WHERE
        VARIABLE_NAME like '%encrypt%';
     )
 
-    encryption_params = sql_session.query(query_encryption_params).results.rows.map{|x| {x['variable_name']=> x['variable_value']}}.reduce({}, :merge)
+    encryption_params = sql_session.query(query_encryption_params).results.rows.map { |x| { x['variable_name'] => x['variable_value'] } }.reduce({}, :merge)
 
-    describe "Encryption Param:" do
+    describe 'Encryption Param:' do
       subject { encryption_params }
       its(['audit_log_encryption']) { should cmp 'AES' }
       its(['binlog_encryption']) { should cmp 'ON' }
@@ -137,14 +139,14 @@ or other supported protocols.
     query_general_log = %(
     SELECT
        VARIABLE_NAME,
-       VARIABLE_VALUE 
+       VARIABLE_VALUE
     FROM
-       performance_schema.global_variables 
+       performance_schema.global_variables
     WHERE
        VARIABLE_NAME like 'general_log';
     )
 
-    describe "general_log config" do
+    describe 'general_log config' do
       subject { sql_session.query(query_general_log).results.column('variable_value').join }
       it { should cmp 'OFF' }
     end
@@ -152,7 +154,7 @@ or other supported protocols.
     query_tablespaces = %(
     SELECT
        INNODB_TABLESPACES.NAME,
-       INNODB_TABLESPACES.ENCRYPTION 
+       INNODB_TABLESPACES.ENCRYPTION
     FROM
        information_schema.INNODB_TABLESPACES;
     )
@@ -160,18 +162,18 @@ or other supported protocols.
     tablespaces = sql_session.query(query_tablespaces).results.rows
 
     tablespaces.each do |tablespace|
-        describe "Tablespace #{tablespace['name']} encryption" do
-          subject { tablespace }
-          its(['encryption']) { should cmp 'Y' }
-        end
+      describe "Tablespace #{tablespace['name']} encryption" do
+        subject { tablespace }
+        its(['encryption']) { should cmp 'Y' }
+      end
     end
 
   else
-    
+
     impact 0.0
     describe 'Not applicable since these features are not available in AWS RDS' do
       skip 'Not applicable since these features are not available in AWS RDS'
-    end  
-    
+    end
+
   end
 end

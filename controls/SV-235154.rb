@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235154' do
   title 'The MySQL Database Server 8.0 must maintain the authenticity of
 communications sessions by guarding against man-in-the-middle attacks that
@@ -53,14 +55,14 @@ ssl_fips_mode=STRICT'
   ssl_params = sql_session.query(query_ssl_params).results
 
   if !input('aws_rds')
-    
+
     ssl_fips_mode = ssl_params.column('@@ssl_fips_mode').join
     describe '@@ssl_fips_mode' do
       it "shoud be ON or STRICT. Got #{ssl_fips_mode}" do
         expect(ssl_fips_mode).to be_in(['ON', 'STRICT'])
       end
     end
-  
+
     require_secure_transport = ssl_params.column('@@require_secure_transport').join
     describe '@@require_secure_transport' do
       it "should be 1 or ON. Got #{require_secure_transport}" do
@@ -69,12 +71,11 @@ ssl_fips_mode=STRICT'
     end
 
   else
-    
+
     impact 0.0
     describe 'Not applicable since ssl_fips_mode is set to 0 (OFF) and cannot be configured in AWS RDS' do
       skip 'Not applicable since ssl_fips_mode is set to 0 (OFF) and cannot be configured in AWS RDS'
     end
-    
-  end    
-    
+
+  end
 end

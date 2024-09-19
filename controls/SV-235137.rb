@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235137' do
   title 'If Database Management System (DBMS) authentication using passwords is employed, the DBMS must enforce the DOD standards for password complexity and lifetime.'
   desc 'OS/enterprise authentication and identification must be used (SRG-APP-000023-DB-000001). Native DBMS authentication may be used only when circumstances make it unavoidable; and must be documented and Authorizing Official (AO)-approved.
@@ -22,7 +24,7 @@ a. Password lifetime limits for interactive accounts: Minimum 24 hours, maximum 
 b. Password lifetime limits for non-interactive accounts: Minimum 24 hours, maximum 365 days.
 c. Number of password changes before an old one may be reused: Minimum of five.
 
-Connect as an admin. 
+Connect as an admin.
 
 SELECT component_urn FROM mysql.component
 where component_urn='file://component_validate_password' group by component_urn;
@@ -31,7 +33,7 @@ If the "validate password" component is installed the result will be file://comp
 
 If "validate password" component is not installed, this is a finding.
 
-If the "component_validate_password" is installed, review the password policies to ensure required password complexity is met. 
+If the "component_validate_password" is installed, review the password policies to ensure required password complexity is met.
 
 Run the following to review the password policy:
 
@@ -111,51 +113,51 @@ ALTER USER 'jeffrey'@'localhost' PASSWORD EXPIRE INTERVAL 90 DAY;"
   FROM   performance_schema.global_variables
   WHERE  variable_name LIKE 'valid%password%'
           OR variable_name LIKE 'password_%'
-          OR variable_name LIKE 'default_password_lifetime'; 
+          OR variable_name LIKE 'default_password_lifetime';
   )
 
-  password_params = sql_session.query(query_password_params).results.rows.map{|x| {x['variable_name']=> x['variable_value']}}.reduce({}, :merge)
+  password_params = sql_session.query(query_password_params).results.rows.map { |x| { x['variable_name'] => x['variable_value'] } }.reduce({}, :merge)
 
-	if !input('aws_rds')
-  
-		query_component = %(
+  if !input('aws_rds')
+
+    query_component = %(
 		SELECT component_urn
 		FROM   mysql.component
-		GROUP  BY component_urn; 
+		GROUP  BY component_urn;
 		)
 
-		describe "List of installed components" do
-			subject { sql_session.query(query_component).results.column('component_urn') }
-			it { should include 'file://component_validate_password' }
-		end
+    describe 'List of installed components' do
+      subject { sql_session.query(query_component).results.column('component_urn') }
+      it { should include 'file://component_validate_password' }
+    end
 
-		describe "Password requirement:" do
-			subject { password_params }
-			its(['validate_password.check_user_name']) { should cmp 'ON' }
-			its(['validate_password.length']) { should cmp >= input('min_password_length') }
-			its(['validate_password.mixed_case_count']) { should cmp >= input('password_mixed_case_count') }
-			its(['validate_password.special_char_count']) { should cmp >= input('password_special_character_count') }
-			its(['validate_password.number_count']) { should cmp >= input('password_number_count') }
-			its(['validate_password.policy']) { should cmp 'STRONG' }
-			its(['password_history']) { should cmp >= input('password_history') }
-			its(['password_reuse_interval']) { should cmp >= 365 }
-			its(['default_password_lifetime']) { should cmp >= input('max_password_lifetime') }
-		end
+    describe 'Password requirement:' do
+      subject { password_params }
+      its(['validate_password.check_user_name']) { should cmp 'ON' }
+      its(['validate_password.length']) { should cmp >= input('min_password_length') }
+      its(['validate_password.mixed_case_count']) { should cmp >= input('password_mixed_case_count') }
+      its(['validate_password.special_char_count']) { should cmp >= input('password_special_character_count') }
+      its(['validate_password.number_count']) { should cmp >= input('password_number_count') }
+      its(['validate_password.policy']) { should cmp 'STRONG' }
+      its(['password_history']) { should cmp >= input('password_history') }
+      its(['password_reuse_interval']) { should cmp >= 365 }
+      its(['default_password_lifetime']) { should cmp >= input('max_password_lifetime') }
+    end
 
-	else
+  else
 
-		query_component = %(
+    query_component = %(
     SELECT plugin_name, plugin_status, plugin_type, plugin_library
 		FROM information_schema.plugins
 		WHERE plugin_name='validate_password';
     )
 
-    describe "Validate_password Plugin Status" do
+    describe 'Validate_password Plugin Status' do
       subject { sql_session.query(query_component).results.column('plugin_status') }
       it { should cmp 'ACTIVE' }
     end
 
-		describe "Password requirement:" do
+    describe 'Password requirement:' do
       subject { password_params }
       its(['validate_password_length']) { should cmp >= input('min_password_length') }
       its(['validate_password_mixed_case_count']) { should cmp >= input('password_mixed_case_count') }
@@ -166,5 +168,5 @@ ALTER USER 'jeffrey'@'localhost' PASSWORD EXPIRE INTERVAL 90 DAY;"
       its(['password_reuse_interval']) { should cmp >= 365 }
       its(['default_password_lifetime']) { should cmp >= input('max_password_lifetime') }
     end
-	end
+  end
 end

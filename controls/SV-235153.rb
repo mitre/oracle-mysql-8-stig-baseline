@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235153' do
   title 'Access to database files must be limited to relevant processes and to
 authorized, administrative users.'
@@ -118,12 +120,12 @@ certificate, key, or other directories.'
   query_locations = %(
   SELECT
      VARIABLE_NAME,
-     VARIABLE_VALUE 
+     VARIABLE_VALUE
   FROM
-     performance_schema.global_variables 
+     performance_schema.global_variables
   WHERE
-     VARIABLE_NAME LIKE '%dir' 
-     or VARIABLE_NAME LIKE '%file' 
+     VARIABLE_NAME LIKE '%dir'
+     or VARIABLE_NAME LIKE '%file'
   order by
      VARIABLE_NAME;
   )

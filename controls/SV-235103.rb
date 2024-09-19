@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 control 'SV-235103' do
   title 'The MySQL Database Server 8.0 must be configured to provide audit
 record generation capability for DoD-defined auditable events within all
@@ -38,7 +40,7 @@ SELECT PLUGIN_NAME, plugin_status FROM INFORMATION_SCHEMA.PLUGINS
 
 If nothing is returned OR if the results are not "audit_log" and "plugin_status='ACTIVE'" , this is a finding.
 
-Next determine if the audit lot is encrypted. 
+Next determine if the audit lot is encrypted.
 SELECT VARIABLE_NAME, VARIABLE_VALUE
 FROM performance_schema.global_variables
 WHERE VARIABLE_NAME LIKE 'audit_log_encryption' ;
@@ -83,49 +85,49 @@ true } }');
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  if !input('aws_rds')
-    audit_log_plugin = %(
+  audit_log_plugin = if !input('aws_rds')
+                       %(
     SELECT
        PLUGIN_NAME,
-       plugin_status 
+       plugin_status
     FROM
-       INFORMATION_SCHEMA.PLUGINS 
+       INFORMATION_SCHEMA.PLUGINS
     WHERE
        PLUGIN_NAME LIKE 'audit_log' ;
     )
-  else
-    audit_log_plugin = %(
+                     else
+                       %(
     SELECT
        PLUGIN_NAME,
-       plugin_status 
+       plugin_status
     FROM
-       INFORMATION_SCHEMA.PLUGINS 
+       INFORMATION_SCHEMA.PLUGINS
     WHERE
        PLUGIN_NAME LIKE 'SERVER_AUDIT' ;
     )
-  end
-  
+                     end
+
   audit_log_encryption = %(
   SELECT
      VARIABLE_NAME,
-     VARIABLE_VALUE 
+     VARIABLE_VALUE
   FROM
-     performance_schema.global_variables 
+     performance_schema.global_variables
   WHERE
      VARIABLE_NAME LIKE 'audit_log_encryption' ;
   )
 
-    describe "Audit Log Plugin status" do
-      subject { sql_session.query(audit_log_plugin).results.column('plugin_status') }
-      it { should cmp 'ACTIVE' }
-    end
-  
-  if !input('aws_rds')
+  describe 'Audit Log Plugin status' do
+    subject { sql_session.query(audit_log_plugin).results.column('plugin_status') }
+    it { should cmp 'ACTIVE' }
+  end
 
-    describe "audit_log_encryption config" do
+  unless input('aws_rds')
+
+    describe 'audit_log_encryption config' do
       subject { sql_session.query(audit_log_encryption).results.column('variable_value') }
       it { should cmp 'AES' }
     end
-    
+
   end
 end
