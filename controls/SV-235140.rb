@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 control 'SV-235140' do
-  title "The MySQL Database Server 8.0 must obscure feedback of authentication
+  title 'The MySQL Database Server 8.0 must obscure feedback of authentication
 information during the authentication process to protect the information from
-possible exploitation/use by unauthorized individuals."
-  desc  "The #{input('org_name')} standard for authentication is #{input('org_name')}-approved PKI certificates.
+possible exploitation/use by unauthorized individuals.'
+  desc 'The DoD standard for authentication is DoD-approved PKI certificates.
 
     Normally, with PKI authentication, the interaction with the user for
 authentication will be handled by a software component separate from the
@@ -26,14 +28,11 @@ essential tool with the same limitation:
 obtain Authorizing Official (AO) approval
     2) Train all users of the tool in the importance of not using the
 plain-text password option and in how to keep the password hidden by using the
-\"-p\" without the password option. The user will then be prompted and the
+"-p" without the password option. The user will then be prompted and the
 password obfuscated.
     3) Make use of OS pluggable password manager integration to protect
-passwords using keyrings
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    If all interaction with the user for purposes of authentication is handled
+passwords using keyrings'
+  desc 'check', 'If all interaction with the user for purposes of authentication is handled
 by a software component separate from the MySQL Database Server 8.0, this is
 not a finding.
 
@@ -45,10 +44,8 @@ passwords) during or after the authentication process, this is a finding.
 in password.
 
     Ensure users are trained to use alternatives to command line password
-parameters, if they are not, this is a finding.
-  "
-  desc 'fix', "
-    Modify and configure each non-compliant application, tool, or feature
+parameters, if they are not, this is a finding.'
+  desc 'fix', "Modify and configure each non-compliant application, tool, or feature
 associated with the MySQL Database Server 8.0/database so that it does not
 display authentication secrets.
 
@@ -64,13 +61,13 @@ keyrings. Following is an example:
     Enter password:
 
     $ mysqlsh --user=user --password
-    Please provide the password for 'user@localhost':
-  "
+    Please provide the password for 'user@localhost':"
   impact 0.7
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'high'
   tag gtitle: 'SRG-APP-000178-DB-000083'
   tag gid: 'V-235140'
-  tag rid: 'SV-235140r638812_rule'
+  tag rid: 'SV-235140r961047_rule'
   tag stig_id: 'MYS8-00-005300'
   tag fix_id: 'F-38322r623541_fix'
   tag cci: ['CCI-000206']

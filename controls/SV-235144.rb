@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 control 'SV-235144' do
-  title "Unused database components, MySQL Database Server 8.0 software, and
-database objects must be removed."
-  desc  "Information systems are capable of providing a wide variety of
+  title 'Unused database components, MySQL Database Server 8.0 software, and
+database objects must be removed.'
+  desc 'Information systems are capable of providing a wide variety of
 functions and services. Some of the functions and services, provided by
 default, may not be necessary to support essential organizational operations
 (e.g., key missions, functions).
@@ -10,11 +12,8 @@ default, may not be necessary to support essential organizational operations
 functionality exceeding requirements or mission objectives.
 
     Database Management Systems (DBMSs) must adhere to the principles of least
-functionality by providing only essential capabilities.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Review the list of components and features installed with the MySQL
+functionality by providing only essential capabilities.'
+  desc 'check', 'Review the list of components and features installed with the MySQL
 Database Server 8.0.
 
     List options MySQL Plugins/Components
@@ -29,10 +28,8 @@ Database Server 8.0.
 
     Compare the feature listing against the required components listing.
 
-    If any components are installed, but are not required, this is a finding.
-  "
-  desc 'fix', "
-    Uninstall unused components or features that are installed and can be
+    If any components are installed, but are not required, this is a finding.'
+  desc 'fix', 'Uninstall unused components or features that are installed and can be
 uninstalled. Remove any database objects and applications that are installed to
 support them.
 
@@ -56,13 +53,13 @@ parameter from the my.cnf or on the command line.
 
     For example - The audit message emit function is not being called, the
 component is not needed.
-    UNINSTALL COMPONENT \"file://component_audit_api_message_emit\";
-  "
+    UNINSTALL COMPONENT "file://component_audit_api_message_emit";'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000141-DB-000091'
   tag gid: 'V-235144'
-  tag rid: 'SV-235144r638812_rule'
+  tag rid: 'SV-235144r960963_rule'
   tag stig_id: 'MYS8-00-005700'
   tag fix_id: 'F-38326r623553_fix'
   tag cci: ['CCI-000381']
@@ -73,17 +70,17 @@ component is not needed.
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  if !input('aws_rds')
-   approved_plugins = input('approved_plugins')
-  else
-   approved_plugins = input('approved_plugins') + ['validate_password','RDS_PROCESSLIST','RDS_EVENTS_THREADS_WAITS_CURRENT']
-  end
+  approved_plugins = if !input('aws_rds')
+                       input('approved_plugins')
+                     else
+                       input('approved_plugins') + ['validate_password', 'RDS_PROCESSLIST', 'RDS_EVENTS_THREADS_WAITS_CURRENT']
+                     end
 
   query_plugins = %(
   SELECT
-     * 
+     *
   FROM
-     information_schema.PLUGINS 
+     information_schema.PLUGINS
   where
      plugin_library is NOT NULL;
   )
@@ -93,10 +90,10 @@ component is not needed.
     it { should be_in approved_plugins }
   end
 
-	if !input('aws_rds')
+  unless input('aws_rds')
     query_components = %(
     SELECT
-      * 
+      *
     FROM
       mysql.component;
     )

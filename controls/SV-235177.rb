@@ -1,11 +1,11 @@
+# frozen_string_literal: true
+
 control 'SV-235177' do
-  title "The MySQL Database Server 8.0 must prohibit the use of cached
-authenticators after an organization-defined time period."
-  desc  "If cached authentication information is out-of-date, the validity of
-the authentication information may be questionable."
-  desc  'rationale', ''
-  desc  'check', "
-    Verify that the MySQL is using Kerberos Authentication.
+  title 'The MySQL Database Server 8.0 must prohibit the use of cached
+authenticators after an organization-defined time period.'
+  desc 'If cached authentication information is out-of-date, the validity of
+the authentication information may be questionable.'
+  desc 'check', "Verify that the MySQL is using Kerberos Authentication.
 
     On the server:
     SELECT PLUGIN_NAME, PLUGIN_STATUS
@@ -36,10 +36,8 @@ principal
 Kerberos is enabled, check the LDAP server for the maximum lifetime of the
 Kerberos service Tickets expiration policy.
 
-    If the lifetime exceeds the desired expiration time, this is a finding.
-  "
-  desc 'fix', "
-    Modify system settings to implement the organization-defined limit on the
+    If the lifetime exceeds the desired expiration time, this is a finding."
+  desc 'fix', %q(Modify system settings to implement the organization-defined limit on the
 lifetime of cached authenticators.
 
     Configure the MySQL server for GSSAPI/Kerberos LDAP authentication plugin
@@ -49,14 +47,14 @@ to use the GSSAPI/Kerberos authentication method.
 might contain:
     [mysqld]
     plugin-load-add=authentication_ldap_sasl.so
-    authentication_ldap_sasl_auth_method_name=\"GSSAPI\"
+    authentication_ldap_sasl_auth_method_name="GSSAPI"
     authentication_ldap_sasl_server_host=198.51.100.10
     authentication_ldap_sasl_server_port=389
 
-authentication_ldap_sasl_bind_root_dn=\"cn=admin,cn=users,dc=MYSQL,dc=LOCAL\"
-    authentication_ldap_sasl_bind_root_pwd=\"password\"
-    authentication_ldap_sasl_bind_base_dn=\"cn=users,dc=MYSQL,dc=LOCAL\"
-    authentication_ldap_sasl_user_search_attr=\"sAMAccountName\"
+authentication_ldap_sasl_bind_root_dn="cn=admin,cn=users,dc=MYSQL,dc=LOCAL"
+    authentication_ldap_sasl_bind_root_pwd="password"
+    authentication_ldap_sasl_bind_base_dn="cn=users,dc=MYSQL,dc=LOCAL"
+    authentication_ldap_sasl_user_search_attr="sAMAccountName"
 
     Create account(s) using Kerberos Authentication.
     For example:
@@ -72,13 +70,13 @@ authentication_ldap_sasl_bind_root_dn=\"cn=admin,cn=users,dc=MYSQL,dc=LOCAL\"
 
     GRANT PROXY
       ON 'proxied_krb_user'
-      TO 'bredon@MYSQL.LOCAL’;
-  "
+      TO 'bredon@MYSQL.LOCAL’;)
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000400-DB-000367'
   tag gid: 'V-235177'
-  tag rid: 'SV-235177r638812_rule'
+  tag rid: 'SV-235177r961521_rule'
   tag stig_id: 'MYS8-00-010300'
   tag fix_id: 'F-38359r623652_fix'
   tag cci: ['CCI-002007']

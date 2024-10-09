@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 control 'SV-235101' do
-  title "The audit information produced by the MySQL Database Server 8.0 must
-be protected from unauthorized deletion."
-  desc  "If audit data were to become compromised, then competent forensic
+  title 'The audit information produced by the MySQL Database Server 8.0 must
+be protected from unauthorized deletion.'
+  desc 'If audit data were to become compromised, then competent forensic
 analysis and discovery of the true source of potentially malicious system
 activity is impossible to achieve.
 
@@ -24,11 +26,8 @@ settings, and audit reports) needed to successfully audit information system
 activity.
 
     Deletion of database audit data could mask the theft of, or the
-unauthorized modification of, sensitive data stored in the database.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Review locations of audit logs, both internal to the database and database
+unauthorized modification of, sensitive data stored in the database.'
+  desc 'check', %q(Review locations of audit logs, both internal to the database and database
 audit logs located at the operating system level.
 
     Verify there are appropriate controls and permissions to protect the audit
@@ -49,8 +48,8 @@ the datadir. Run the this script to find the data directory:
     ls -l <directory where audit log files are located>
     ls -l <directory where audit log files are located> | grep -i
 <audit_file_name>
-    For example if the values returned by - \"select @@datadir,
-@@audit_log_file; \" are  /usr/local/mysql/data/,  audit.log
+    For example if the values returned by - "select @@datadir,
+@@audit_log_file; " are  /usr/local/mysql/data/,  audit.log
     ls -l  /usr/local/mysql/data/
 
     See below for an example:
@@ -68,14 +67,12 @@ audit.20190424T190008.log
     -rw-r-----    1 _mysql  _mysql     30208 Apr 24 14:10
 audit.20190424T191044.log.enc
 
-    If the owner and group are not \"mysql\" or \"_mysql\", this is a finding.
+    If the owner and group are not "mysql" or "_mysql", this is a finding.
 
     If the directory or file permissions are more permissive than owner having
 Read/Write (RW) and group having Read (R) access to the audit files, aka
-\"750\", this is a finding.
-  "
-  desc 'fix', "
-    Apply controls and modify permissions to protect database audit log data
+"750", this is a finding.)
+  desc 'fix', 'Apply controls and modify permissions to protect database audit log data
 from unauthorized access, whether stored in the database itself or at the OS
 level.
 
@@ -94,45 +91,45 @@ level.
     sudo chown mysql <audit directory path>
     sudo chgrp mysql <audit directory path>
     Change permissions
-    chmod 750 <directory path>
-  "
+    chmod 750 <directory path>'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000120-DB-000061'
   tag gid: 'V-235101'
-  tag rid: 'SV-235101r638812_rule'
+  tag rid: 'SV-235101r960936_rule'
   tag stig_id: 'MYS8-00-001400'
   tag fix_id: 'F-38283r623424_fix'
   tag cci: ['CCI-000164']
-  tag nist: ['AU-9']
+  tag nist: ['AU-9', 'AU-9 a']
 
   if !input('aws_rds')
-  
-  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  audit_log_path = input('audit_log_path')
+    sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  datadir = %(
+    audit_log_path = input('audit_log_path')
+
+    datadir = %(
     SELECT
        VARIABLE_NAME,
-       VARIABLE_VALUE 
+       VARIABLE_VALUE
     FROM
-       performance_schema.global_variables 
+       performance_schema.global_variables
     WHERE
        VARIABLE_NAME LIKE 'datadir';
   )
 
     audit_log_files = command("ls -d #{audit_log_path}").stdout.split
 
-    describe "List of audit_log files" do
+    describe 'List of audit_log files' do
       subject { audit_log_files }
       it { should_not be_empty }
     end
 
     audit_log_files.each do |log_file|
       describe file(log_file) do
-        its('owner') { should match /^[_]?mysql$/ }
-        its('group') { should match /^[_]?mysql$/ }
+        its('owner') { should match(/^_?mysql$/) }
+        its('group') { should match(/^_?mysql$/) }
         it { should_not be_more_permissive_than('0750') }
       end
     end
@@ -141,8 +138,8 @@ level.
 
     describe "Data Directory: #{datadir_path}" do
       subject { directory(datadir_path) }
-      its('owner') { should match /^[_]?mysql$/ }
-      its('group') { should match /^[_]?mysql$/ }
+      its('owner') { should match(/^_?mysql$/) }
+      its('group') { should match(/^_?mysql$/) }
       it { should_not be_more_permissive_than('0750') }
     end
   else

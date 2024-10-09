@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 control 'SV-235173' do
-  title "The MySQL Database Server 8.0 must allocate audit record storage
+  title 'The MySQL Database Server 8.0 must allocate audit record storage
 capacity in accordance with organization-defined audit record storage
-requirements."
-  desc  "To ensure sufficient storage capacity for the audit logs, the Database
+requirements.'
+  desc "To ensure sufficient storage capacity for the audit logs, the Database
 Management System (DBMS) must be able to allocate audit record storage
 capacity. Although another requirement (SRG-APP-000515-DB-000318) mandates that
 audit data be off-loaded to a centralized log management system, it remains
@@ -21,11 +23,8 @@ number of users; expected number of concurrent users during busy periods;
 number and type of events being monitored; types and amounts of data being
 captured; the frequency/speed with which audit records are off-loaded to the
 central log management system; and any limitations that exist on the DBMS's
-ability to reuse the space formerly occupied by off-loaded records.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Check the server documentation for the SQL Audit file size configurations.
+ability to reuse the space formerly occupied by off-loaded records."
+  desc 'check', %q(Check the server documentation for the SQL Audit file size configurations.
 Locate the Audit file path and drive.
 
     SELECT VARIABLE_NAME, VARIABLE_VALUE
@@ -49,12 +48,10 @@ files to be stored simultaneously.
     Note that MySQL does not delete log files; that requires third-party tools
 or custom scripts.
 
-    If the calculated product of the \"audit_log_rotate_on_size\" times the
+    If the calculated product of the "audit_log_rotate_on_size" times the
 number of audit files allowed will exceed the size of the storage location,
-this is a finding.
-  "
-  desc 'fix', "
-    Review the MySQL Audit file location, ensure the destination has enough
+this is a finding.)
+  desc 'fix', 'Review the MySQL Audit file location, ensure the destination has enough
 space available to accommodate the maximum total size of all files that could
 be written.
 
@@ -69,13 +66,13 @@ example:
     [mysqld]
     audit-log-file=/var/log/mysql/audit.log
     audit-log-format=JSON
-    audit-log-compression=GZIP
-  "
+    audit-log-compression=GZIP'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000357-DB-000316'
   tag gid: 'V-235173'
-  tag rid: 'SV-235173r638812_rule'
+  tag rid: 'SV-235173r961392_rule'
   tag stig_id: 'MYS8-00-009600'
   tag fix_id: 'F-38355r623640_fix'
   tag cci: ['CCI-001849']
@@ -86,12 +83,12 @@ example:
   query_audit_configurations = %(
   SELECT
      VARIABLE_NAME,
-     VARIABLE_VALUE 
+     VARIABLE_VALUE
   FROM
-     performance_schema.global_variables 
+     performance_schema.global_variables
   WHERE
-     VARIABLE_NAME = 'audit_log_file' 
-     OR VARIABLE_NAME = 'datadir' 
+     VARIABLE_NAME = 'audit_log_file'
+     OR VARIABLE_NAME = 'datadir'
      OR VARIABLE_NAME = 'audit_log_rotate_on_size';
   )
 

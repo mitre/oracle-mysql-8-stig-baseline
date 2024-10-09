@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 control 'SV-235099' do
-  title "The audit information produced by the MySQL Database Server 8.0 must
-be protected from unauthorized read access."
-  desc  "If audit data were to become compromised, then competent forensic
+  title 'The audit information produced by the MySQL Database Server 8.0 must
+be protected from unauthorized read access.'
+  desc 'If audit data were to become compromised, then competent forensic
 analysis and discovery of the true source of potentially malicious system
 activity is difficult, if not impossible, to achieve. In addition, access to
 audit records provides information an attacker could potentially use to their
@@ -31,11 +33,8 @@ interprets it relative to the data directory. If the value is a full path name,
 the plugin uses the value as is. A full path name may be useful if it is
 desirable to locate audit files on a separate file system or directory. For
 security reasons, write the audit log file to a directory accessible only to
-the MySQL server and to users with a legitimate reason to view the log.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Review locations of audit logs, both internal to the database and database
+the MySQL server and to users with a legitimate reason to view the log.'
+  desc 'check', %q(Review locations of audit logs, both internal to the database and database
 audit logs located at the operating system level.
 
     Verify there are appropriate controls and permissions to protect the audit
@@ -56,8 +55,8 @@ the datadir. Run the this script to find the data directory:
     ls -l <directory where audit log files are located>
     ls -l <directory where audit log files are located> | grep -i
 <audit_file_name>
-    For example if the values returned by - \"select @@datadir,
-@@audit_log_file; \" are  /usr/local/mysql/data/,  audit.log
+    For example if the values returned by - "select @@datadir,
+@@audit_log_file; " are  /usr/local/mysql/data/,  audit.log
     ls -l  /usr/local/mysql/data/
 
     See below for an example:
@@ -75,14 +74,12 @@ audit.20190424T190008.log
     -rw-r-----    1 _mysql  _mysql     30208 Apr 24 14:10
 audit.20190424T191044.log.enc
 
-    If the owner and group are not \"mysql\" or \"_mysql\", this is a finding.
+    If the owner and group are not "mysql" or "_mysql", this is a finding.
 
     If the directory or file permissions are more permissive than owner having
 Read/Write (RW) and group having Read (R) access to the audit files, aka
-\"750\", this is a finding.
-  "
-  desc 'fix', "
-    Apply controls and modify permissions to protect database audit log data
+"750", this is a finding.)
+  desc 'fix', 'Apply controls and modify permissions to protect database audit log data
 from unauthorized access, whether stored in the database itself or at the OS
 level.
 
@@ -101,45 +98,45 @@ level.
     sudo chown mysql <audit directory path>
     sudo chgrp mysql <audit directory path>
     Change permissions
-    chmod 750 <directory path>
-  "
+    chmod 750 <directory path>'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000118-DB-000059'
   tag gid: 'V-235099'
-  tag rid: 'SV-235099r638812_rule'
+  tag rid: 'SV-235099r960930_rule'
   tag stig_id: 'MYS8-00-001200'
   tag fix_id: 'F-38281r623418_fix'
   tag cci: ['CCI-000162']
-  tag nist: ['AU-9']
-  
+  tag nist: ['AU-9', 'AU-9 a']
+
   if !input('aws_rds')
 
-  sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
+    sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  audit_log_path = input('audit_log_path')
+    audit_log_path = input('audit_log_path')
 
-  datadir = %(
+    datadir = %(
     SELECT
        VARIABLE_NAME,
-       VARIABLE_VALUE 
+       VARIABLE_VALUE
     FROM
-       performance_schema.global_variables 
+       performance_schema.global_variables
     WHERE
        VARIABLE_NAME LIKE 'datadir';
   )
 
     audit_log_files = command("ls -d #{audit_log_path}").stdout.split
 
-    describe "List of audit_log files" do
+    describe 'List of audit_log files' do
       subject { audit_log_files }
       it { should_not be_empty }
     end
 
     audit_log_files.each do |log_file|
       describe file(log_file) do
-        its('owner') { should match /^[_]?mysql$/ }
-        its('group') { should match /^[_]?mysql$/ }
+        its('owner') { should match(/^_?mysql$/) }
+        its('group') { should match(/^_?mysql$/) }
         it { should_not be_more_permissive_than('0750') }
       end
     end
@@ -148,8 +145,8 @@ level.
 
     describe "Data Directory: #{datadir_path}" do
       subject { directory(datadir_path) }
-      its('owner') { should match /^[_]?mysql$/ }
-      its('group') { should match /^[_]?mysql$/ }
+      its('owner') { should match(/^_?mysql$/) }
+      its('group') { should match(/^_?mysql$/) }
       it { should_not be_more_permissive_than('0750') }
     end
 

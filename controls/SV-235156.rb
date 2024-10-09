@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 control 'SV-235156' do
-  title "The MySQL Database Server 8.0 must check the validity of all data
-inputs except those specifically identified by the organization."
-  desc  "Invalid user input occurs when a user inserts data or characters into
+  title 'The MySQL Database Server 8.0 must check the validity of all data
+inputs except those specifically identified by the organization.'
+  desc "Invalid user input occurs when a user inserts data or characters into
 an application's data entry fields and the application is unprepared to process
 that data. This results in unanticipated application behavior, potentially
 leading to an application or information system compromise. Invalid user input
@@ -19,11 +21,8 @@ in the database, whether accidental or malicious, reduces the reliability and
 usability of the system. Available protections include data types, referential
 constraints, uniqueness constraints, range checking, and application-specific
 logic. Application-specific logic can be implemented within the database in
-stored procedures and triggers, where appropriate.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Review MySQL Database Server 8.0 code (stored procedures, functions,
+stored procedures and triggers, where appropriate."
+  desc 'check', 'Review MySQL Database Server 8.0 code (stored procedures, functions,
 triggers), application code, settings, column and field definitions, triggers,
 and constraints to determine whether the database is protected against invalid
 input. If code exists that allows invalid data to be acted upon or input into
@@ -44,20 +43,18 @@ not a finding.
 
     MySQL Workbench Schema and Table Inspectors are effective tools for
 performing the review process, as are the MySQL Information Schema, and MySQL
-Schema tables.
-  "
-  desc  'fix', "
-    Use parameterized queries, constraints, foreign keys, etc., to validate
+Schema tables.'
+  desc 'fix', 'Use parameterized queries, constraints, foreign keys, etc., to validate
 data input.
 
     Modify MySQL SQL Server to properly use the correct column data types as
-required in the database.
-  "
+required in the database.'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000251-DB-000160'
   tag gid: 'V-235156'
-  tag rid: 'SV-235156r638812_rule'
+  tag rid: 'SV-235156r961158_rule'
   tag stig_id: 'MYS8-00-007300'
   tag fix_id: 'F-38338r623589_fix'
   tag cci: ['CCI-001310']

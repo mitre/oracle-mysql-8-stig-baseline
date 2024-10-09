@@ -1,95 +1,56 @@
+# frozen_string_literal: true
+
 control 'SV-235121' do
-  title "The MySQL Database Server 8.0 must generate audit records when
-security objects are deleted."
-  desc  "The removal of security objects from the database/Database Management
+  title 'The MySQL Database Server 8.0 must generate audit records when
+security objects are deleted.'
+  desc "The removal of security objects from the database/Database Management
 System (DBMS) would seriously degrade a system's information assurance posture.
 If such an event occurs, it must be logged."
-  desc  'rationale', ''
-  desc  'check', "
-    Review the system documentation to determine if MySQL Server is required to
-audit when security objects are deleted.
+  desc 'check', %q(Review the system documentation to determine if MySQL Server is required to audit when security objects are deleted.
 
-    Check if MySQL audit is configured and enabled. The my.cnf file will set
-the variable audit_file.
+Check if MySQL audit is configured and enabled. The my.cnf file will set the variable audit_file.
 
-    To further check, execute the following query:
-    SELECT PLUGIN_NAME, PLUGIN_STATUS
-          FROM INFORMATION_SCHEMA.PLUGINS
-          WHERE PLUGIN_NAME LIKE 'audit%';
+To further check, execute the following query:
+SELECT PLUGIN_NAME, PLUGIN_STATUS
+      FROM INFORMATION_SCHEMA.PLUGINS
+      WHERE PLUGIN_NAME LIKE 'audit%';
 
-[NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 
-Community Server (also used by AWS RDS) has reduced or different features. 
-For Community Server, the MariaDB audit plugin may be used. 
-This InSpec profile is adapted to measure accordingly when using Community Server:
-    Verify the plugin installation by running:
-    SELECT PLUGIN_NAME, PLUGIN_STATUS
-           FROM INFORMATION_SCHEMA.PLUGINS
-           WHERE PLUGIN_NAME LIKE 'SERVER%';
-    The value for SERVER_AUDIT should return ACTIVE.]
+The status of the audit_log plugin must be "active". If it is not "active", this is a finding.
 
-    The status of the audit_log plugin must be \"active\". If it is not
-\"active\", this is a finding.
+Review audit filters and associated users by running the following queries:
+SELECT `audit_log_filter`.`NAME`,
+   `audit_log_filter`.`FILTER`
+FROM `mysql`.`audit_log_filter`;
 
-[NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 
-Community Server (also used by AWS RDS) has reduced or different features. 
-For Community Server, the MariaDB audit plugin may be used and configured to 
-audit all CONNECT and QUERY events.
-This InSpec profile is adapted to measure accordingly when using Community Server:
-    Verify the CONNECT and QUERY events are enabled:
-    SHOW variables LIKE 'server_audit_events';
-    +---------------------+---------------+
-    | Variable_name       | Value         |
-    +---------------------+---------------+
-    | server_audit_events | CONNECT,QUERY |
-    +---------------------+---------------+
-  	1 row in set (0.00 sec)    
-  	The value for server_audit_events should return CONNECT,QUERY.]
-    
-    Review audit filters and associated users by running the following queries:
-    SELECT `audit_log_filter`.`NAME`,
-       `audit_log_filter`.`FILTER`
-    FROM `mysql`.`audit_log_filter`;
+SELECT `audit_log_user`.`USER`,
+   `audit_log_user`.`HOST`,
+   `audit_log_user`.`FILTERNAME`
+FROM `mysql`.`audit_log_user`;
 
-    SELECT `audit_log_user`.`USER`,
-       `audit_log_user`.`HOST`,
-       `audit_log_user`.`FILTERNAME`
-    FROM `mysql`.`audit_log_user`;
+All currently defined audits for the MySQL server instance will be listed. If no audits are returned, this is a finding.
 
-    All currently defined audits for the MySQL server instance will be listed.
-If no audits are returned, this is a finding.
+To check if the audit filters in place are generating records when security objects are deleted, run the following, which will test auditing. Note: This is destructive. Back up the database table prior to testing so it can be restored.
+drop mysql.procs_priv;
 
-    To check if the audit filters in place are generating records when security
-objects are deleted, run the following, which will test auditing. Note: This is
-destructive. Back up the database table prior to testing so it can be restored.
-    drop mysql.procs_priv;
+Review the audit log by running the Linux command:
+sudo cat  <directory where audit log files are located>/audit.log|egrep DROP
+For example if the values returned by - "select @@datadir, @@audit_log_file; " are  /usr/local/mysql/data/,  audit.log
+sudo cat  /usr/local/mysql/data/audit.log |egrep DROP
 
-    Review the audit log by running the Linux command:
-    sudo cat  <directory where audit log files are located>/audit.log|egrep DROP
-    For example if the values returned by - \"select @@datadir,
-@@audit_log_file; \" are  /usr/local/mysql/data/,  audit.log
-    sudo cat  /usr/local/mysql/data/audit.log |egrep DROP
+The audit data will look similar to the example below:
+{ "timestamp": "2020-08-21 17:06:02", "id": 1, "class": "general", "event": "status", "connection_id": 9, "account": { "user": "root", "host": "localhost" }, "login": { "user": "root", "os": "", "ip": "::1", "proxy": "" }, "general_data": { "command": "Query", "sql_command": "drop_table", "query": "DROP TABLE `mysql`.`proxies_priv`", "status": 0 } },
 
-    The audit data will look similar to the example below:
-    { \"timestamp\": \"2020-08-21 17:06:02\", \"id\": 1, \"class\":
-\"general\", \"event\": \"status\", \"connection_id\": 9, \"account\": {
-\"user\": \"root\", \"host\": \"localhost\" }, \"login\": { \"user\": \"root\",
-\"os\": \"\", \"ip\": \"::1\", \"proxy\": \"\" }, \"general_data\": {
-\"command\": \"Query\", \"sql_command\": \"drop_table\", \"query\": \"DROP
-TABLE `mysql`.`proxies_priv`\", \"status\": 0 } },
-
-    If the audit event is not present, this is a finding.
-  "
-  desc 'fix', "
-    Configure the MySQL Database Server to audit when security objects are
+If the audit event is not present, this is a finding.)
+  desc 'fix', 'Configure the MySQL Database Server to audit when security objects are
 deleted.
 
-    See the supplemental file \"MySQL80Audit.sql\".
-  "
+    See the supplemental file "MySQL80Audit.sql".'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000501-DB-000336'
   tag gid: 'V-235121'
-  tag rid: 'SV-235121r638812_rule'
+  tag rid: 'SV-235121r961818_rule'
   tag stig_id: 'MYS8-00-003400'
   tag fix_id: 'F-38303r623484_fix'
   tag cci: ['CCI-000172']
@@ -97,28 +58,28 @@ deleted.
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  if !input('aws_rds')
-    audit_log_plugin = %(
+  audit_log_plugin = if !input('aws_rds')
+                       %(
     SELECT
        PLUGIN_NAME,
-       plugin_status 
+       plugin_status
     FROM
-       INFORMATION_SCHEMA.PLUGINS 
+       INFORMATION_SCHEMA.PLUGINS
     WHERE
        PLUGIN_NAME LIKE 'audit_log' ;
     )
-  else
-    audit_log_plugin = %(
+                     else
+                       %(
     SELECT
        PLUGIN_NAME,
-       plugin_status 
+       plugin_status
     FROM
-       INFORMATION_SCHEMA.PLUGINS 
+       INFORMATION_SCHEMA.PLUGINS
     WHERE
        PLUGIN_NAME LIKE 'SERVER_AUDIT' ;
     )
-  end
-  
+                     end
+
   audit_log_plugin_status = sql_session.query(audit_log_plugin)
 
   query_audit_log_filter = %(
@@ -146,15 +107,14 @@ deleted.
 
   server_audit_events_setting = sql_session.query(query_server_audit_events)
 
-
   if !input('aws_rds')
-  
+
     # Following code design will allow for adaptive tests in this partially automatable control
     # If ANY of the automatable tests FAIL, the control will report automated statues
     # If ALL automatable tests PASS, MANUAL review statuses are reported to ensure full compliance
 
-    if !audit_log_plugin_status.results.column('plugin_status').join.eql?('ACTIVE') or
-       audit_log_filter_entries.results.empty? or
+    if !audit_log_plugin_status.results.column('plugin_status').join.eql?('ACTIVE') ||
+       audit_log_filter_entries.results.empty? ||
        audit_log_user_entries.results.empty?
 
       describe 'Audit Log Plugin status' do
@@ -174,7 +134,7 @@ deleted.
     end
 
     describe "Manually validate `audit_log` plugin is active:\n #{audit_log_plugin_status.output}" do
-      skip "Manually validate `audit_log` plugin is active:\n #{audit_log_plugin_status.output}" 
+      skip "Manually validate `audit_log` plugin is active:\n #{audit_log_plugin_status.output}"
     end
     describe "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}" do
       skip "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}"
@@ -185,9 +145,9 @@ deleted.
     describe 'Manually validate that required audit logs are generated when the specified query is executed.' do
       skip 'Manually validate that required audit logs are generated when the specified query is executed.'
     end
-    
+
   else
-    
+
     describe 'Audit Log Plugin status' do
       subject { audit_log_plugin_status.results.column('plugin_status') }
       it { should cmp 'ACTIVE' }
@@ -197,7 +157,6 @@ deleted.
       subject { Set[server_audit_events_setting.results.column('value')[0].split(',')] }
       it { should cmp Set['CONNECT,QUERY'.split(',')] }
     end
-    
+
   end
-    
 end

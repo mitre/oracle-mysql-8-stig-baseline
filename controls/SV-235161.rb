@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 control 'SV-235161' do
-  title "The MySQL Database Server 8.0 must protect its audit configuration
-from unauthorized modification."
-  desc  "Protecting audit data also includes identifying and protecting the
+  title 'The MySQL Database Server 8.0 must protect its audit configuration
+from unauthorized modification.'
+  desc 'Protecting audit data also includes identifying and protecting the
 tools used to view and manipulate log data. Therefore, protecting audit tools
 is necessary to prevent unauthorized operation on audit data.
 
@@ -13,11 +15,8 @@ the modification of audit tools.
     Audit tools include, but are not limited to, vendor-provided and open
 source audit tools needed to successfully view and manipulate audit information
 system activity and records. Audit tools include custom queries and report
-generators.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Check users with permissions to administer MySQL Auditing.
+generators.'
+  desc 'check', %q(Check users with permissions to administer MySQL Auditing.
 
     select * from information_schema.user_privileges where privilege_type =
 'AUDIT_ADMIN';
@@ -36,10 +35,8 @@ generators.
     FROM performance_schema.global_variables where variable_name =
 'audit_log_encryption';
 
-    If \"audit_log_encryption\" is not set to \"AES\", this is a finding.
-  "
-  desc 'fix', "
-    Remove audit-related permissions from individuals and roles not authorized
+    If "audit_log_encryption" is not set to "AES", this is a finding.)
+  desc 'fix', %q(Remove audit-related permissions from individuals and roles not authorized
 to have them.
 
     REVOKE AUDIT_ADMIN on *.* FROM <user>;
@@ -54,10 +51,10 @@ to have them.
 
     Note: First instantiate the keyring plugin which is needed to store the
 audit encryption key.
-    The example above has an \"early-plugin-load=keyring_file.so\" entry in the
+    The example above has an "early-plugin-load=keyring_file.so" entry in the
 my.cnf file.
     A keyring plugin must be present before adding the
-\"audit-log-encryption=AES\" entry or the database will not start.
+"audit-log-encryption=AES" entry or the database will not start.
 
     Below are valid key ring plugins:
 
@@ -95,13 +92,13 @@ keyring_oci_management_endpoint=shortAlphaNumericString-management.kms.us-ashbur
     early-plugin-load=keyring_hashicorp.so
     keyring_hashicorp_role_id='ee3b495c-d0c9-11e9-8881-8444c71c32aa'
     keyring_hashicorp_secret_id='0512af29-d0ca-11e9-95ee-0010e00dd718'
-    keyring_hashicorp_store_path='/v1/kv/mysql'
-  "
+    keyring_hashicorp_store_path='/v1/kv/mysql')
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000122-DB-000203'
   tag gid: 'V-235161'
-  tag rid: 'SV-235161r638812_rule'
+  tag rid: 'SV-235161r960942_rule'
   tag stig_id: 'MYS8-00-008100'
   tag fix_id: 'F-38343r623604_fix'
   tag cci: ['CCI-001494']
@@ -109,26 +106,26 @@ keyring_oci_management_endpoint=shortAlphaNumericString-management.kms.us-ashbur
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  if !input('aws_rds')
-    audit_admins = input('audit_admins')
-  else
-    audit_admins = input('audit_admins') + ["'rdsadmin'@'localhost'"]
-  end
+  audit_admins = if !input('aws_rds')
+                   input('audit_admins')
+                 else
+                   input('audit_admins') + ["'rdsadmin'@'localhost'"]
+                 end
 
   query_audit_admins = %(
   SELECT
-     * 
+     *
   FROM
-     information_schema.user_privileges 
+     information_schema.user_privileges
   WHERE
      privilege_type = 'AUDIT_ADMIN';
   )
 
   query_keyring_plugins = %(
   SELECT
-     * 
+     *
   FROM
-     information_schema.PLUGINS 
+     information_schema.PLUGINS
   where
      plugin_name like 'keyring%';
   )
@@ -136,9 +133,9 @@ keyring_oci_management_endpoint=shortAlphaNumericString-management.kms.us-ashbur
   audit_log_encryption = %(
   SELECT
      VARIABLE_NAME,
-     VARIABLE_VALUE 
+     VARIABLE_VALUE
   FROM
-     performance_schema.global_variables 
+     performance_schema.global_variables
   WHERE
      VARIABLE_NAME LIKE 'audit_log_encryption' ;
   )
@@ -148,18 +145,17 @@ keyring_oci_management_endpoint=shortAlphaNumericString-management.kms.us-ashbur
     it { should be_in audit_admins }
   end
 
-  if !input('aws_rds')
+  unless input('aws_rds')
 
-    describe "List of installed keyring plugins" do
+    describe 'List of installed keyring plugins' do
       subject { sql_session.query(query_keyring_plugins).results.column('variable_value') }
       it { should_not be_empty }
     end
 
-    describe "audit_log_encryption config" do
+    describe 'audit_log_encryption config' do
       subject { sql_session.query(audit_log_encryption).results.column('variable_value') }
       it { should cmp 'AES' }
     end
-    
+
   end
-  
 end

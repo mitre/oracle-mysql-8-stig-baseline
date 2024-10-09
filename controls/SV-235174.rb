@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 control 'SV-235174' do
-  title "The MySQL Database Server 8.0 must off-load audit data to a separate
+  title 'The MySQL Database Server 8.0 must off-load audit data to a separate
 log management facility; this must be continuous and in near real time for
 systems with a network connection to the storage facility and weekly or more
-often for stand-alone systems."
-  desc  "Information stored in one location is vulnerable to accidental or
+often for stand-alone systems.'
+  desc 'Information stored in one location is vulnerable to accidental or
 incidental deletion or alteration.
 
     Off-loading is a common process in information systems with limited audit
@@ -12,11 +14,8 @@ storage capacity.
     The DBMS may write audit records to database tables, to files in the file
 system, to other kinds of local repository, or directly to a centralized log
 management system. Whatever the method used, it must be compatible with
-off-loading the records to the centralized system.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Review the system documentation for a description of how audit records are
+off-loading the records to the centralized system.'
+  desc 'check', 'Review the system documentation for a description of how audit records are
 off-loaded.
 
     Check that the OS or software is in place to copy or transfer the specified
@@ -29,10 +28,8 @@ repository to enable the required transfer of audit data. If not, this is a
 finding.
 
     Verify that the specified audit record content is indeed copied or
-transferred to the central repository. If it is not, this is a finding.
-  "
-  desc 'fix', "
-    If necessary, employ SQL code calls to the audit log read functions or
+transferred to the central repository. If it is not, this is a finding.'
+  desc 'fix', 'If necessary, employ SQL code calls to the audit log read functions or
 other software to copy or transfer the specified audit record content to the
 repository.
 
@@ -54,13 +51,13 @@ removal using some alternative method on the OS filesystem, for example a
 third-party tool or a scheduled script.
 
     If, after the preceding steps, the transfer is not succeeding, diagnose and
-repair the problem.
-  "
+repair the problem.'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000515-DB-000318'
   tag gid: 'V-235174'
-  tag rid: 'SV-235174r638812_rule'
+  tag rid: 'SV-235174r961860_rule'
   tag stig_id: 'MYS8-00-009700'
   tag fix_id: 'F-38356r623643_fix'
   tag cci: ['CCI-001851']

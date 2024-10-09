@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 control 'SV-235165' do
-  title "Database software, including MySQL Database Server 8.0 configuration
+  title 'Database software, including MySQL Database Server 8.0 configuration
 files, must be stored in dedicated directories, or DASD pools (remove),
-separate from the host OS and other applications."
-  desc  "When dealing with change control issues, it should be noted any
+separate from the host OS and other applications.'
+  desc "When dealing with change control issues, it should be noted any
 changes to the hardware, software, and/or firmware components of the
 information system and/or application can potentially have significant effects
 on the overall security of the system.
@@ -17,11 +19,8 @@ dedicated directories both threatens and is threatened by other hosted
 applications. Access controls defined for one application may by default
 provide access to the other application's database objects or directories. Any
 method that provides any level of separation of security context assists in the
-protection between applications.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Review the MySQL Database Server 8.0  software library directory and note
+protection between applications."
+  desc 'check', "Review the MySQL Database Server 8.0  software library directory and note
 other root directories located on the same disk directory or any subdirectories.
 
     To list directory variables run:
@@ -53,24 +52,22 @@ length(t1.variable_path) > 0;
 
     If result of VARIABLE_PATH shows that configuration values are not stored
 in files dedicated directories separate from the host os or other applications,
-this is a finding.
-  "
-  desc 'fix', "
-    Install all applications on directories separate from the DBMS software
+this is a finding."
+  desc 'fix', 'Install all applications on directories separate from the DBMS software
 library directory. Relocate any directories or reinstall other application
 software that currently shares the DBMS software library directory.
 
     If it is determined that configuration (options files) are inappropriately
 located, take the steps to move and protect these files and reconfigure mysqld
 startup commands to point to new the file location by setting the
-\"--defaults-file\" to point to the new location and filename for the mysql
-configuration file.
-  "
+"--defaults-file" to point to the new location and filename for the mysql
+configuration file.'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000133-DB-000199'
   tag gid: 'V-235165'
-  tag rid: 'SV-235165r638812_rule'
+  tag rid: 'SV-235165r960960_rule'
   tag stig_id: 'MYS8-00-008500'
   tag fix_id: 'F-38347r623616_fix'
   tag cci: ['CCI-001499']
@@ -79,7 +76,7 @@ configuration file.
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
   query_directory_variables = %(
-  show variables 
+  show variables
   where
      variable_name like '%dir%';
   )
@@ -87,16 +84,15 @@ configuration file.
   query_configuration_variables = %(
   SELECT
      t1.*,
-     VARIABLE_VALUE 
+     VARIABLE_VALUE
   FROM
-     performance_schema.variables_info t1 
+     performance_schema.variables_info t1
      JOIN
-        performance_schema.global_variables t2 
-        ON t2.VARIABLE_NAME = t1.VARIABLE_NAME 
+        performance_schema.global_variables t2
+        ON t2.VARIABLE_NAME = t1.VARIABLE_NAME
   where
      length(t1.variable_path) > 0;
    )
-
 
   describe "Review the MySQL Database Server 8.0  software library directory and note
 other root directories located on the same disk directory or any subdirectories.
@@ -106,7 +102,7 @@ datadir, basedir, or other non tmpdir directories, examine or investigate their
 use.\n#{sql_session.query(query_directory_variables).output}" do
     skip "Review the MySQL Database Server 8.0  software library directory and note
     other root directories located on the same disk directory or any subdirectories.
-    
+
         If any non-MySQL Database Server 8.0 software directories exist on the
     datadir, basedir, or other non tmpdir directories, examine or investigate their
     use.\n#{sql_session.query(query_directory_variables).output}"

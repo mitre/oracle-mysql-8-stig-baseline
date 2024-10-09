@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 control 'SV-235147' do
-  title "The MySQL Database Server 8.0 must uniquely identify and authenticate
-organizational users (or processes acting on behalf of organizational users)."
-  desc  "To ensure accountability and prevent unauthenticated access,
+  title 'The MySQL Database Server 8.0 must uniquely identify and authenticate
+organizational users (or processes acting on behalf of organizational users).'
+  desc 'To ensure accountability and prevent unauthenticated access,
 organizational users must be identified and authenticated to prevent potential
 misuse and compromise of the system.
 
@@ -16,11 +18,8 @@ information system without identification or authentication; and
     (ii) Accesses that occur through authorized use of group authenticators
 without individual authentication. Organizations may require unique
 identification of individuals in group accounts (e.g., shared privilege
-accounts) or for detailed accountability of individual activity.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Review MySQL Database Server 8.0 settings to determine whether
+accounts) or for detailed accountability of individual activity.'
+  desc 'check', %q(Review MySQL Database Server 8.0 settings to determine whether
 organizational users are uniquely identified and authenticated when logging
 on/connecting to the system.
 
@@ -49,7 +48,7 @@ permissions to organizational level, run this SQL:
 organizational authentication source.
 
     Review users using organizational authentication.  Review the
-\"authentication_string\" for proper mapping:
+"authentication_string" for proper mapping:
     SELECT `user`.`Host`,
         `user`.`user`,
         `user`.`plugin`,
@@ -60,10 +59,8 @@ organizational authentication source.
 is a finding.
 
     If accounts are determined to be shared, determine if they are directly
-accessible to end users. If so, this is a finding.
-  "
-  desc 'fix', "
-    Configure MySQL Database Server 8.0 settings to uniquely identify and
+accessible to end users. If so, this is a finding.)
+  desc 'fix', "Configure MySQL Database Server 8.0 settings to uniquely identify and
 authenticate all organizational users who log on/connect to the system.
 
     Remove user-accessible shared accounts and use individual user names.
@@ -91,13 +88,13 @@ relevant circumstances.
       IDENTIFIED WITH authentication_ldap_simple
       BY 'uid=betsy_ldap,ou=People,dc=example,dc=com';
 
-    Assign appropriate roles and grants.
-  "
+    Assign appropriate roles and grants."
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000148-DB-000103'
   tag gid: 'V-235147'
-  tag rid: 'SV-235147r638812_rule'
+  tag rid: 'SV-235147r960969_rule'
   tag stig_id: 'MYS8-00-006100'
   tag fix_id: 'F-38329r623562_fix'
   tag cci: ['CCI-000764']
@@ -108,21 +105,21 @@ relevant circumstances.
   query_auth_plugins = %(
   SELECT
      plugin_name,
-     plugin_status 
+     plugin_status
   FROM
-     information_schema.plugins 
+     information_schema.plugins
   WHERE
-     plugin_name LIKE '%ldap%' 
-     OR plugin_name LIKE '%pam%' 
+     plugin_name LIKE '%ldap%'
+     OR plugin_name LIKE '%pam%'
      OR plugin_name LIKE '%authentication_windows %';
   )
 
   query_auth_variables = %(
   SELECT
      VARIABLE_NAME,
-     VARIABLE_VALUE 
+     VARIABLE_VALUE
   FROM
-     performance_schema.global_variables 
+     performance_schema.global_variables
   WHERE
      VARIABLE_NAME LIKE 'auth%' ;
   )
@@ -132,9 +129,9 @@ relevant circumstances.
      user.Host,
      user.user,
      user.plugin,
-     user.authentication_string 
+     user.authentication_string
   from
-     mysql.user 
+     mysql.user
   where
      plugin like 'auth%';
   )

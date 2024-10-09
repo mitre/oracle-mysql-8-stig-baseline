@@ -1,12 +1,12 @@
+# frozen_string_literal: true
+
 control 'SV-235167' do
-  title "The MySQL Database Server 8.0 must disable network functions, ports,
+  title 'The MySQL Database Server 8.0 must disable network functions, ports,
 protocols, and services deemed by the organization to be nonsecure, in accord
-with the Ports, Protocols, and Services Management (PPSM) guidance."
-  desc  "Use of nonsecure network functions, ports, protocols, and services
-exposes the system to avoidable threats."
-  desc  'rationale', ''
-  desc  'check', "
-    The server must only use approved network communication libraries, ports,
+with the Ports, Protocols, and Services Management (PPSM) guidance.'
+  desc 'Use of nonsecure network functions, ports, protocols, and services
+exposes the system to avoidable threats.'
+  desc 'check', "The server must only use approved network communication libraries, ports,
 and protocols.
 
     Obtain a list of all approved network libraries, communication ports, and
@@ -55,10 +55,8 @@ VARIABLE_NAME;
     select @@named_pipe;
 
     If any ports or protocols are used that are not specifically approved in
-the server documentation, this is a finding.
-  "
-  desc 'fix', "
-    Disable each prohibited network function, port, protocol, or service
+the server documentation, this is a finding."
+  desc 'fix', 'Disable each prohibited network function, port, protocol, or service
 prohibited by the PPSM guidance.
 
     Change mysql options related to network, ports, and protocols for the
@@ -82,13 +80,13 @@ or protocol settings.
 
     Additionally the X Plugin can be disabled at startup/restart by either
 setting mysqlx=0 in the MySQL configuration file, or by passing in either
-\"--mysqlx=0\" or \"--skip-mysqlx\" when starting the MySQL server.
-  "
+"--mysqlx=0" or "--skip-mysqlx" when starting the MySQL server.'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000383-DB-000364'
   tag gid: 'V-235167'
-  tag rid: 'SV-235167r638812_rule'
+  tag rid: 'SV-235167r961470_rule'
   tag stig_id: 'MYS8-00-009000'
   tag fix_id: 'F-38349r623622_fix'
   tag cci: ['CCI-001762']
@@ -102,11 +100,11 @@ setting mysqlx=0 in the MySQL configuration file, or by passing in either
   query_ports = %(
   SELECT
      VARIABLE_NAME,
-     VARIABLE_VALUE 
+     VARIABLE_VALUE
   FROM
-     performance_schema.global_variables 
+     performance_schema.global_variables
   WHERE
-     VARIABLE_NAME in 
+     VARIABLE_NAME in
      (
         'port',
         'mysqlx_port',
@@ -117,12 +115,12 @@ setting mysqlx=0 in the MySQL configuration file, or by passing in either
   query_sockets = %(
   SELECT
      VARIABLE_NAME,
-     VARIABLE_VALUE 
+     VARIABLE_VALUE
   FROM
-     performance_schema.global_variables 
+     performance_schema.global_variables
   where
-     VARIABLE_NAME like '%pipe%' 
-     or VARIABLE_NAME = 'socket' 
+     VARIABLE_NAME like '%pipe%'
+     or VARIABLE_NAME = 'socket'
      or VARIABLE_NAME = 'mysqlx_socket';
   )
 

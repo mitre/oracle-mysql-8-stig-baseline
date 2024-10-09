@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 control 'SV-235166' do
-  title "The role(s)/group(s) used to modify database structure (including but
+  title 'The role(s)/group(s) used to modify database structure (including but
 not necessarily limited to tables, indexes, storage, etc.) and logic modules
 (stored procedures, functions, triggers, links to software external to the
-MySQL Database Server 8.0, etc.) must be restricted to authorized users."
-  desc  "If the DBMS were to allow any user to make changes to database
+MySQL Database Server 8.0, etc.) must be restricted to authorized users.'
+  desc 'If the DBMS were to allow any user to make changes to database
 structure or logic, then those changes might be implemented without undergoing
 the appropriate testing and approvals that are part of a robust change
 management process.
@@ -13,11 +15,8 @@ obtain access to information system components for purposes of initiating
 changes, including upgrades and modifications.
 
     Unmanaged changes that occur to the database software libraries or
-configuration can lead to unauthorized or compromised installations.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    MySQL database objects do not have an owner. MySQL is a single instance and
+configuration can lead to unauthorized or compromised installations.'
+  desc 'check', "MySQL database objects do not have an owner. MySQL is a single instance and
 single database with multiple schemas (aliased to be called either schema or
 database). Permissions are based on schemas and schema objects and privileges
 include grants to objects or grants to allow users to further grants access to
@@ -37,20 +36,18 @@ the following:
     show grants for 'test'@'%';
 
     If any database objects are found to have access by users not authorized to
-the database objects, this is a finding.
-  "
-  desc 'fix', "
-    Assign ownership of authorized objects to authorized object owner accounts.
+the database objects, this is a finding."
+  desc 'fix', 'Assign ownership of authorized objects to authorized object owner accounts.
 
-    Review user accounts with the GRANT OPTION.
+Review user accounts with the GRANT OPTION.
 
-    REVOKE GRANT OPTION to limit users with grant privileges.
-  "
+REVOKE GRANT OPTION to limit users with grant privileges.'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000133-DB-000362'
   tag gid: 'V-235166'
-  tag rid: 'SV-235166r638812_rule'
+  tag rid: 'SV-235166r960960_rule'
   tag stig_id: 'MYS8-00-008700'
   tag fix_id: 'F-38348r623619_fix'
   tag cci: ['CCI-001499']

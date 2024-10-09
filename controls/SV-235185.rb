@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 control 'SV-235185' do
-  title "The MySQL Database Server 8.0 must automatically terminate a user
+  title 'The MySQL Database Server 8.0 must automatically terminate a user
 session after organization-defined conditions or trigger events requiring
-session disconnect."
-  desc  "This addresses the termination of user-initiated logical sessions in
+session disconnect.'
+  desc "This addresses the termination of user-initiated logical sessions in
 contrast to the termination of network connections associated with
 communications sessions (i.e., network disconnect). A logical session (for
 local, network, and remote access) is initiated whenever a user (or process
@@ -27,11 +29,8 @@ killing the connections thread with the KILL processlist_id statement.
 
     Thread processlist identifiers can be determined from the ID column of the
 INFORMATION_SCHEMA PROCESSLIST table, the Id column of SHOW PROCESSLIST output,
-and the PROCESSLIST_ID column of the Performance Schema threads table.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Review system documentation to obtain the organization's definition of
+and the PROCESSLIST_ID column of the Performance Schema threads table."
+  desc 'check', "Review system documentation to obtain the organization's definition of
 circumstances requiring automatic session termination. If the documentation
 explicitly states that such termination is not required or is prohibited, this
 is not a finding.
@@ -57,22 +56,20 @@ reauthenticate.
 
     KILL CONNECTION processslist_id;
 
-    If the provided SQL does not force reauthentication, this is a finding.
-  "
-  desc 'fix', "
-    Modify and/or configure MySQL and related applications and tools so that
+    If the provided SQL does not force reauthentication, this is a finding."
+  desc 'fix', 'Modify and/or configure MySQL and related applications and tools so that
 users are always required to reauthenticate when changing role or escalating
 privileges.
 
     To make a single user reauthenticate, the following must be present:
 
-    KILL CONNECTION processslist_id;
-  "
+    KILL CONNECTION processslist_id;'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000295-DB-000305'
   tag gid: 'V-235185'
-  tag rid: 'SV-235185r638812_rule'
+  tag rid: 'SV-235185r961221_rule'
   tag stig_id: 'MYS8-00-011100'
   tag fix_id: 'F-38367r623676_fix'
   tag cci: ['CCI-002361']

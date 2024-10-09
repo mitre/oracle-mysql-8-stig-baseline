@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 control 'SV-235151' do
-  title "The MySQL Database Server 8.0 must isolate security functions from
-non-security functions."
-  desc  "An isolation boundary provides access control and protects the
+  title 'The MySQL Database Server 8.0 must isolate security functions from
+non-security functions.'
+  desc 'An isolation boundary provides access control and protects the
 integrity of the hardware, software, and firmware that perform security
 functions.
 
@@ -39,11 +41,8 @@ Performance Schema are in-memory tables that use no persistent on-disk storage.
 
     MySQL 8.0 includes the sys schema, a set of objects that helps DBAs and
 developers interpret data collected by the Performance Schema. The sys schema
-objects can be used for typical tuning and diagnosis use cases.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Determine elements of security functionality (lists of permissions,
+objects can be used for typical tuning and diagnosis use cases.'
+  desc 'check', "Determine elements of security functionality (lists of permissions,
 additional authentication information, stored procedures, application specific
 auditing, etc.) which are being housed inside the MySQL server.
 
@@ -66,10 +65,8 @@ multiple schemas. MySQL uses the term database and schema interchangeably.
 functionality is stored.
 
     If security-related database objects or code are not kept separate, this is
-a finding.
-  "
-  desc 'fix', "
-    Check the server documentation, locate security-related database objects
+a finding."
+  desc 'fix', 'Check the server documentation, locate security-related database objects
 and code in a separate database, schema, table, or other separate security
 domain from database objects and code implementing application logic.
 
@@ -86,13 +83,13 @@ separate database, schema, or other separate security domain from database
 objects and code implementing application logic. In all cases, use GRANT,
 REVOKE, … , DROP ROLE statements to add and remove permissions on
 administrative/server-level and schema/database-level, or database object
-security-related objects to provide effective isolation.
-  "
+security-related objects to provide effective isolation.'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000233-DB-000124'
   tag gid: 'V-235151'
-  tag rid: 'SV-235151r638812_rule'
+  tag rid: 'SV-235151r961131_rule'
   tag stig_id: 'MYS8-00-006500'
   tag fix_id: 'F-38333r623574_fix'
   tag cci: ['CCI-001084']
@@ -102,11 +99,11 @@ security-related objects to provide effective isolation.
 
   query_schemas = %(
   SELECT
-     SCHEMATA.SCHEMA_NAME 
+     SCHEMATA.SCHEMA_NAME
   FROM
-     information_schema.SCHEMATA 
+     information_schema.SCHEMATA
   where
-     SCHEMA_NAME not in 
+     SCHEMA_NAME not in
      (
         'mysql',
         'information_schema',
@@ -124,7 +121,7 @@ functionality is stored.
 a finding.\n#{schemas}" do
     skip "Manually review the database structure to determine where security-related
     functionality is stored.
-    
+
         If security-related database objects or code are not kept separate, this is
     a finding.\n#{schemas}"
   end

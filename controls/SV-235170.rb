@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 control 'SV-235170' do
-  title "The MySQL Database Server 8.0 must produce audit records of its
+  title 'The MySQL Database Server 8.0 must produce audit records of its
 enforcement of access restrictions associated with changes to the configuration
-of the MySQL Database Server 8.0 or database(s)."
-  desc  "Without auditing the enforcement of access restrictions against
+of the MySQL Database Server 8.0 or database(s).'
+  desc 'Without auditing the enforcement of access restrictions against
 changes to configuration, it would be difficult to identify attempted attacks
 and an audit trail would not be available for forensic investigation for
 after-the-fact actions.
@@ -11,139 +13,87 @@ after-the-fact actions.
 unauthorized changes to configuration settings. Enforcement action methods may
 be as simple as denying access to a file based on the application of file
 permissions (access restriction). Audit items may consist of lists of actions
-blocked by access restrictions or changes identified after the fact.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Determine if an audit is configured to capture denied actions.
+blocked by access restrictions or changes identified after the fact.'
+  desc 'check', %q(Determine if an audit is configured to capture denied actions.
 
-    Check if MySQL audit is configured and enabled. The my.cnf file will set
-the variable audit_file.
+Check if MySQL audit is configured and enabled. The my.cnf file will set the variable audit_file.
 
-    To further check, execute the following query:
+To further check, execute the following query:
 
-    SELECT PLUGIN_NAME, PLUGIN_STATUS
-          FROM INFORMATION_SCHEMA.PLUGINS
-          WHERE PLUGIN_NAME LIKE 'audit%';
+SELECT PLUGIN_NAME, PLUGIN_STATUS
+      FROM INFORMATION_SCHEMA.PLUGINS
+      WHERE PLUGIN_NAME LIKE 'audit%';
 
-[NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 
-Community Server (also used by AWS RDS) has reduced or different features. 
-For Community Server, the MariaDB audit plugin may be used. 
-This InSpec profile is adapted to measure accordingly when using Community Server:
-    Verify the plugin installation by running:
-    SELECT PLUGIN_NAME, PLUGIN_STATUS
-           FROM INFORMATION_SCHEMA.PLUGINS
-           WHERE PLUGIN_NAME LIKE 'SERVER%';
-    The value for SERVER_AUDIT should return ACTIVE.]
+The status of the audit_log plugin must be "active". If it is not "active", this is a finding.
 
-    The status of the audit_log plugin must be \"active\". If it is not
-\"active\", this is a finding.
+Review audit filters and associated users by running the following queries:
+SELECT `audit_log_filter`.`NAME`,
+   `audit_log_filter`.`FILTER`
+FROM `mysql`.`audit_log_filter`;
 
-[NOTE: The STIG guidance is based on MySQL 8 Enterprise Edition. 
-Community Server (also used by AWS RDS) has reduced or different features. 
-For Community Server, the MariaDB audit plugin may be used and configured to 
-audit all CONNECT and QUERY events.
-This InSpec profile is adapted to measure accordingly when using Community Server:
-    Verify the CONNECT and QUERY events are enabled:
-    SHOW variables LIKE 'server_audit_events';
-    +---------------------+---------------+
-    | Variable_name       | Value         |
-    +---------------------+---------------+
-    | server_audit_events | CONNECT,QUERY |
-    +---------------------+---------------+
-  	1 row in set (0.00 sec)    
-  	The value for server_audit_events should return CONNECT,QUERY.]
+SELECT `audit_log_user`.`USER`,
+   `audit_log_user`.`HOST`,
+   `audit_log_user`.`FILTERNAME`
+FROM `mysql`.`audit_log_user`;
 
-    Review audit filters and associated users by running the following queries:
-    SELECT `audit_log_filter`.`NAME`,
-       `audit_log_filter`.`FILTER`
-    FROM `mysql`.`audit_log_filter`;
+All currently defined audits for the MySQL server instance will be listed. If no audits are returned, this is a finding.
 
-    SELECT `audit_log_user`.`USER`,
-       `audit_log_user`.`HOST`,
-       `audit_log_user`.`FILTERNAME`
-    FROM `mysql`.`audit_log_user`;
+Connect and run commands as a low-privilege user. For example attempt to change system variables, user name, or another user's password, all of which should fail:
+set persist wait_timeout=28000;
+rename user passme to cantchange;
+SET PASSWORD FOR passme = 'sfsdfsdf';
 
-    All currently defined audits for the MySQL server instance will be listed.
-If no audits are returned, this is a finding.
+Review the audit log and inspect event data containing identity and user subject details by running the Linux command:
+sudo cat  <directory where audit log files are located>/audit.log
 
-    Connect and run commands as a low-privilege user. For example attempt to
-change system variables, user name, or another user's password, all of which
-should fail:
-    set persist wait_timeout=28000;
-    rename user passme to cantchange;
-    SET PASSWORD FOR passme = 'sfsdfsdf';
+For example, if the values returned by "select @@datadir, @@audit_log_file; " are  /usr/local/mysql/data/,  audit.log
+sudo cat  /usr/local/mysql/data/audit.log
 
-    Review the audit log and inspect event data containing identity and user
-subject details by running the Linux command:
-    sudo cat  <directory where audit log files are located>/audit.log
-    For example if the values returned by \"select @@datadir, @@audit_log_file;
-\" are  /usr/local/mysql/data/,  audit.log
-    sudo cat  /usr/local/mysql/data/audit.log
+{ "timestamp": "2020-08-31 20:10:21", "id": 1, "class": "general", "event": "status", "connection_id": 38, "account": { "user": "fewconnects", "host": "localhost" }, "login": { "user": "fewconnects", "os": "", "ip": "127.0.0.1", "proxy": "" }, "general_data": { "command": "Query", "sql_command": "set_option", "query": "set persist wait_timeout=28000", "status": 1227 } },
+{ "timestamp": "2020-08-31 20:10:48", "id": 1, "class": "general", "event": "status", "connection_id": 38, "account": { "user": "fewconnects", "host": "localhost" }, "login": { "user": "fewconnects", "os": "", "ip": "127.0.0.1", "proxy": "" }, "general_data": { "command": "Query", "sql_command": "rename_user", "query": "rename user passme to cantchange", "status": 1227 } },
+, "host": "localhost" }, "login": { "user": "fewconnects", "os": "", "ip": "127.0.0.1", "proxy": "" }, "general_data": { "command": "Query", "sql_command": "set_password", "query": "SET PASSWORD FOR `passme`@`%`=<secret>", "status": 1044 } },
 
-    { \"timestamp\": \"2020-08-31 20:10:21\", \"id\": 1, \"class\":
-\"general\", \"event\": \"status\", \"connection_id\": 38, \"account\": {
-\"user\": \"fewconnects\", \"host\": \"localhost\" }, \"login\": { \"user\":
-\"fewconnects\", \"os\": \"\", \"ip\": \"127.0.0.1\", \"proxy\": \"\" },
-\"general_data\": { \"command\": \"Query\", \"sql_command\": \"set_option\",
-\"query\": \"set persist wait_timeout=28000\", \"status\": 1227 } },
-    { \"timestamp\": \"2020-08-31 20:10:48\", \"id\": 1, \"class\":
-\"general\", \"event\": \"status\", \"connection_id\": 38, \"account\": {
-\"user\": \"fewconnects\", \"host\": \"localhost\" }, \"login\": { \"user\":
-\"fewconnects\", \"os\": \"\", \"ip\": \"127.0.0.1\", \"proxy\": \"\" },
-\"general_data\": { \"command\": \"Query\", \"sql_command\": \"rename_user\",
-\"query\": \"rename user passme to cantchange\", \"status\": 1227 } },
-    , \"host\": \"localhost\" }, \"login\": { \"user\": \"fewconnects\",
-\"os\": \"\", \"ip\": \"127.0.0.1\", \"proxy\": \"\" }, \"general_data\": {
-\"command\": \"Query\", \"sql_command\": \"set_password\", \"query\": \"SET
-PASSWORD FOR `passme`@`%`=<secret>\", \"status\": 1044 } },
-    Note each has a non-zero status, 1227, 1227, and 1044 respectively.
+Note each has a non-zero status, 1227, 1227, and 1044 respectively.
 
-    If the audit log does not contain records of its enforcement of access
-restrictions associated with changes to the configuration of the DBMS or
-database(s), this is a finding.
-  "
-  desc 'fix', "
-    If currently required, configure the MySQL Database Server to produce audit
-records when enforcement of access restrictions is associated with changes to
-the configuration of the DBMS or database(s).
+If the audit log does not contain records of its enforcement of access restrictions associated with changes to the configuration of the DBMS or database(s), this is a finding.)
+  desc 'fix', 'If currently required, configure the MySQL Database Server to produce audit records when enforcement of access restrictions is associated with changes to the configuration of the DBMS or database(s).
 
-    See the supplemental file \"MySQL80Audit.sql\".
-  "
+Refer to the supplemental file "MySQL80Audit.sql".'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000381-DB-000361'
   tag gid: 'V-235170'
-  tag rid: 'SV-235170r638812_rule'
+  tag rid: 'SV-235170r998296_rule'
   tag stig_id: 'MYS8-00-009300'
-  tag fix_id: 'F-38352r623631_fix'
-  tag cci: ['CCI-001814']
-  tag nist: ['CM-5 (1)']
+  tag fix_id: 'F-38352r998295_fix'
+  tag cci: ['CCI-001814', 'CCI-003938']
+  tag nist: ['CM-5 (1)', 'CM-5 (1) (b)']
 
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
-  if !input('aws_rds')
-    audit_log_plugin = %(
+  audit_log_plugin = if !input('aws_rds')
+                       %(
     SELECT
        PLUGIN_NAME,
-       plugin_status 
+       plugin_status
     FROM
-       INFORMATION_SCHEMA.PLUGINS 
+       INFORMATION_SCHEMA.PLUGINS
     WHERE
        PLUGIN_NAME LIKE 'audit_log' ;
     )
-  else
-    audit_log_plugin = %(
+                     else
+                       %(
     SELECT
        PLUGIN_NAME,
-       plugin_status 
+       plugin_status
     FROM
-       INFORMATION_SCHEMA.PLUGINS 
+       INFORMATION_SCHEMA.PLUGINS
     WHERE
        PLUGIN_NAME LIKE 'SERVER_AUDIT' ;
     )
-  end
-  
+                     end
+
   audit_log_plugin_status = sql_session.query(audit_log_plugin)
 
   query_audit_log_filter = %(
@@ -171,15 +121,14 @@ the configuration of the DBMS or database(s).
 
   server_audit_events_setting = sql_session.query(query_server_audit_events)
 
-
   if !input('aws_rds')
-  
+
     # Following code design will allow for adaptive tests in this partially automatable control
     # If ANY of the automatable tests FAIL, the control will report automated statues
     # If ALL automatable tests PASS, MANUAL review statuses are reported to ensure full compliance
 
-    if !audit_log_plugin_status.results.column('plugin_status').join.eql?('ACTIVE') or
-       audit_log_filter_entries.results.empty? or
+    if !audit_log_plugin_status.results.column('plugin_status').join.eql?('ACTIVE') ||
+       audit_log_filter_entries.results.empty? ||
        audit_log_user_entries.results.empty?
 
       describe 'Audit Log Plugin status' do
@@ -206,10 +155,10 @@ the configuration of the DBMS or database(s).
     end
     describe "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}" do
       skip "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}"
-    end 
-    
+    end
+
   else
-    
+
     describe 'Audit Log Plugin status' do
       subject { audit_log_plugin_status.results.column('plugin_status') }
       it { should cmp 'ACTIVE' }
@@ -219,7 +168,6 @@ the configuration of the DBMS or database(s).
       subject { Set[server_audit_events_setting.results.column('value')[0].split(',')] }
       it { should cmp Set['CONNECT,QUERY'.split(',')] }
     end
-    
+
   end
-    
 end

@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 control 'SV-235195' do
-  title "When invalid inputs are received, the MySQL Database Server 8.0 must
+  title 'When invalid inputs are received, the MySQL Database Server 8.0 must
 behave in a predictable and documented manner that reflects organizational and
-system objectives."
-  desc  "A common vulnerability is unplanned behavior when invalid inputs are
+system objectives.'
+  desc 'A common vulnerability is unplanned behavior when invalid inputs are
 received. This requirement guards against adverse or unintended system behavior
 caused by invalid inputs, where information system responses to the invalid
 input may be disruptive or cause the system to fail into an unsafe state.
@@ -18,11 +20,8 @@ application developers, and may have limited, if any, access to source code.
 Nevertheless, protections of this type are so important to the secure operation
 of databases that they must not be ignored. At a minimum, the DBA must attempt
 to obtain assurances from the development organization that this issue has been
-addressed, and must document what has been discovered.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    Review the MySQL Server to ensure it behaves in a predictable and
+addressed, and must document what has been discovered.'
+  desc 'check', 'Review the MySQL Server to ensure it behaves in a predictable and
 documented manner that reflects organizational and system objectives when
 invalid inputs are received.
 
@@ -30,10 +29,8 @@ invalid inputs are received.
     SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS;
 
     If input validation is required beyond those enforced by the datatype and
-no constraints exist for data input, this is a finding.
-  "
-  desc 'fix', "
-    Configure the MySQL Server to behave in a predictable and documented manner
+no constraints exist for data input, this is a finding.'
+  desc 'fix', 'Configure the MySQL Server to behave in a predictable and documented manner
 that reflects organizational and system objectives when invalid inputs are
 received.
 
@@ -48,13 +45,13 @@ CHECK (i BETWEEN 7 AND 12 ) );
     Adding a constraint to an existing table
 
     ALTER TABLE <table_name>
-               ADD [CONSTRAINT [symbol]] CHECK (condition) [[NOT] ENFORCED]
-  "
+               ADD [CONSTRAINT [symbol]] CHECK (condition) [[NOT] ENFORCED]'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000447-DB-000393'
   tag gid: 'V-235195'
-  tag rid: 'SV-235195r638812_rule'
+  tag rid: 'SV-235195r961656_rule'
   tag stig_id: 'MYS8-00-012500'
   tag fix_id: 'F-38377r623706_fix'
   tag cci: ['CCI-002754']
@@ -64,7 +61,7 @@ CHECK (i BETWEEN 7 AND 12 ) );
 
   query_constraints = %(
   SELECT
-     * 
+     *
   FROM
      INFORMATION_SCHEMA.TABLE_CONSTRAINTS;
   )

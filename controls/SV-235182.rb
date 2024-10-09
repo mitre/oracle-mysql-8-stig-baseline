@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 control 'SV-235182' do
-  title "The MySQL Database Server 8.0 must associate organization-defined
+  title 'The MySQL Database Server 8.0 must associate organization-defined
 types of security labels having organization-defined security label values with
-information in storage."
-  desc  "Without the association of security labels to information, there is no
+information in storage.'
+  desc 'Without the association of security labels to information, there is no
 basis for the DBMS to make security-related access-control decisions.
 
     Security labels are abstractions representing the basic properties or
@@ -28,11 +30,8 @@ DBMS product, a third-party product, or custom application code.
 columns of the base table. A view can provide value-based security for the
 information in a table. To use a view requires appropriate privileges only for
 the view itself. The user need not be given privileges on base objects
-underlying the view.
-  "
-  desc  'rationale', ''
-  desc  'check', "
-    If security labeling is not required, this is not a finding.
+underlying the view.'
+  desc 'check', 'If security labeling is not required, this is not a finding.
 
     For data that have been labeled with a column indicating data is classified
 read-only views can be created and secured via access privileges such that a
@@ -42,16 +41,16 @@ can only view records that are labeled with the tag of classified).
     If security labeling requirements have been specified, but neither a
 third-party solution nor a MySQL Views and Stored Procedures are used to
 implement row level security solution is implemented that reliably maintains
-labels on information in storage, this is a finding.
-  "
-  desc 'fix', "Deploy MySQL Views and Stored Procedures or a third-party
+labels on information in storage, this is a finding.'
+  desc 'fix', 'Deploy MySQL Views and Stored Procedures or a third-party
 software, or add custom data structures, data elements, and application code,
-to provide reliable security labeling of information in storage."
+to provide reliable security labeling of information in storage.'
   impact 0.5
+  ref 'DPMS Target Oracle MySQL 8.0'
   tag severity: 'medium'
   tag gtitle: 'SRG-APP-000311-DB-000308'
   tag gid: 'V-235182'
-  tag rid: 'SV-235182r638812_rule'
+  tag rid: 'SV-235182r961269_rule'
   tag stig_id: 'MYS8-00-010800'
   tag fix_id: 'F-38364r623667_fix'
   tag cci: ['CCI-002262']
