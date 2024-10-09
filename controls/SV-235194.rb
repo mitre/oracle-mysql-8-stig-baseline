@@ -77,7 +77,7 @@ patches are consistently applied to MySQL within the time allowed."
 
   version = sql_session.query(query_version).results
 
-  describe '@@version' do
+  describe "The installed mysql version: #{version.column('@@version').join}" do
     subject { version.column('@@version').join }
     it { should cmp >= minimum_mysql_version }
   end
