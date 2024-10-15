@@ -185,21 +185,18 @@ the STIG compliance audit:
 
   server_audit_events_setting = sql_session.query(query_server_audit_events)
 
+  describe 'Audit Log Plugin status' do
+    subject { audit_log_plugin_status.results.column('plugin_status') }
+    it { should cmp 'ACTIVE' }
+  end
 
-  if !input('aws_rds')
+  if audit_log_plugin_status.results.column('plugin_status').join.eql?('ACTIVE')
 
-    # Following code design will allow for adaptive tests in this partially automatable control
-    # If ANY of the automatable tests FAIL, the control will report automated statues
-    # If ALL automatable tests PASS, MANUAL review statuses are reported to ensure full compliance
+    if !input('aws_rds')
 
-    if !audit_log_plugin_status.results.column('plugin_status').join.eql?('ACTIVE') or
-       audit_log_filter_entries.results.empty? or
-       audit_log_user_entries.results.empty?
-
-      describe 'Audit Log Plugin status' do
-        subject { audit_log_plugin_status.results.column('plugin_status') }
-        it { should cmp 'ACTIVE' }
-      end
+      # Following code design will allow for adaptive tests in this partially automatable control
+      # If ANY of the automatable tests FAIL, the control will report automated statuses
+      # If ALL automatable tests PASS, MANUAL review statuses are reported to ensure full compliance
 
       describe 'List of entries in Table: audit_log_filter' do
         subject { audit_log_filter_entries.results }
@@ -210,30 +207,23 @@ the STIG compliance audit:
         subject { audit_log_user_entries.results }
         it { should_not be_empty }
       end
-    end
+      
+      if !audit_log_filter_entries.results.empty? or !audit_log_user_entries.results.empty?
 
-    describe "Manually validate `audit_log` plugin is active:\n #{audit_log_plugin_status.output}" do
-      skip "Manually validate `audit_log` plugin is active:\n #{audit_log_plugin_status.output}" 
-    end
-    describe "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}" do
-      skip "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}"
-    end
-    describe "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}" do
-      skip "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}" 
-    end
-    
-  else
-    
-    describe 'Audit Log Plugin status' do
-      subject { audit_log_plugin_status.results.column('plugin_status') }
-      it { should cmp 'ACTIVE' }
-    end
+        describe "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}" do
+          skip "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}"
+        end
+        describe "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}" do
+          skip "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}" 
+        end
+      end
 
-    describe 'Community Server server_audit_events settings' do
-      subject { Set[server_audit_events_setting.results.column('value')[0].split(',')] }
-      it { should cmp Set['CONNECT,QUERY'.split(',')] }
+    else
+
+      describe 'Community Server server_audit_events settings' do
+        subject { Set[server_audit_events_setting.results.column('value')[0].split(',')] }
+        it { should cmp Set['CONNECT,QUERY'.split(',')] }
+      end
     end
-    
-  end
-    
+  end 
 end

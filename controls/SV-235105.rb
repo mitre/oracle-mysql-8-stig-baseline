@@ -167,7 +167,7 @@ records when audit when privileges/permissions are retrieved.
     if !input('aws_rds')
 
       # Following code design will allow for adaptive tests in this partially automatable control
-      # If ANY of the automatable tests FAIL, the control will report automated statues
+      # If ANY of the automatable tests FAIL, the control will report automated statuses
       # If ALL automatable tests PASS, MANUAL review statuses are reported to ensure full compliance
 
       describe 'List of entries in Table: audit_log_filter' do
