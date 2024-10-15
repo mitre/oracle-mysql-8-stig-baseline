@@ -106,10 +106,6 @@ records when audit when privileges/permissions are retrieved.
   tag cci: ['CCI-000172']
   tag nist: ['AU-12 c']
 
-  # Following code design will allow for adaptive tests in this partially automatable control
-  # If ANY of the automatable tests FAIL, the control will report automated statues
-  # If ALL automatable tests PASS, MANUAL review statuses are reported to ensure full compliance
-
   sql_session = mysql_session(input('user'), input('password'), input('host'), input('port'))
 
   if !input('aws_rds')
@@ -167,7 +163,12 @@ records when audit when privileges/permissions are retrieved.
   end
 
   if audit_log_plugin_status.results.column('plugin_status').join.eql?('ACTIVE')
+
     if !input('aws_rds')
+
+      # Following code design will allow for adaptive tests in this partially automatable control
+      # If ANY of the automatable tests FAIL, the control will report automated statues
+      # If ALL automatable tests PASS, MANUAL review statuses are reported to ensure full compliance
 
       describe 'List of entries in Table: audit_log_filter' do
         subject { audit_log_filter_entries.results }
@@ -178,17 +179,20 @@ records when audit when privileges/permissions are retrieved.
         subject { audit_log_user_entries.results }
         it { should_not be_empty }
       end
+    
+      if !audit_log_filter_entries.results.empty? or !audit_log_user_entries.results.empty?
 
-      describe "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}" do
-        skip "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}"
+        describe "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}" do
+          skip "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}"
+        end
+        describe "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}" do
+          skip "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}"
+        end
+        describe "Manually validate that required audit logs are generated when the following query is executed:\nselect * from mysql.proxies_priv;" do
+          skip "Manually validate that required audit logs are generated when the following query is executed:\nselect * from mysql.proxies_priv;"
+        end
       end
-      describe "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}" do
-        skip "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}"
-      end
-      describe "Manually validate that required audit logs are generated when the following query is executed:\nselect * from mysql.proxies_priv;" do
-        skip "Manually validate that required audit logs are generated when the following query is executed:\nselect * from mysql.proxies_priv;"
-      end
-      
+
     else
       
       describe 'Community Server server_audit_events settings' do
