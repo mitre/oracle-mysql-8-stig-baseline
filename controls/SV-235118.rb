@@ -281,14 +281,15 @@ level sec data',
       
       if !audit_log_filter_entries.results.empty? or !audit_log_user_entries.results.empty?
 
-      describe "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}" do
-        skip "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}"
-      end
-      describe "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}" do
-        skip "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}"
-      end
-      describe 'Manually validate that required audit logs are generated when the specified query is executed.' do
-        skip 'Manually validate that required audit logs are generated when the specified query is executed.'
+        describe "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}" do
+          skip "Manually review table `audit_log_filter` contains required entries:\n #{audit_log_filter_entries.output}"
+        end
+        describe "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}" do
+          skip "Manually review table `audit_log_user` contains required entries:\n #{audit_log_user_entries.output}"
+        end
+        describe 'Manually validate that required audit logs are generated when the specified query is executed.' do
+          skip 'Manually validate that required audit logs are generated when the specified query is executed.'
+        end
       end
       
     else
