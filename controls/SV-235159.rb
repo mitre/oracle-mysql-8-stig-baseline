@@ -166,11 +166,11 @@ If no audits are returned, this is a finding.
       it { should cmp 'ACTIVE' }
     end
 
-    describe 'Community Server server_audit_events settings' do
-      subject { Set[server_audit_events_setting.results.column('value')[0].split(',')] }
-      it { should cmp Set['CONNECT,QUERY'.split(',')] }
+    if audit_log_plugin_status.results.column('plugin_status').join.eql?('ACTIVE')
+      describe 'Community Server server_audit_events settings' do
+        subject { Set[server_audit_events_setting.results.column('value')[0].split(',')] }
+        it { should cmp Set['CONNECT,QUERY'.split(',')] }
+      end
     end
-    
   end
-    
 end
