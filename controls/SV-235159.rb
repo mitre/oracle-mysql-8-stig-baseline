@@ -136,32 +136,37 @@ If no audits are returned, this is a finding.
 
   server_audit_events_setting = sql_session.query(query_server_audit_events)
 
-  describe 'Audit Log Plugin status' do
-    subject { audit_log_plugin_status.results.column('plugin_status') }
-    it { should cmp 'ACTIVE' }
-  end
 
-  if audit_log_plugin_status.results.column('plugin_status').join.eql?('ACTIVE')
+  if !input('aws_rds')
+
+    describe ini(mycnf) do
+      its ('mysqld.plugin-load-add') { should cmp 'audit_log.so' }
+      its ('mysqld.audit-log') { should cmp 'FORCE_PLUS_PERMANENT' }
+    end
+
+    describe 'Audit Log Plugin status' do
+      subject { audit_log_plugin_status.results.column('plugin_status').join }
+      it { should cmp 'ACTIVE' }
+    end
+
+    describe 'List of entries in Table: audit_log_filter' do
+      subject { audit_log_filter_entries.results }
+      it { should_not be_empty }
+    end
+
+    describe 'List of entries in Table: audit_log_user' do
+      subject { audit_log_user_entries.results }
+      it { should_not be_empty }
+    end
     
-    if !input('aws_rds')
+  else
+    
+    describe 'Audit Log Plugin status' do
+      subject { audit_log_plugin_status.results.column('plugin_status') }
+      it { should cmp 'ACTIVE' }
+    end
 
-      describe ini(mycnf) do
-        its ('mysqld.plugin-load-add') { should cmp 'audit_log.so' }
-        its ('mysqld.audit-log') { should cmp 'FORCE_PLUS_PERMANENT' }
-      end
-
-      describe 'List of entries in Table: audit_log_filter' do
-        subject { audit_log_filter_entries.results }
-        it { should_not be_empty }
-      end
-
-      describe 'List of entries in Table: audit_log_user' do
-        subject { audit_log_user_entries.results }
-        it { should_not be_empty }
-      end
-      
-    else
-
+    if audit_log_plugin_status.results.column('plugin_status').join.eql?('ACTIVE')
       describe 'Community Server server_audit_events settings' do
         subject { Set[server_audit_events_setting.results.column('value')[0].split(',')] }
         it { should cmp Set['CONNECT,QUERY'.split(',')] }
