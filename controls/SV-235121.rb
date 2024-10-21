@@ -150,7 +150,7 @@ deleted.
   if !input('aws_rds')
   
     # Following code design will allow for adaptive tests in this partially automatable control
-    # If ANY of the automatable tests FAIL, the control will report automated statues
+    # If ANY of the automatable tests FAIL, the control will report automated statuses
     # If ALL automatable tests PASS, MANUAL review statuses are reported to ensure full compliance
 
     if !audit_log_plugin_status.results.column('plugin_status').join.eql?('ACTIVE') or
@@ -193,11 +193,11 @@ deleted.
       it { should cmp 'ACTIVE' }
     end
 
-    describe 'Community Server server_audit_events settings' do
-      subject { Set[server_audit_events_setting.results.column('value')[0].split(',')] }
-      it { should cmp Set['CONNECT,QUERY'.split(',')] }
+    if audit_log_plugin_status.results.column('plugin_status').join.eql?('ACTIVE')
+      describe 'Community Server server_audit_events settings' do
+        subject { Set[server_audit_events_setting.results.column('value')[0].split(',')] }
+        it { should cmp Set['CONNECT,QUERY'.split(',')] }
+      end
     end
-    
   end
-    
 end
